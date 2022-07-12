@@ -671,7 +671,6 @@ $(document).ready(function () {
         const formData = new FormData(this),
             url = $(this).data('submit');
 
-        if (confirm('Are you sure?')) {
             $.ajax({
                 url,
                 type: 'POST',
@@ -692,7 +691,6 @@ $(document).ready(function () {
                     cardWaitMe(offCanvas, true);
                 }
             })
-        }
     })
 
     $('body').on('click', '.change-mail-message-language li', function () {

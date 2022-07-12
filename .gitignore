@@ -27,4 +27,5 @@ public/uploads/avatars/
 
 .idea/deployment.xml
 
+.idea
 config/broadcasting.php
