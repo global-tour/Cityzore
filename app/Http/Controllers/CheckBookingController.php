@@ -301,15 +301,15 @@ class CheckBookingController extends Controller
     public function sendConfirmationCode(Request $request)
     {
         try {
+            $apiRelated = new ApiRelated();
             $bookingRefCode = $request->bookingRefCode;
 
             $booking = Booking::where('bookingRefCode', $bookingRefCode)->orWhere('gygBookingReference', $bookingRefCode)->first(); // check if bokun or gyg
             if (is_null($booking)) {
                 $bookings = Booking::where('bookingRefCode', 'like', '%' . $bookingRefCode . '%')->get();
                 foreach ($bookings as $book) {
-                    $bknRefCode = explode("-", $book->bookingRefCode);
-                    $bknRefCode = $bknRefCode[count($bknRefCode) - 1];
-                    if ($bknRefCode == $bookingRefCode) {
+                    $bknRefCode = $apiRelated->explodeBookingRefCode($book->bookingRefCode);
+                    if ($bknRefCode['bkn'] == $bookingRefCode) {
                         $booking = $book;
                         break;
                     }
