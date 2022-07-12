@@ -37,8 +37,8 @@ if (strpos($requestURL, 'admin') !== false || strpos($requestURL, 'supplier') !=
                                     class="text-secondary">{{__('example')}}: BKN12345</span></label>
                         </div>
                         <div class="col-md-6">
-                            <input style="height: 25px" id="bookingRefCode" type="text" class="form-control name="
-                                   bookingRefCode" required autocomplete="name" autofocus>
+                            <input style="height: 25px" id="bookingRefCode" type="text" class="form-control"
+                                   name="bookingRefCode" required autocomplete="name" autofocus>
                         </div>
                     </div>
                     <div id="conCodeBlock" style="display: none;">
@@ -49,8 +49,8 @@ if (strpos($requestURL, 'admin') !== false || strpos($requestURL, 'supplier') !=
                             <label for="bookingRefCode"
                                    class="col-md-4 col-form-label text-md-right">{{__('confirmationCode')}}</label>
                             <div class="col-md-6">
-                                <input style="height: 25px" id="confirmationCode" type="text" class="form-control name="
-                                       confirmationCode" required autocomplete="name" autofocus>
+                                <input style="height: 25px" id="confirmationCode" type="text" class="form-control"
+                                       name="confirmationCode" required autocomplete="name" autofocus>
                             </div>
                         </div>
                     </div>

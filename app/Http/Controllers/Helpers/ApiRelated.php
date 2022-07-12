@@ -985,7 +985,7 @@ class ApiRelated
 
     public function explodeBookingRefCode($bknRefCode)
     {
-        $bknRefCode = explode('-', $bknRefCode);
+        $bknRefCode = array_filter(explode('-', $bknRefCode));
         $ref = [];
 
         foreach ($bknRefCode as $item){
