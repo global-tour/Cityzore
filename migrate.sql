@@ -1,0 +1,19 @@
+CreateUsersTable: create table `users` (`id` bigint unsigned not null auto_increment primary key, `name` varchar(255) not null, `surname` varchar(255) not null, `email` varchar(255) not null, `email_verified_at` timestamp null, `password` varchar(255) not null, `countryCode` varchar(255) not null, `phoneNumber` varchar(255) not null, `address` varchar(255) not null, `remember_token` varchar(100) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreateUsersTable: alter table `users` add unique `users_email_unique`(`email`)
+CreatePasswordResetsTable: create table `password_resets` (`email` varchar(255) not null, `token` varchar(255) not null, `created_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreatePasswordResetsTable: alter table `password_resets` add index `password_resets_email_index`(`email`)
+CreateCheckBoxesTable: create table `check_boxes` (`id` bigint unsigned not null auto_increment primary key, `checkbox` varchar(255) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreatePermissionTables: create table `permissions` (`id` int unsigned not null auto_increment primary key, `name` varchar(255) not null, `guard_name` varchar(255) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreatePermissionTables: create table `roles` (`id` int unsigned not null auto_increment primary key, `name` varchar(255) not null, `guard_name` varchar(255) not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreatePermissionTables: create table `model_has_permissions` (`permission_id` int unsigned not null, `model_type` varchar(255) not null, `model_id` bigint unsigned not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreatePermissionTables: alter table `model_has_permissions` add index `model_has_permissions_model_id_model_type_index`(`model_id`, `model_type`)
+CreatePermissionTables: alter table `model_has_permissions` add constraint `model_has_permissions_permission_id_foreign` foreign key (`permission_id`) references `permissions` (`id`) on delete cascade
+CreatePermissionTables: alter table `model_has_permissions` add primary key `model_has_permissions_permission_model_type_primary`(`permission_id`, `model_id`, `model_type`)
+CreatePermissionTables: create table `model_has_roles` (`role_id` int unsigned not null, `model_type` varchar(255) not null, `model_id` bigint unsigned not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreatePermissionTables: alter table `model_has_roles` add index `model_has_roles_model_id_model_type_index`(`model_id`, `model_type`)
+CreatePermissionTables: alter table `model_has_roles` add constraint `model_has_roles_role_id_foreign` foreign key (`role_id`) references `roles` (`id`) on delete cascade
+CreatePermissionTables: alter table `model_has_roles` add primary key `model_has_roles_role_model_type_primary`(`role_id`, `model_id`, `model_type`)
+CreatePermissionTables: create table `role_has_permissions` (`permission_id` int unsigned not null, `role_id` int unsigned not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'
+CreatePermissionTables: alter table `role_has_permissions` add constraint `role_has_permissions_permission_id_foreign` foreign key (`permission_id`) references `permissions` (`id`) on delete cascade
+CreatePermissionTables: alter table `role_has_permissions` add constraint `role_has_permissions_role_id_foreign` foreign key (`role_id`) references `roles` (`id`) on delete cascade
+CreatePermissionTables: alter table `role_has_permissions` add primary key `role_has_permissions_permission_id_role_id_primary`(`permission_id`, `role_id`)

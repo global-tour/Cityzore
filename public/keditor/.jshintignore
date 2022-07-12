@@ -1,0 +1,7 @@
+node_modules
+dist
+build
+document
+test
+karma.conf.js
+webpack.*.js

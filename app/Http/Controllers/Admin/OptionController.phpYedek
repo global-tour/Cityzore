@@ -1,0 +1,682 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Av;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helpers\ComissionCalculateHelper;
+use App\Http\Controllers\Helpers\CommonFunctions;
+use App\Http\Controllers\Helpers\RefCodeGenerator;
+use App\Option;
+use App\Pricing;
+use App\Product;
+use App\Adminlog;
+use App\Supplier;
+use App\TicketType;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class OptionController extends Controller
+{
+
+    public $commonFunctions;
+
+    public function __construct()
+    {
+        $this->commonFunctions = new CommonFunctions();
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index(Request $request)
+    {
+        return view('panel.options.index');
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $pricings = Pricing::where('supplierID', -1)->get();
+        $availabilities = Av::where('supplierID', -1)->get();
+        if (auth()->guard('supplier')->check()) {
+            $supplierId = auth()->user()->id;
+            $pricings = Pricing::where('supplierID', $supplierId)->get();
+            $availabilities = Av::where('supplierID', $supplierId)->get();
+        }
+
+        return view('panel.options.create',
+            [
+                'pricings' => $pricings,
+                'availabilities' => $availabilities
+            ]
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        $adminLog = new Adminlog();
+        $adminLog->userID = auth()->user()->id;
+        $adminLog->page = 'Option';
+        $adminLog->url = $request->url();
+        $adminLog->action = 'Saved Option';
+
+        $sameName = Option::where('title', $request->title)->get();
+        if (count($sameName) > 0) {
+            return response()->json(['errors' => 'There is an option using this name. Please change name of option', 'option' => []]);
+        }
+        $comission = 0;
+        //Auth Supplier ID Check
+        if (Auth::guard('supplier')->check()) {
+            $supplier = Auth::guard('supplier')->user();
+            $supplier_id = $supplier->id;
+            $comission = $supplier->comission;
+        }
+
+        //If Admin => -1
+        if (Auth::guard('admin')->check()) {
+            $supplier_id = -1;
+        }
+
+        $meetingComment = $request->meetingComment;
+
+        $refCodeGenerator = new RefCodeGenerator();
+        $referenceCode = $refCodeGenerator->refCodeGeneratorForOption();
+
+        if ($request->ajax()) {
+            $opt = new Option();
+            $opt->referenceCode = $referenceCode;
+            $opt->minPerson = $request->minPerson;
+            $opt->maxPerson = is_null($request->maxPerson) ? '' : $request->maxPerson;
+            $title = str_replace("  "," ", $request->title);
+            $opt->title = $title;
+            $opt->description = $request->description;
+            $opt->meetingComment = $meetingComment;
+            $opt->meetingPoint = $request->meetingPoint;
+            $opt->meetingPointLat = $request->meetingPointLat;
+            $opt->meetingPointLong = $request->meetingPointLong;
+            $opt->meetingPointDesc = $request->meetingPointDesc;
+            $opt->cutOfTime = $request->cutOfTime;
+            $opt->cutOfTimeDate = $request->cutOfTimeDate;
+            $opt->tourDuration = $request->tourDuration;
+            $opt->tourDurationDate = $request->tourDurationDate;
+            $opt->pricings = $request->pricings;
+            $opt->comission = $comission;
+            $opt->supplierID = $supplier_id;
+            $opt->isMixed = $request->isMixed;
+            $opt->isPublished = 1;
+            if (!is_null($request->contactInformationFieldsArray)) {
+                $contactInformationFieldsFinal = $this->createContactInformationFields($request->contactInformationFieldsArray);
+                $opt->contactInformationFields = json_encode($contactInformationFieldsFinal);
+            }
+            $opt->contactForAllTravelers = (int)$request->contactForAllTravelers;
+            if ($opt->save()) {
+                $adminLog->details = auth()->user()->name . ' clicked to Save Option Button and created a new option with id ' . $opt->id;
+                $adminLog->optionRefCode = $referenceCode;
+                $adminLog->tableName = 'options';
+                $adminLog->result = 'successful';
+            } else {
+                $adminLog->result = 'failed';
+            }
+            $adminLog->save();
+
+
+            $opt->pricings()->attach($request->pricings);
+            $opt->avs()->attach($request->availabilities);
+
+            if (Auth::guard('supplier')->check()) {
+                $opt->supplier()->attach($supplier_id);
+            }
+            return response()->json($opt, 200);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function optionDetach(Request $request, $id)
+    {
+        $product = Product::findOrFail($request->productId);
+        $product->options()->detach($request->optId);
+        $productOpts = json_decode($product->options, true);
+        if (!is_null($productOpts)) {
+            $key = array_search($request->optId, $productOpts);
+            if ($key != false) {
+                unset($productOpts[$key]);
+            }
+        }
+
+        if (count($product->options()->get()) <= 0) {
+            $product->isDraft = 1;
+            $product->isPublished = 0;
+        }
+
+        $product->options = json_encode($productOpts);
+        $product->save();
+        return response()->json(['success' => 'Option is removed successfully']);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function optionStore(Request $request)
+    {
+        $adminLog = new Adminlog();
+        $adminLog->userID = auth()->user()->id;
+        $adminLog->page = 'Option';
+        $adminLog->url = $request->url();
+        $adminLog->action = 'Saved Option';
+
+        $sameName = Option::where('title', $request->title)->get();
+        if (count($sameName) > 0) {
+            return response()->json(['errors' => 'There is an option using this name. Please change name of option', 'option' => []]);
+        }
+        $comission = 0;
+        //Auth Supplier ID Check
+        if (Auth::guard('supplier')->check()) {
+            $supplier = Auth::guard('supplier')->user();
+            $supplier_id = $supplier->id;
+            $comission = $supplier->comission;
+        }
+
+        //If Admin => -1
+        if (Auth::guard('admin')->check()) {
+            $supplier_id = -1;
+        }
+
+        $refCodeGenerator = new RefCodeGenerator();
+        $referenceCode = $refCodeGenerator->refCodeGeneratorForOption();
+
+        $contactInformationFieldsFinal = $this->createContactInformationFields($request->contactInformationFieldsArray);
+
+        if ($request->ajax()) {
+            $option = new Option();
+            $option->referenceCode = $referenceCode;
+            $title = str_replace("  "," ", $request->title);
+            $option->title = $title;
+            $option->description = $request->description;
+            $option->minPerson = $request->minPerson;
+            $option->maxPerson = is_null($request->maxPerson) ? '' : $request->maxPerson;
+            $option->meetingPoint = $request->meetingPoint;
+            $option->meetingComment = $request->meetingComment;
+            $option->meetingPointLat = $request->meetingPointLat;
+            $option->meetingPointLong = $request->meetingPointLong;
+            $option->meetingPointDesc = $request->meetingPointDesc;
+            $option->cutOfTime = $request->cutOfTime;
+            $option->cutOfTimeDate = $request->cutOfTimeDate;
+            $option->tourDuration = $request->tourDuration;
+            $option->tourDurationDate = $request->tourDurationDate;
+            $option->pricings = $request->pricings;
+            $option->comission = $comission;
+            $option->supplierID = $supplier_id;
+            $option->isMixed = $request->isMixed;
+            if (!is_null($request->contactInformationFieldsArray)) {
+                $contactInformationFieldsFinal = $this->createContactInformationFields($request->contactInformationFieldsArray);
+                $option->contactInformationFields = json_encode($contactInformationFieldsFinal);
+            }
+            $option->contactForAllTravelers = $request->contactForAllTravelers;
+            if ($option->save()) {
+                $option->pricings()->attach($request->pricings);
+                $option->avs()->attach($request->availabilities);
+                $adminLog->details = auth()->user()->name . ' clicked to Save Option Button and created a new option with id ' . $option->id;
+                $adminLog->optionRefCode = $referenceCode;
+                $adminLog->tableName = 'options';
+                $adminLog->result = 'successful';
+            } else {
+                $adminLog->result = 'failed';
+            }
+            $adminLog->save();
+
+            if (Auth::guard('supplier')->check()) {
+                $option->supplier()->attach($supplier_id);
+            }
+            return response()->json($option, 200);
+        }
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $option = Option::findOrFail($id);
+
+        if (auth()->guard('supplier')->check()) {
+            $supplier = Supplier::where('id', auth()->guard('supplier')->user()->id)->first();
+            $pricings = $supplier->pricing;
+            $availabilities = $supplier->av;
+        }
+
+        if (auth()->guard('admin')->check()) {
+            $supplierID = $option->supplierID;
+            $pricings = Pricing::where('supplierID', $supplierID)->get();
+            $availabilities = Av::where('supplierID', $supplierID)->get();
+        }
+        $option_availabilities = $option->avs()->get();
+        if (is_null($option)) {
+            abort(404);
+        }
+
+        return view('panel.options.edit',
+            [
+                'option' => $option,
+                'pricings' => $pricings,
+                'availabilities' => $availabilities,
+                'option_availabilities' => $option_availabilities
+            ]
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function optionUpdate(Request $request)
+    {
+        $adminLog = new Adminlog();
+        $adminLog->userID = auth()->user()->id;
+        $adminLog->page = 'Option';
+        $adminLog->url = $request->url();
+        $adminLog->action = 'Updated Option';
+
+
+        $comission = 0;
+        //Auth Supplier ID Check
+        if (Auth::guard('supplier')->check()) {
+            $supplier = Auth::guard('supplier')->user();
+            $supplier_id = $supplier->id;
+            $comission = $supplier->comission;
+        }
+
+        //If Admin => -1
+        if (Auth::guard('admin')->check()) {
+            $supplier_id = -1;
+        }
+
+        if ($request->ajax()) {
+            $option = Option::findOrFail($request->optionId);
+            $sameName = Option::where('title', $request->title)->get();
+            if (count($sameName) > 0 && count($sameName) != 1) {
+                return response()->json(['errors' => 'There is an option using this name. Please change name of option', 'option' => []]);
+            } else if (count($sameName) == 1) {
+                $firstHasSameName = $sameName->first();
+                if ($firstHasSameName->id != $option->id) {
+                    return response()->json(['errors' => 'There is an option using this name. Please change name of option', 'option' => []]);
+                }
+            }
+
+            if (!is_null($request->contactInformationFieldsArray)) {
+                $contactInformationFieldsFinal = $this->createContactInformationFields($request->contactInformationFieldsArray);
+                $option->contactInformationFields = json_encode($contactInformationFieldsFinal);
+            }
+
+            $title = str_replace("  "," ", $request->title);
+            $option->title = $title;
+            $option->description = $request->description;
+            $option->minPerson = $request->minPerson;
+            $option->maxPerson = is_null($request->maxPerson) ? '' : $request->maxPerson;
+            $option->meetingPoint = $request->meetingPoint;
+            $option->meetingComment = $request->meetingComment;
+            $option->meetingPointLat = $request->meetingPointLat;
+            $option->meetingPointLong = $request->meetingPointLong;
+            $option->meetingPointDesc = $request->meetingPointDesc;
+            $option->cutOfTime = $request->cutOfTime;
+            $option->cutOfTimeDate = $request->cutOfTimeDate;
+            $option->tourDuration = $request->tourDuration;
+            $option->tourDurationDate = $request->tourDurationDate;
+            $option->comission = $comission;
+            $option->supplierID = $supplier_id;
+            $option->isMixed = $request->isMixed;
+            $option->contactForAllTravelers = (int)$request->contactForAllTravelers;
+            if ($option->pricings != $request->pricings) {
+                $option->pricings()->detach($option->pricings);
+                $option->pricings()->attach($request->pricings);
+            }
+            $option->avs()->detach();
+            $option->avs()->attach($request->availabilities);
+            $option->pricings = $request->pricings;
+            if ($option->save()) {
+                $adminLog->details = auth()->user()->name . ' clicked to Update Button and updated option with id ' . $option->id;
+                $adminLog->optionRefCode = $option->referenceCode;
+                $adminLog->tableName = 'options';
+                $adminLog->result = 'successful';
+            } else {
+                $adminLog->result = 'failed';
+            }
+            $adminLog->save();
+
+            if (count($option->avs()->get()) > 0 && count($option->pricings()->get()) > 0) {
+                $option->isPublished = 1;
+                $option->save();
+            } else {
+                $option->isPublished = 0;
+                $option->save();
+            }
+
+            if (Auth::guard('supplier')->check()) {
+                $option->supplier()->detach();
+                $option->supplier()->attach($supplier_id);
+            }
+            return response()->json($option, 200);
+        }
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $adminLog = new Adminlog();
+        $adminLog->userID = auth()->user()->id;
+        $adminLog->page = 'Option';
+        $adminLog->url = env('APP_ADMIN', 'https://admin.cityzore.com'). '/option/'.$id.'/delete';
+        $adminLog->action = 'Deleted Option';
+        $adminLog->details = auth()->user()->name . ' clicked to Delete Icon Button and deleted option with id ' . $id;
+        $adminLog->tableName = 'options';
+        $option = Option::findOrFail($id);
+        $products = $option->products()->get();
+        if ($option->delete()) {
+            $option->avs()->detach();
+            $option->products()->detach();
+            $option->pricings()->detach();
+
+            $adminLog->result = 'successful';
+            $adminLog->save();
+            foreach ($products as $p) {
+                if (count($p->options()->get()) <= 0) {
+                    $p->isPublished = 0;
+                    $p->isDraft = 1;
+                    $p->supplierPublished = 0;
+                    $p->save();
+                }
+            }
+        }
+
+        return redirect('/option');
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function preview(Request $request)
+    {
+        $previewOption = Option::findOrFail($request->optionId);
+        $previewAvailabilities = $previewOption->avs()->get();
+        $availabilitiesExtras = [];
+        foreach ($previewAvailabilities as $pAv) {
+            $avdate_min = $pAv->avdates()->min('valid_from');
+            $avdate_max = $pAv->avdates()->max('valid_to');
+            $isLimitless = $pAv->isLimitless == 1;
+            array_push($availabilitiesExtras, ['id' => $pAv->id, 'min' => $avdate_min, 'max' => $avdate_max, 'isLimitless' => $isLimitless]);
+        }
+        $previewPricing = $previewOption->pricings()->first(); // Option has only one pricing
+        return response()->json(
+            [
+                'success' => true,
+                'previewOption' => $previewOption,
+                'previewAvailabilities' => $previewAvailabilities,
+                'previewPricing' => $previewPricing,
+                'availabilitiesExtras' => $availabilitiesExtras
+            ]
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function saveOptionCommission(Request $request)
+    {
+        $option = Option::findOrFail($request->optionId);
+        $commission = $request->commission;
+        $option->comission = $commission;
+        $option->save();
+
+        return ['optionId' => $option->id, 'comFromRequest' => $commission, 'comFromDB' => $option->comission];
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function changeOptionPublishedStatus(Request $request)
+    {
+        $adminLog = new Adminlog();
+        $adminLog->userID = auth()->user()->id;
+        $adminLog->page = 'Option';
+        $adminLog->url = env('APP_ADMIN', 'https://admin.cityzore.com'). '/option/changeOptionPublishedStatus';
+        $adminLog->tableName = 'options';
+
+        $option = Option::findOrFail($request->id);
+        if ($request->isPublished == 1) {
+            $adminLog->action = 'Published Option';
+            $adminLog->details = auth()->user()->name . ' clicked to Published/Not Published Toggle and Published Option with id ' . $request->id;
+            $adminLog->optionRefCode = $option->referenceCode;
+        } else {
+            $adminLog->action = 'Not Published Option';
+            $adminLog->details = auth()->user()->name . ' clicked to Published/Not Published Toggle and Not Published Option with id ' . $request->id;
+            $adminLog->optionRefCode = $option->referenceCode;
+        }
+        $option->isPublished = $request->isPublished;
+        if ($option->save()) {
+            $adminLog->result = 'successful';
+        } else {
+            $adminLog->result = 'failed';
+        }
+        $adminLog->save();
+        $product = $option->products()->get();
+        $optionIsPublished = [];
+        foreach ($product as $p) {
+            foreach ($p->options()->get() as $o) {
+                array_push($optionIsPublished, $o->isPublished);
+            }
+            if (!in_array(1, $optionIsPublished)) {
+                $p->isDraft = 1;
+                $p->isPublished  = 0;
+                $p->save();
+            }
+        }
+
+        return response()->json(['success'=>'Status change successfully.']);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setApiConnection(Request $request)
+    {
+        $option = Option::findOrFail($request->optionID);
+        $oldValue = $option->connectedToApi;
+        $option->connectedToApi = $oldValue == 0 ? 1 : 0;
+        if ($option->save()) {
+            $str = $option->connectedToApi == 0 ? 'disconnected' : 'connected';
+            return response()->json(['success' => 'Option is marked as '. $str .' successfully!', 'value' => $option->connectedToApi]);
+        }
+        return response()->json(['error' => 'A problem is occured!']);
+    }
+
+    /**
+     * Handles an ajax request for getting option part
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getOptionPart(Request $request)
+    {
+        $part = $request->part;
+
+        if (in_array($part, [1, 2, 3, 6])) {
+            if ($part == 1) {
+                $option = Option::select('title', 'description');
+            }
+
+            if ($part == 2) {
+                $option = Option::select('minPerson', 'maxPerson');
+            }
+
+            if ($part == 3) {
+                $option = Option::select('cutOfTime', 'cutOfTimeDate', 'tourDuration', 'tourDurationDate');
+            }
+
+            if ($part == 6) {
+                $option = Option::select('meetingPoint', 'meetingPointLat', 'meetingPointLong', 'meetingPointDesc', 'meetingComment');
+            }
+
+            $option = $option->where('id', $request->optionID)->first();
+            return response()->json(['success' => 'Successful', 'option' => $option]);
+        }
+
+        if ($part == 4) {
+            $option = Option::findOrFail($request->optionID);
+            $pricing = $option->pricings()->first();
+            $commission = 0;
+            $userType = 'admin';
+            if (auth()->guard('supplier')->check()) {
+                $supplier = Supplier::where('id', Auth::guard('supplier')->user()->id)->first();
+                $commission = $supplier->comission;
+                $userType = 'supplier';
+            }
+
+            return response()->json(['success' => 'Successful', 'pricing' => $pricing, 'commission' => $commission, 'userType' => $userType]);
+        }
+
+        if ($part == 5) {
+            $option = Option::findOrFail($request->optionID);
+            $availability = $option->avs()->first();
+            $ticketTypes = TicketType::all();
+            $isLimitless = $availability->isLimitless;
+            $avdates = $availability->avdates();
+            $minDate = $avdates->min('valid_from');
+            $maxDate = $avdates->max('valid_to');
+            $availabilityTicketType = $availability->ticketType()->first();
+
+            return response()->json(
+                [
+                    'success' => 'Successful',
+                    'availability' => $availability,
+                    'ticketTypes' => $ticketTypes,
+                    'isLimitless' => $isLimitless,
+                    'minDate' => $minDate,
+                    'maxDate' => $maxDate,
+                    'availabilityTicketType' => $availabilityTicketType
+                ]
+            );
+        }
+        if ($part == 7) {
+            $option = Option::findOrFail($request->optionID);
+
+            return response()->json([
+                'option' => $option,
+            ]);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function saveOptionPart(Request $request)
+    {
+        $values = $request->values;
+        $optionID = $request->optionID;
+        $optionStep = $request->optionStep;
+        $option = Option::findOrFail($optionID);
+        if ($optionStep == 1) {
+            $title = str_replace("  "," ", $values['title']);
+            $option->title = $title;
+            $option->description = $values['description'];
+            $option->save();
+        }
+        if ($optionStep == 2) {
+            $option->minPerson = $values['minPerson'];
+            $option->maxPerson = $values['maxPerson'];
+            $option->save();
+        }
+        if ($optionStep == 3) {
+            $option->cutOfTime = $values['cutOfTime'];
+            $option->cutOfTimeDate = $values['cutOfTimeDate'];
+            $option->tourDuration = $values['tourDuration'];
+            $option->tourDurationDate = $values['tourDurationDate'];
+            $option->save();
+        }
+        if ($optionStep == 6) {
+            if (array_key_exists('meetingPoint', $values)) {
+                $option->meetingPoint = $values['meetingPoint'];
+                $option->meetingPointLat = $values['meetingPointLat'];
+                $option->meetingPointLong = $values['meetingPointLong'];
+                if ($values['meetingComment'] != '') {
+                    $option->meetingComment = $values['meetingComment'];
+                }
+                $option->meetingPointDesc = null;
+            } else {
+                $option->meetingPoint = null;
+                $option->meetingPointLat = null;
+                $option->meetingPointLong = null;
+                $option->meetingComment = null;
+                $option->meetingPointDesc = $values['meetingPointDesc'];
+            }
+            $option->save();
+        }
+
+        if ($optionStep == 7) {
+            if (array_key_exists('contactInformationFieldsArray', $request->values)) {
+                $contactInformationFieldsFinal = $this->createContactInformationFields($request->values['contactInformationFieldsArray']);
+                $option->contactInformationFields = json_encode($contactInformationFieldsFinal);
+            } else {
+                $option->contactInformationFields = NULL;
+            }
+            $option->contactForAllTravelers = (int)$request->values['contactForAllTravelers'];
+            $option->save();
+        }
+        return $values;
+    }
+
+    /**
+     * @param $contactInformationFieldsArray
+     * @return array
+     */
+    public function createContactInformationFields($contactInformationFieldsArray)
+    {
+        $contactInformationFieldsFinal = [];
+        if ($contactInformationFieldsArray != null) {
+            for ($i=0;$i<count($contactInformationFieldsArray);$i++) {
+                $name = $contactInformationFieldsArray[$i]['title'];
+                $splitTitle = preg_split('\' +\'', $name);
+                if (count($splitTitle) == 1) {
+                    $nameFinal = $splitTitle[0];
+                } elseif (count($splitTitle) > 1) {
+                    for ($j = 1; $j < count($splitTitle); $j++) {
+                        $titleUcFirst = implode((array)ucfirst($splitTitle[$j - 1])) . implode(array(ucfirst($splitTitle[$j])));
+                        if (count($splitTitle) == 2) {
+                            $nameFinal = lcfirst($titleUcFirst);
+                        } elseif (count($splitTitle) > 2) {
+                            $nameFinal = lcfirst($splitTitle[0] . $titleUcFirst);
+                        }
+                    }
+                }
+                array_push($contactInformationFieldsFinal, [
+                    "title" => $contactInformationFieldsArray[$i]['title'],
+                    "name" => $nameFinal,
+                    "isRequired" => $contactInformationFieldsArray[$i]['isRequired'],
+                ]);
+            }
+        }
+
+        return $contactInformationFieldsFinal;
+    }
+
+}

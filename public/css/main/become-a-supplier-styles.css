@@ -1,0 +1,89 @@
+.spe-title p {
+    margin-bottom: 0px;
+    font-size: 15px;
+    font-weight: 400;
+    padding-top: 0px;
+    color: #888;
+    font-family: 'Quicksand', sans-serif;
+}
+
+input {
+    height: 2rem !important;
+    margin: 0 0 0px 0 !important;
+}
+
+.spe-title h2 {
+    font-size: 37px !important;
+}
+
+.pad-top-o{
+    padding-top: 0px !important;
+}
+
+.left-side img {
+    width: 250px;
+    height: 130px;
+    margin-top: 2%;
+    margin-bottom: 5%;
+    border-radius: 10px;
+}
+
+.left-side .row {
+    margin-top: 8%;
+}
+
+.spe-title {
+    margin-bottom: 20px;
+}
+
+.supplier-form {
+    box-shadow: 3px 3px 5px 6px #ccc;
+    background-color: #253d52;
+}
+
+.dot {
+    height: 35px;
+    width: 35px;
+    background-color: #ed3049;
+    border-radius: 50%;
+    display: inline-block;
+    color: white;
+    font-weight: bold;
+    padding-top: 2%;
+    float: left;
+}
+
+.dot2 {
+    height: 35px;
+    width: 35px;
+    background-color: #253d52;
+    border-radius: 50%;
+    display: inline-block;
+    color: white;
+    font-weight: bold;
+    padding-top: 2%;
+    float: left;
+}
+
+.right-side {
+    background-color: white;
+    border-top-right-radius: 35%;
+}
+
+.steps {
+    text-align: center;
+    background-color: white;
+    border-radius: 10px;
+    padding: 1%;
+    text-align:center;
+    margin: auto;
+    width: 90%;
+    padding: 10px;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}

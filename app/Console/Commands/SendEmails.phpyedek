@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Mails;
+use App\Http\Controllers\Helpers\MailOperations;
+
+
+class SendEmails extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'send:emails';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command for sending mails';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $mailOperations = new MailOperations();
+        $mails = Mails::where('status', 0)->get();
+        foreach ($mails as $mail) {
+            $data = json_decode($mail->data, true);
+            $data = $data[0];
+            $mailOperations->sendMail($data, $mail->blade, $mail->to);
+            $mail->status = 1;
+            $mail->save();
+        }
+    }
+}

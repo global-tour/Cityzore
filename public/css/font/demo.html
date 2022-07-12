@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+  <head><!--[if lt IE 9]><script language="javascript" type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <meta charset="UTF-8"><style>/*
+ * Bootstrap v2.2.1
+ *
+ * Copyright 2012 Twitter, Inc
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Designed and built with all the love in the world @twitter by @mdo and @fat.
+ */
+.clearfix {
+  *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.clearfix:after {
+  clear: both;
+}
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+a:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+a:hover,
+a:active {
+  outline: 0;
+}
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-size: 100%;
+  vertical-align: middle;
+}
+button,
+input {
+  *overflow: visible;
+  line-height: normal;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #333;
+  background-color: #fff;
+}
+a {
+  color: #08c;
+  text-decoration: none;
+}
+a:hover {
+  color: #005580;
+  text-decoration: underline;
+}
+.row {
+  margin-left: -20px;
+  *zoom: 1;
+}
+.row:before,
+.row:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.row:after {
+  clear: both;
+}
+[class*="span"] {
+  float: left;
+  min-height: 1px;
+  margin-left: 20px;
+}
+.container,
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+  width: 940px;
+}
+.span12 {
+  width: 940px;
+}
+.span11 {
+  width: 860px;
+}
+.span10 {
+  width: 780px;
+}
+.span9 {
+  width: 700px;
+}
+.span8 {
+  width: 620px;
+}
+.span7 {
+  width: 540px;
+}
+.span6 {
+  width: 460px;
+}
+.span5 {
+  width: 380px;
+}
+.span4 {
+  width: 300px;
+}
+.span3 {
+  width: 220px;
+}
+.span2 {
+  width: 140px;
+}
+.span1 {
+  width: 60px;
+}
+[class*="span"].pull-right,
+.row-fluid [class*="span"].pull-right {
+  float: right;
+}
+.container {
+  margin-right: auto;
+  margin-left: auto;
+  *zoom: 1;
+}
+.container:before,
+.container:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.container:after {
+  clear: both;
+}
+p {
+  margin: 0 0 10px;
+}
+.lead {
+  margin-bottom: 20px;
+  font-size: 21px;
+  font-weight: 200;
+  line-height: 30px;
+}
+small {
+  font-size: 85%;
+}
+h1 {
+  margin: 10px 0;
+  font-family: inherit;
+  font-weight: bold;
+  line-height: 20px;
+  color: inherit;
+  text-rendering: optimizelegibility;
+}
+h1 small {
+  font-weight: normal;
+  line-height: 1;
+  color: #999;
+}
+h1 {
+  line-height: 40px;
+}
+h1 {
+  font-size: 38.5px;
+}
+h1 small {
+  font-size: 24.5px;
+}
+body {
+  margin-top: 90px;
+}
+.header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  margin-left: -480px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  padding-top: 10px;
+  z-index: 10;
+}
+.footer {
+  color: #ddd;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 20px;
+}
+.footer a {
+  color: #ccc;
+  text-decoration: underline;
+}
+.the-icons {
+  font-size: 14px;
+  line-height: 24px;
+}
+.switch {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  color: #666;
+}
+.switch input {
+  margin-right: 0.3em;
+}
+.codesOn .i-name {
+  display: none;
+}
+.codesOn .i-code {
+  display: inline;
+}
+.i-code {
+  display: none;
+}
+@font-face {
+      font-family: 'cityzore';
+      src: url('./font/cityzore.eot?42643455');
+      src: url('./font/cityzore.eot?42643455#iefix') format('embedded-opentype'),
+           url('./font/cityzore.woff?42643455') format('woff'),
+           url('./font/cityzore.ttf?42643455') format('truetype'),
+           url('./font/cityzore.svg?42643455#cityzore') format('svg');
+      font-weight: normal;
+      font-style: normal;
+    }
+     
+     
+    .demo-icon
+    {
+      font-family: "cityzore";
+      font-style: normal;
+      font-weight: normal;
+      speak: never;
+     
+      display: inline-block;
+      text-decoration: inherit;
+      width: 1em;
+      margin-right: .2em;
+      text-align: center;
+      /* opacity: .8; */
+     
+      /* For safety - reset parent styles, that can break glyph codes*/
+      font-variant: normal;
+      text-transform: none;
+     
+      /* fix buttons height, for twitter bootstrap */
+      line-height: 1em;
+     
+      /* Animation center compensation - margins should be symmetric */
+      /* remove if not needed */
+      margin-left: .2em;
+     
+      /* You can be more comfortable with increased icons size */
+      /* font-size: 120%; */
+     
+      /* Font smoothing. That was taken from TWBS */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+     
+      /* Uncomment for 3D effect */
+      /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+    }
+     </style>
+    <link rel="stylesheet" href="css/animation.css"><!--[if IE 7]><link rel="stylesheet" href="css/" + font.fontname + "-ie7.css"><![endif]-->
+    <script>
+      function toggleCodes(on) {
+        var obj = document.getElementById('icons');
+      
+        if (on) {
+          obj.className += ' codesOn';
+        } else {
+          obj.className = obj.className.replace(' codesOn', '');
+        }
+      }
+      
+    </script>
+  </head>
+  <body>
+    <div class="container header">
+      <h1>cityzore <small>font demo</small></h1>
+      <label class="switch">
+        <input type="checkbox" onclick="toggleCodes(this.checked)">show codes
+      </label>
+    </div>
+    <div class="container" id="icons">
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe800"><i class="demo-icon icon-cz-availability">&#xe800;</i> <span class="i-name">icon-cz-availability</span><span class="i-code">0xe800</span></div>
+        <div class="the-icons span3" title="Code: 0xe801"><i class="demo-icon icon-cz-management">&#xe801;</i> <span class="i-name">icon-cz-management</span><span class="i-code">0xe801</span></div>
+        <div class="the-icons span3" title="Code: 0xe802"><i class="demo-icon icon-cz-product">&#xe802;</i> <span class="i-name">icon-cz-product</span><span class="i-code">0xe802</span></div>
+        <div class="the-icons span3" title="Code: 0xe803"><i class="demo-icon icon-cz-pricing">&#xe803;</i> <span class="i-name">icon-cz-pricing</span><span class="i-code">0xe803</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe804"><i class="demo-icon icon-cz-booking">&#xe804;</i> <span class="i-name">icon-cz-booking</span><span class="i-code">0xe804</span></div>
+        <div class="the-icons span3" title="Code: 0xe805"><i class="demo-icon icon-cz-logout">&#xe805;</i> <span class="i-name">icon-cz-logout</span><span class="i-code">0xe805</span></div>
+        <div class="the-icons span3" title="Code: 0xe806"><i class="demo-icon icon-cz-user">&#xe806;</i> <span class="i-name">icon-cz-user</span><span class="i-code">0xe806</span></div>
+        <div class="the-icons span3" title="Code: 0xe807"><i class="demo-icon icon-cz-blockout">&#xe807;</i> <span class="i-name">icon-cz-blockout</span><span class="i-code">0xe807</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe808"><i class="demo-icon icon-cz-edit">&#xe808;</i> <span class="i-name">icon-cz-edit</span><span class="i-code">0xe808</span></div>
+        <div class="the-icons span3" title="Code: 0xe809"><i class="demo-icon icon-cz-ticket">&#xe809;</i> <span class="i-name">icon-cz-ticket</span><span class="i-code">0xe809</span></div>
+        <div class="the-icons span3" title="Code: 0xe80a"><i class="demo-icon icon-cz-barcode">&#xe80a;</i> <span class="i-name">icon-cz-barcode</span><span class="i-code">0xe80a</span></div>
+        <div class="the-icons span3" title="Code: 0xe80b"><i class="demo-icon icon-cz-payment">&#xe80b;</i> <span class="i-name">icon-cz-payment</span><span class="i-code">0xe80b</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe80c"><i class="demo-icon icon-cz-location">&#xe80c;</i> <span class="i-name">icon-cz-location</span><span class="i-code">0xe80c</span></div>
+        <div class="the-icons span3" title="Code: 0xe80d"><i class="demo-icon icon-cz-cart">&#xe80d;</i> <span class="i-name">icon-cz-cart</span><span class="i-code">0xe80d</span></div>
+        <div class="the-icons span3" title="Code: 0xe80e"><i class="demo-icon icon-cz-dashboard">&#xe80e;</i> <span class="i-name">icon-cz-dashboard</span><span class="i-code">0xe80e</span></div>
+        <div class="the-icons span3" title="Code: 0xe80f"><i class="demo-icon icon-cz-trash">&#xe80f;</i> <span class="i-name">icon-cz-trash</span><span class="i-code">0xe80f</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe810"><i class="demo-icon icon-cz-home">&#xe810;</i> <span class="i-name">icon-cz-home</span><span class="i-code">0xe810</span></div>
+        <div class="the-icons span3" title="Code: 0xe811"><i class="demo-icon icon-cz-login">&#xe811;</i> <span class="i-name">icon-cz-login</span><span class="i-code">0xe811</span></div>
+        <div class="the-icons span3" title="Code: 0xe812"><i class="demo-icon icon-cz-plus">&#xe812;</i> <span class="i-name">icon-cz-plus</span><span class="i-code">0xe812</span></div>
+        <div class="the-icons span3" title="Code: 0xe813"><i class="demo-icon icon-cz-cancel">&#xe813;</i> <span class="i-name">icon-cz-cancel</span><span class="i-code">0xe813</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe814"><i class="demo-icon icon-cz-star-empty">&#xe814;</i> <span class="i-name">icon-cz-star-empty</span><span class="i-code">0xe814</span></div>
+        <div class="the-icons span3" title="Code: 0xe815"><i class="demo-icon icon-cz-star">&#xe815;</i> <span class="i-name">icon-cz-star</span><span class="i-code">0xe815</span></div>
+        <div class="the-icons span3" title="Code: 0xe816"><i class="demo-icon icon-cz-like">&#xe816;</i> <span class="i-name">icon-cz-like</span><span class="i-code">0xe816</span></div>
+        <div class="the-icons span3" title="Code: 0xe817"><i class="demo-icon icon-cz-dislike">&#xe817;</i> <span class="i-name">icon-cz-dislike</span><span class="i-code">0xe817</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe818"><i class="demo-icon icon-cz-qar">&#xe818;</i> <span class="i-name">icon-cz-qar</span><span class="i-code">0xe818</span></div>
+        <div class="the-icons span3" title="Code: 0xe819"><i class="demo-icon icon-cz-picture">&#xe819;</i> <span class="i-name">icon-cz-picture</span><span class="i-code">0xe819</span></div>
+        <div class="the-icons span3" title="Code: 0xe81a"><i class="demo-icon icon-cz-cad">&#xe81a;</i> <span class="i-name">icon-cz-cad</span><span class="i-code">0xe81a</span></div>
+        <div class="the-icons span3" title="Code: 0xe81b"><i class="demo-icon icon-cz-add-commission">&#xe81b;</i> <span class="i-name">icon-cz-add-commission</span><span class="i-code">0xe81b</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe81c"><i class="demo-icon icon-cz-notre-dame">&#xe81c;</i> <span class="i-name">icon-cz-notre-dame</span><span class="i-code">0xe81c</span></div>
+        <div class="the-icons span3" title="Code: 0xe81d"><i class="demo-icon icon-cz-triomphe">&#xe81d;</i> <span class="i-name">icon-cz-triomphe</span><span class="i-code">0xe81d</span></div>
+        <div class="the-icons span3" title="Code: 0xe81e"><i class="demo-icon icon-cz-bus">&#xe81e;</i> <span class="i-name">icon-cz-bus</span><span class="i-code">0xe81e</span></div>
+        <div class="the-icons span3" title="Code: 0xe81f"><i class="demo-icon icon-cz-umbrella">&#xe81f;</i> <span class="i-name">icon-cz-umbrella</span><span class="i-code">0xe81f</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe820"><i class="demo-icon icon-cz-louvre">&#xe820;</i> <span class="i-name">icon-cz-louvre</span><span class="i-code">0xe820</span></div>
+        <div class="the-icons span3" title="Code: 0xe821"><i class="demo-icon icon-cz-skull">&#xe821;</i> <span class="i-name">icon-cz-skull</span><span class="i-code">0xe821</span></div>
+        <div class="the-icons span3" title="Code: 0xe822"><i class="demo-icon icon-cz-eiffel">&#xe822;</i> <span class="i-name">icon-cz-eiffel</span><span class="i-code">0xe822</span></div>
+        <div class="the-icons span3" title="Code: 0xe823"><i class="demo-icon icon-cz-ferris-wheel">&#xe823;</i> <span class="i-name">icon-cz-ferris-wheel</span><span class="i-code">0xe823</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe824"><i class="demo-icon icon-cz-connection">&#xe824;</i> <span class="i-name">icon-cz-connection</span><span class="i-code">0xe824</span></div>
+        <div class="the-icons span3" title="Code: 0xe825"><i class="demo-icon icon-cz-czk">&#xe825;</i> <span class="i-name">icon-cz-czk</span><span class="i-code">0xe825</span></div>
+        <div class="the-icons span3" title="Code: 0xe826"><i class="demo-icon icon-cz-azn">&#xe826;</i> <span class="i-name">icon-cz-azn</span><span class="i-code">0xe826</span></div>
+        <div class="the-icons span3" title="Code: 0xe827"><i class="demo-icon icon-cz-thb">&#xe827;</i> <span class="i-name">icon-cz-thb</span><span class="i-code">0xe827</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe828"><i class="demo-icon icon-cz-jpy">&#xe828;</i> <span class="i-name">icon-cz-jpy</span><span class="i-code">0xe828</span></div>
+        <div class="the-icons span3" title="Code: 0xe829"><i class="demo-icon icon-cz-krw">&#xe829;</i> <span class="i-name">icon-cz-krw</span><span class="i-code">0xe829</span></div>
+        <div class="the-icons span3" title="Code: 0xe82a"><i class="demo-icon icon-cz-nok">&#xe82a;</i> <span class="i-name">icon-cz-nok</span><span class="i-code">0xe82a</span></div>
+        <div class="the-icons span3" title="Code: 0xe82b"><i class="demo-icon icon-cz-chf">&#xe82b;</i> <span class="i-name">icon-cz-chf</span><span class="i-code">0xe82b</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe82c"><i class="demo-icon icon-cz-preview">&#xe82c;</i> <span class="i-name">icon-cz-preview</span><span class="i-code">0xe82c</span></div>
+        <div class="the-icons span3" title="Code: 0xe82d"><i class="demo-icon icon-cz-aed">&#xe82d;</i> <span class="i-name">icon-cz-aed</span><span class="i-code">0xe82d</span></div>
+        <div class="the-icons span3" title="Code: 0xe82e"><i class="demo-icon icon-cz-add-date">&#xe82e;</i> <span class="i-name">icon-cz-add-date</span><span class="i-code">0xe82e</span></div>
+        <div class="the-icons span3" title="Code: 0xe82f"><i class="demo-icon icon-cz-copy">&#xe82f;</i> <span class="i-name">icon-cz-copy</span><span class="i-code">0xe82f</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe830"><i class="demo-icon icon-cz-amex">&#xe830;</i> <span class="i-name">icon-cz-amex</span><span class="i-code">0xe830</span></div>
+        <div class="the-icons span3" title="Code: 0xe831"><i class="demo-icon icon-cz-disscount">&#xe831;</i> <span class="i-name">icon-cz-disscount</span><span class="i-code">0xe831</span></div>
+        <div class="the-icons span3" title="Code: 0xe832"><i class="demo-icon icon-cz-restaurant">&#xe832;</i> <span class="i-name">icon-cz-restaurant</span><span class="i-code">0xe832</span></div>
+        <div class="the-icons span3" title="Code: 0xe833"><i class="demo-icon icon-cz-hotel">&#xe833;</i> <span class="i-name">icon-cz-hotel</span><span class="i-code">0xe833</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe834"><i class="demo-icon icon-cz-gallery">&#xe834;</i> <span class="i-name">icon-cz-gallery</span><span class="i-code">0xe834</span></div>
+        <div class="the-icons span3" title="Code: 0xe835"><i class="demo-icon icon-cz-new-photo">&#xe835;</i> <span class="i-name">icon-cz-new-photo</span><span class="i-code">0xe835</span></div>
+        <div class="the-icons span3" title="Code: 0xe836"><i class="demo-icon icon-cz-hour">&#xe836;</i> <span class="i-name">icon-cz-hour</span><span class="i-code">0xe836</span></div>
+        <div class="the-icons span3" title="Code: 0xe837"><i class="demo-icon icon-cz-christmas">&#xe837;</i> <span class="i-name">icon-cz-christmas</span><span class="i-code">0xe837</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe838"><i class="demo-icon icon-cz-percentage">&#xe838;</i> <span class="i-name">icon-cz-percentage</span><span class="i-code">0xe838</span></div>
+        <div class="the-icons span3" title="Code: 0xe839"><i class="demo-icon icon-cz-graphics">&#xe839;</i> <span class="i-name">icon-cz-graphics</span><span class="i-code">0xe839</span></div>
+        <div class="the-icons span3" title="Code: 0xe83a"><i class="demo-icon icon-cz-menu-outline">&#xe83a;</i> <span class="i-name">icon-cz-menu-outline</span><span class="i-code">0xe83a</span></div>
+        <div class="the-icons span3" title="Code: 0xe83b"><i class="demo-icon icon-cz-menu">&#xe83b;</i> <span class="i-name">icon-cz-menu</span><span class="i-code">0xe83b</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe83c"><i class="demo-icon icon-cz-bell">&#xe83c;</i> <span class="i-name">icon-cz-bell</span><span class="i-code">0xe83c</span></div>
+        <div class="the-icons span3" title="Code: 0xe83d"><i class="demo-icon icon-cz-floppy">&#xe83d;</i> <span class="i-name">icon-cz-floppy</span><span class="i-code">0xe83d</span></div>
+        <div class="the-icons span3" title="Code: 0xe83e"><i class="demo-icon icon-cz-logs">&#xe83e;</i> <span class="i-name">icon-cz-logs</span><span class="i-code">0xe83e</span></div>
+        <div class="the-icons span3" title="Code: 0xe846"><i class="demo-icon icon-cz-holiday">&#xe846;</i> <span class="i-name">icon-cz-holiday</span><span class="i-code">0xe846</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xe847"><i class="demo-icon icon-cz-add-time">&#xe847;</i> <span class="i-name">icon-cz-add-time</span><span class="i-code">0xe847</span></div>
+        <div class="the-icons span3" title="Code: 0xe85f"><i class="demo-icon icon-cz-seo">&#xe85f;</i> <span class="i-name">icon-cz-seo</span><span class="i-code">0xe85f</span></div>
+        <div class="the-icons span3" title="Code: 0xf0c9"><i class="demo-icon icon-cz-hamburger">&#xf0c9;</i> <span class="i-name">icon-cz-hamburger</span><span class="i-code">0xf0c9</span></div>
+        <div class="the-icons span3" title="Code: 0xf0e0"><i class="demo-icon icon-cz-mail">&#xf0e0;</i> <span class="i-name">icon-cz-mail</span><span class="i-code">0xf0e0</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xf100"><i class="demo-icon icon-cz-double-left">&#xf100;</i> <span class="i-name">icon-cz-double-left</span><span class="i-code">0xf100</span></div>
+        <div class="the-icons span3" title="Code: 0xf102"><i class="demo-icon icon-cz-angle-up">&#xf102;</i> <span class="i-name">icon-cz-angle-up</span><span class="i-code">0xf102</span></div>
+        <div class="the-icons span3" title="Code: 0xf104"><i class="demo-icon icon-cz-angle-left">&#xf104;</i> <span class="i-name">icon-cz-angle-left</span><span class="i-code">0xf104</span></div>
+        <div class="the-icons span3" title="Code: 0xf105"><i class="demo-icon icon-cz-angle-right">&#xf105;</i> <span class="i-name">icon-cz-angle-right</span><span class="i-code">0xf105</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xf123"><i class="demo-icon icon-cz-star-half">&#xf123;</i> <span class="i-name">icon-cz-star-half</span><span class="i-code">0xf123</span></div>
+        <div class="the-icons span3" title="Code: 0xf135"><i class="demo-icon icon-cz-rocket">&#xf135;</i> <span class="i-name">icon-cz-rocket</span><span class="i-code">0xf135</span></div>
+        <div class="the-icons span3" title="Code: 0xf153"><i class="demo-icon icon-cz-eur">&#xf153;</i> <span class="i-name">icon-cz-eur</span><span class="i-code">0xf153</span></div>
+        <div class="the-icons span3" title="Code: 0xf154"><i class="demo-icon icon-cz-gbp">&#xf154;</i> <span class="i-name">icon-cz-gbp</span><span class="i-code">0xf154</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xf155"><i class="demo-icon icon-cz-usd">&#xf155;</i> <span class="i-name">icon-cz-usd</span><span class="i-code">0xf155</span></div>
+        <div class="the-icons span3" title="Code: 0xf156"><i class="demo-icon icon-cz-inr">&#xf156;</i> <span class="i-name">icon-cz-inr</span><span class="i-code">0xf156</span></div>
+        <div class="the-icons span3" title="Code: 0xf158"><i class="demo-icon icon-cz-rub">&#xf158;</i> <span class="i-name">icon-cz-rub</span><span class="i-code">0xf158</span></div>
+        <div class="the-icons span3" title="Code: 0xf160"><i class="demo-icon icon-cz-sort">&#xf160;</i> <span class="i-name">icon-cz-sort</span><span class="i-code">0xf160</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xf195"><i class="demo-icon icon-cz-try">&#xf195;</i> <span class="i-name">icon-cz-try</span><span class="i-code">0xf195</span></div>
+        <div class="the-icons span3" title="Code: 0xf1ab"><i class="demo-icon icon-cz-localization">&#xf1ab;</i> <span class="i-name">icon-cz-localization</span><span class="i-code">0xf1ab</span></div>
+        <div class="the-icons span3" title="Code: 0xf1e0"><i class="demo-icon icon-cz-share">&#xf1e0;</i> <span class="i-name">icon-cz-share</span><span class="i-code">0xf1e0</span></div>
+        <div class="the-icons span3" title="Code: 0xf1f0"><i class="demo-icon icon-cz-visa">&#xf1f0;</i> <span class="i-name">icon-cz-visa</span><span class="i-code">0xf1f0</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xf1f1"><i class="demo-icon icon-cz-mastercard">&#xf1f1;</i> <span class="i-name">icon-cz-mastercard</span><span class="i-code">0xf1f1</span></div>
+        <div class="the-icons span3" title="Code: 0xf232"><i class="demo-icon icon-cz-whatsapp">&#xf232;</i> <span class="i-name">icon-cz-whatsapp</span><span class="i-code">0xf232</span></div>
+        <div class="the-icons span3" title="Code: 0xf27a"><i class="demo-icon icon-cz-comment">&#xf27a;</i> <span class="i-name">icon-cz-comment</span><span class="i-code">0xf27a</span></div>
+        <div class="the-icons span3" title="Code: 0xf309"><i class="demo-icon icon-cz-twitter">&#xf309;</i> <span class="i-name">icon-cz-twitter</span><span class="i-code">0xf309</span></div>
+      </div>
+      <div class="row">
+        <div class="the-icons span3" title="Code: 0xf30c"><i class="demo-icon icon-cz-facebook">&#xf30c;</i> <span class="i-name">icon-cz-facebook</span><span class="i-code">0xf30c</span></div>
+        <div class="the-icons span3" title="Code: 0xf318"><i class="demo-icon icon-cz-linkedin">&#xf318;</i> <span class="i-name">icon-cz-linkedin</span><span class="i-code">0xf318</span></div>
+        <div class="the-icons span3" title="Code: 0xf32d"><i class="demo-icon icon-cz-instagram">&#xf32d;</i> <span class="i-name">icon-cz-instagram</span><span class="i-code">0xf32d</span></div>
+      </div>
+    </div>
+    <div class="container footer">Generated by <a href="http://fontello.com">fontello.com</a></div>
+  </body>
+</html>

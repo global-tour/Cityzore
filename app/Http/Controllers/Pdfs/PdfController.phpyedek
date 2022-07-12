@@ -1,0 +1,336 @@
+<?php
+
+namespace App\Http\Controllers\Pdfs;
+
+use App\Barcode;
+use App\Booking;
+use App\Cart;
+use App\Invoice;
+use App\Option;
+use App\Product;
+use App\ProductGallery;
+use App\Supplier;
+use App\TicketType;
+use App\User;
+use App\Voucher;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use DateTime;
+use Illuminate\Support\Facades\Crypt;
+use Picqer\Barcode\BarcodeGeneratorPNG;
+
+
+class PdfController extends Controller
+{
+
+    public function voucher($lang, $id)
+    {
+        return $this->voucherBackend($id);
+    }
+
+    public function voucherBackend($id)
+    {
+        $booking = Booking::findOrFail($id);
+        $products = Product::all();
+        $url = 'cityzore';
+        $bigBus = $this->barcode('3', $booking->id);
+        $cruiseBarcode = $this->barcode('4', $booking->id);
+        $versaillesBarcode = $this->barcode('5', $booking->id);
+        $arcdeTriomphe = $this->barcode('6', $booking->id);
+        $operaBarcode = $this->barcode('7', $booking->id);
+        $options = Option::where('referenceCode', '=', $booking->optionRefCode)->first();
+        $pricing = $options->pricings()->first();
+        $availabilities = $options->avs()->get();
+        $ticketTypeArr = [];
+        foreach ($availabilities as $availability) {
+            if (!($availability->ticketType()->first()==null)) {
+                array_push($ticketTypeArr, $availability->ticketType()->first()->id);
+            }
+        }
+        $generator = new BarcodeGeneratorPNG();
+        $travelerName = json_decode($booking->travelers, true)[0]['firstName'];
+        $travelerLastname = json_decode($booking->travelers, true)[0]['lastName'];
+        $participantCountArr = [];
+        $participantSum = 0;
+        foreach (json_decode($booking->bookingItems, true) as $bookingItem) {
+            switch ($bookingItem['category']) {
+                case 'EU_CITIZEN':
+                    $title = 'euCitizen';
+                    break;
+                default:
+                    $title = strtolower($bookingItem['category']);
+                    break;
+            }
+            if (!is_null($cruiseBarcode) || !is_null($versaillesBarcode) || !is_null($arcdeTriomphe) || !is_null($operaBarcode)) {
+                if (!is_null($pricing->ignoredCategories)) {
+                    if (!in_array($title, json_decode($pricing->ignoredCategories, true))) {
+                        array_push($participantCountArr, $bookingItem['count']);
+                        $participantSum = array_sum($participantCountArr);
+                    }
+                } else {
+                    array_push($participantCountArr, $bookingItem['count']);
+                    $participantSum = array_sum($participantCountArr);
+                }
+            } else {
+                array_push($participantCountArr, $bookingItem['count']);
+                $participantSum = array_sum($participantCountArr);
+            }
+        }
+        if ($booking->gygBookingReference == null) {
+            $bknNumber = explode("-",$booking->bookingRefCode)[3];
+            $productRefCode = explode('-', $booking->bookingRefCode)[0];
+            foreach ($products as $product) {
+                if ($product->referenceCode == $productRefCode) {
+                    $productImage = ProductGallery::where('id', '=', $product->coverPhoto)->get();
+                    $data = [
+                        'bkn' => $bknNumber,
+                        'travelerName' => $travelerName,
+                        'travelerLastname' => $travelerLastname,
+                        'product' => $product,
+                        'options' => $options,
+                        'booking' => $booking,
+                        'productImage' => $productImage,
+                        'ticketTypeArr' => $ticketTypeArr,
+                        'participantSum' => $participantSum,
+                        'cruiseBarcode' => $cruiseBarcode,
+                        'operaBarcode' => $operaBarcode,
+                        'versaillesBarcode' => $versaillesBarcode,
+                        'arcdeTriomphe' => $arcdeTriomphe,
+                        'bigBus' => $bigBus,
+                        'generator' => $generator,
+                        'url' => $url,
+                    ];
+                }
+            }
+        } else {
+
+            $bknNumber = explode("-",$booking->bookingRefCode)[2];
+            $data = [
+                'bkn' => $bknNumber,
+                'travelerName' => $travelerName,
+                'travelerLastname' => $travelerLastname,
+                'options' => $options,
+                'booking' => $booking,
+                'ticketTypeArr' => $ticketTypeArr,
+                'participantSum' => $participantSum,
+                'cruiseBarcode' => $cruiseBarcode,
+                'versaillesBarcode' => $versaillesBarcode,
+                'arcdeTriomphe' => $arcdeTriomphe,
+                'bigBus' => $bigBus,
+                'generator' => $generator,
+                'url' => $url,
+            ];
+        }
+
+        $pdf = PDF::loadView('pdfs.voucher', $data);
+        return $pdf->stream($travelerName.$travelerLastname.$bknNumber.'.pdf');
+    }
+
+    public function barcode($ticketType, $bookingID)
+    {
+        $barcode = Barcode::where('ticketType', '=',$ticketType)->where('bookingID', '=', $bookingID)->get();
+        return $barcode;
+    }
+
+    public function sendBookingID(Request $request)
+    {
+        $id = $request->id;
+        return ['id' => $id];
+    }
+
+    public function printVoucherByToken($lang, $token)
+    {
+        $decrypted = Crypt::decryptString($token);
+        $booking = Booking::where('bookingRefCode', 'like', '%'.$decrypted)->first();
+        return $this->voucher($lang, $booking->id);
+    }
+
+    public function invoice($lang, $id)
+    {
+        return $this->invoiceBackend($id);
+    }
+
+    public function invoiceBackend($id)
+    {
+        $booking = Booking::findOrFail($id);
+        $url = 'cityzore';
+        $currencySymbols = ['1' => '&#x24;', '2' => '&euro;', '3' => '&#163;', '4' => '&#8378;'];
+        $currencySymbol = $currencySymbols[$booking->currencyID];
+        $products = Product::all();
+        $options = Option::where('referenceCode', '=', $booking->optionRefCode)->first();
+        $invoice = Invoice::where('id', '=', $booking->invoiceID)->first();
+        if ($booking->gygBookingReference == null) {
+            $productRefCode = explode('-', $booking->bookingRefCode)[0];
+            $data = [
+                'booking' => $booking,
+                'invoice' => $invoice,
+                'products' => $products,
+                'options' => $options,
+                'productRefCode' => $productRefCode,
+                'currencySymbol' => $currencySymbol,
+                'url' => $url
+            ];
+        } else {
+            $data = [
+                'booking' => $booking,
+                'invoice' => $invoice,
+                'products' => $products,
+                'options' => $options,
+                'currencySymbol' => $currencySymbol,
+                'url' => $url
+            ];
+        }
+        $pdf = PDF::loadView('pdfs.invoice', $data);
+        return $pdf->stream($invoice->referenceCode.'.pdf');
+    }
+
+    public function multipleTickets(Request $request)
+    {
+        $barcodeDescription = $request->barcodeDescription;
+        $generator = new BarcodeGeneratorPNG();
+        $barcodes = Barcode::where('ticketType', '=', $request->ticketTypeSelect)->where('isUsed', '=', '0')->where('isExpired', '=', 0)->get();
+        $barcodeArray = [];
+        foreach ($barcodes as $barcode) {
+            $endTimeString = explode('/',($barcode->endTime))[2].'-'.explode('/',($barcode->endTime))[1].'-'.explode('/',($barcode->endTime))[0];
+            $barcode->endTime = $endTimeString;
+            array_push($barcodeArray, $barcode);
+        }
+        usort($barcodeArray, function ($a, $b) {
+            return $a['endTime'] <=> $b['endTime'];
+        });
+
+        for ($i=0;$i<$request->barcodeCount;$i++) {
+            $barcodeArray[$i]['isUsed'] = 1;
+            $barcodeArray[$i]['endTime'] = explode('-', $barcodeArray[$i]['endTime'])[2].'/'.explode('-', $barcodeArray[$i]['endTime'])[1].'/'.explode('-',$barcodeArray[$i]['endTime'])[0];
+            $barcodeArray[$i]['description'] = $barcodeDescription;
+            $barcodeArray[$i]->save();
+        }
+
+
+        $data = $request->only(['barcodeCount', 'ticketTypeSelect']);
+        $data2 = [
+            'generator' => $generator,
+            'cruiseBarcodeArray' => $barcodeArray,
+        ];
+        $pdf = PDF::loadView('pdfs.multiple-tickets', $data, $data2);
+        return $pdf->download('abc.pdf');
+    }
+
+    public function getUsableBarcodeCount(Request $request)
+    {
+
+        $ticketTypeName = TicketType::findOrFail($request->ticketType)->name;
+        $ticketType = TicketType::where('name', $ticketTypeName)->get();
+        $ownerID = -1;
+        if (auth()->guard('supplier')->check()) {
+            $ownerID = auth()->user()->id;
+        }
+
+        $usableBarcodeCount = 0;
+        if (count($ticketType) > 0) {
+            $usableBarcodeCount = Barcode::where('isUsed', 0)->where('isReserved', 0)->where('ownerID', $ownerID)->where('ticketType', $request->ticketType)->count();
+        }
+
+        return response()->json(['usableBarcodeCount' => $usableBarcodeCount, 'ticketType' => $ticketType]);
+    }
+
+    public function commissionerInvoice($lang, $id, $totalCommission)
+    {
+        $booking = Booking::findOrFail($id);
+        $products = Product::all();
+        $currencySymbols = ['1' => '&#x24;', '2' => '&euro;', '3' => '&#163;', '4' => '&#8378;'];
+        $currencySymbol = $currencySymbols[$booking->currencyID];
+        $cartCommission = Cart::where('referenceCode', '=', $booking->reservationRefCode)->first()->totalCommission;
+        $options = Option::where('referenceCode', '=', $booking->optionRefCode)->first();
+        $invoice = Invoice::where('id', '=', $booking->invoiceID)->first();
+        if ($booking->gygBookingReference == null) {
+            $productRefCode = explode('-', $booking->bookingRefCode)[0];
+            $data = [
+                'booking' => $booking,
+                'invoice' => $invoice,
+                'products' => $products,
+                'options' => $options,
+                'productRefCode' => $productRefCode,
+                'totalCommission' => $totalCommission,
+                'cartCommission' => $cartCommission,
+                'currencySymbol' => $currencySymbol
+            ];
+        } else {
+            $data = [
+                'booking' => $booking,
+                'invoice' => $invoice,
+                'products' => $products,
+                'options' => $options,
+                'currencySymbol' => $currencySymbol
+            ];
+        }
+        $pdf = PDF::loadView('pdfs.invoice', $data);
+        return $pdf->stream($invoice->referenceCode.'.pdf');
+    }
+
+    public function financeInvoice ($month, $year, $totalRate, $companyID, $commissionerRequest=null)
+    {
+        if ($commissionerRequest == null || $commissionerRequest == 0) {
+            if ($companyID=='-1') {
+                $company = 'Paris Business and Travel';
+                $bookings = Booking::where('gygBookingReference', '=', null)->where('companyID', '=', $companyID)->where('status', '=', 0)->get();
+                $commissionRate = 0;
+            }
+            if (!($companyID=='-1') && !($companyID==null)) {
+                $company = Supplier::where('id', '=', $companyID)->first()->companyName;
+                $bookings = Booking::where('gygBookingReference', '=', null)->where('companyID', '=', $companyID)->where('status', '=', 0)->get();
+                $commissionRate = \App\Supplier::where('id', '=', $companyID)->first()->comission;
+            }
+        }
+        if ($companyID==0) {
+            $company=User::where('id', '=', $commissionerRequest)->first()->name;
+            $bookings = Booking::where('gygBookingReference', '=', null)->where('userID', '=', $commissionerRequest)->where('status', '=', 0)->get();
+            $commissionRate = \App\User::where('id', '=', $commissionerRequest)->first()->commission;
+        }
+
+        $financeBookings = [];
+        foreach ($bookings as $booking) {
+            $bookingDate= explode('/', $booking->date);
+            $bookingMonth = $bookingDate[1];
+            $bookingYear = $bookingDate[2];
+            if (($bookingMonth==$month) && ($bookingYear==$year)) {
+                $arr = ['booking' => $booking];
+                array_push($financeBookings, $arr);
+            }
+        }
+        $data = [
+            'month' => $month,
+            'year' => $year,
+            'totalRate' => $totalRate,
+            'companyID' => $companyID,
+            'company' => $company,
+            'bookings' => $bookings,
+            'financeBookings' => $financeBookings,
+            'commissionRate' => $commissionRate,
+        ];
+        $pdf = PDF::loadView('pdfs.finance-voucher', $data);
+        return $pdf->stream($month.$year.'.pdf');
+    }
+
+    public function panelVoucher($id)
+    {
+        $voucher = Voucher::findOrFail($id);
+        $dateV = json_decode($voucher->dateTime, true)['date'];
+        $dateV = DateTime::createFromFormat('d/m/Y', $dateV);
+        $dateV = $dateV->format('D, d-F-y');
+        $product = Product::where('id', '=', $voucher->productID)->first();
+        $productImage = $product->productGalleries()->where('id', '!=', $product->coverPhoto)->first();
+        $options = Option::where('id', '=', $voucher->optionID)->first();
+        $data = [
+            'voucher' => $voucher,
+            'dateV' => $dateV,
+            'product' => $product,
+            'productImage' => $productImage,
+            'options' => $options,
+        ];
+        $pdf = PDF::loadView('pdfs.panel-voucher', $data);
+        return $pdf->stream($voucher->bookingRefCode.'.pdf');
+    }
+
+}

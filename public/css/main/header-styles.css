@@ -1,0 +1,94 @@
+@media only screen and (max-width: 600px) {
+
+    .wed-logo a img {
+        width: 120px !important;
+        padding: 14px 0px !important;
+    }
+
+    .ed-mm-left {
+        width: 40% !important;
+    }
+
+    .ed-com-t1-left ul li {
+        position: absolute;
+        padding-top: 3%;
+    }
+
+    .ed-com-t1-left ul {
+        padding-left: 0px;
+    }
+
+    .ed-com-t1-right {
+        margin-top: 4% !important;
+    }
+
+    .modal .modal-content {
+        width: 95%;
+    }
+
+    .tr-regi-form {
+        margin-top: 17px !important;
+    }
+
+    .soc-login ul li {
+        width: 100%;
+    }
+
+}
+
+.header-dropbtn:after {
+    display:block!important;
+    content: ''!important;
+    border-bottom: solid 3px #f4364f!important;
+    transform: scaleX(0)!important;
+    transition: transform 250ms ease-in-out!important;
+}
+
+.header-dropbtn:hover:after {
+    transform: scaleX(1)!important;
+}
+
+.header-dropbtn {
+    background-color: #f5f7f9!important;
+    color: #7a8088!important;
+    padding: 2px!important;
+    font-size: 13px!important;
+    border: none!important;
+}
+
+.header-dropdownlang {
+    position: relative!important;
+    display: inline-block!important;
+}
+
+.header-dropdowncur {
+    position: relative!important;
+    display: inline-block!important;
+}
+
+.header-dropdown-content {
+    display: none!important;
+    position: absolute!important;
+    background-color: #f1f1f1!important;
+    min-width: 160px!important;
+    z-index: 2!important;
+    opacity: 1!important;
+}
+
+.header-dropdown-content span {
+    color: #888!important;
+    padding: 12px 16px!important;
+    text-decoration: none!important;
+    display: block!important;
+    cursor: pointer!important;
+}
+
+.header-dropdown-content span:hover {background-color: #ddd!important;}
+
+.header-dropdownlang:hover .header-dropdown-content {display: block!important;}
+
+.header-dropdowncur:hover .header-dropdown-content {display: block!important;}
+
+.header-dropdownlang:hover .header-dropbtn {background-color: #f5f7f9!important;}
+
+.header-dropdowncur:hover .header-dropbtn {background-color: #f5f7f9!important;}

@@ -1,0 +1,155 @@
+<?php
+namespace App\Http\Controllers\Admin;
+
+use App\Av;
+use App\Barcode;
+use App\Booking;
+use App\Cart;
+use App\Currency;
+use App\Http\Controllers\Controller;
+use App\Option;
+use App\Supplier;
+use App\TicketType;
+use App\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Config;
+use PhpParser\Node\Expr\Array_;
+
+class PanelController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth:admin');
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function adminPanel()
+    {
+        $currencies = Currency::where('isActive',1)->select('id','value')->get();
+        $s=date("Y-m-d H:i:s", time()-(60*60*24*30));
+        $e=date("Y-m-d H:i:s", time());
+        $config = Config::where('userID', -1)->first();
+        $bookings = Booking::all();
+        $cart = Cart::all();
+        $suppliers = Supplier::all();
+        $users = User::all();
+        $userCount = count($users);
+        $supplierCount = count($suppliers);
+        $totalAmount = 0.00;
+        $bookingsLast5 = $bookings->sortByDesc('created_at')->take(5);
+        $totalPrice = 0;
+        $cartPercentage = '%0';
+        $cartBought = [];
+        $totalPricesForOption = [];
+        $bookingPercentage = '%0';
+        $gygPercentage = '%0';
+        $barcodes=Barcode::all();
+        $ticketTypes=TicketType::where('usableAsTicket',1)->where('warnTicket','>',0)->get();
+        $ticketArray=Array();
+        foreach($ticketTypes as $ticketType){
+            $temp['ticket_type_id']=intval($ticketType->id);
+            $temp['ticket_type_name']=$ticketType->name;
+            $temp['warnTicket']=intval($ticketType->warnTicket);
+            $temp['count']=$barcodes->where('ticketType',$temp['ticket_type_id'])->where('isUsed',0)->where('isExpired',0)->where('ownerID', -1)->count();
+            $temp['diff']=$temp['count']-$temp['warnTicket'];
+            $temp['diff'] <11 ? array_push($ticketArray,$temp):null;
+        }
+        $types=array_column($ticketArray,'diff');
+        array_multisort($types,SORT_ASC,$ticketArray);
+
+
+        // Total earnings for last 1 month
+        $euroC=floatval(Currency::where('id',2)->value('value'));
+        $defIcon=Currency::where('id',2)->value('iconClass');
+        foreach ($currencies as $currency){
+            $tempTotal=floatval(Booking::where('currencyID',$currency->id)->whereBetween('created_at',[$s,$e])->sum('totalPrice'));
+            if($tempTotal>0) $totalAmount+=round(($tempTotal*floatval($currency->value))/$euroC,2);
+        }
+
+        // 5 options informations that have maximum booking counts.
+        $result = DB::select(
+            DB::raw(" select * from (select optionRefCode, COUNT(optionRefCode) as totalCount
+                from bookings where status = 1 or status =  0 group by optionRefCode)a where  a.totalCount > 0 "));
+        usort($result, function($a, $b) {return ( $b->totalCount - $a->totalCount);});
+        $result = array_slice($result, 0, 5, true);
+        foreach ($result as $r) {
+                if (Option::where('referenceCode', '=', $r->optionRefCode)->first()) {
+                    $booking = Booking::where('optionRefCode', '=', $r->optionRefCode)->get();
+                } else {
+                    $booking = [];
+                }
+            foreach ($booking as $b) {
+                //$bookingTotalPrice = $config->calculateCurrency($b->totalPrice, $config->currencyName->value, $b->currencyID);
+                $bookingTotalPrice = $b->totalPrice;
+                $totalPrice += $bookingTotalPrice;
+            }
+            $totalPricesForOption[$r->optionRefCode] = [];
+            array_push($totalPricesForOption[$r->optionRefCode], ['optionRefCode' => $r->optionRefCode, 'totalPrice' => $totalPrice]);
+        }
+
+        // Calculating percentage between cancelled bookings and all bookings.
+        $cancelledBookings = DB::select(
+            DB::raw("select * from bookings where status = 2 or status = 3"));
+        if (count($cancelledBookings) > 0) {
+            $bookingPercentage = '% '.number_format((count($cancelledBookings) / count($bookings)) * 100, 2, '.', '');
+        }
+
+        // Calculating percentage between GYG bookings and all bookings.
+        $gygBookings = DB::select(DB::raw("select * from bookings where gygBookingReference is not null"));
+        if (count($gygBookings) > 0) {
+            $gygPercentage = '% '. number_format((count($gygBookings) / count($bookings) * 100), 2 , '.', '');
+        }
+
+        // Calculating percentage between bought carts and total carts.
+        if ($cart) {
+            foreach ($cart as $c) {
+                if ($c->status == 2 || $c->status == 3) {
+                    array_push($cartBought, $c);
+                }
+            }
+            if (count($cart) > 0) {
+                $cartPercentage = '% '.number_format((count($cartBought) / count($cart)) * 100, 2, '.', '');
+            }
+        }
+
+        return view('panel.dashboard', [
+            'totalAmount' => $totalAmount,
+            'cartPercentage' => $cartPercentage,
+            'supplierCount' => $supplierCount,
+            'userCount' => $userCount,
+            'bookingsLast5' => $bookingsLast5,
+            'result' => $result,
+            'totalPricesForOption' => $totalPricesForOption,
+            'totalPrice' => $totalPrice,
+            'bookingPercentage' => $bookingPercentage,
+            'gygPercentage' => $gygPercentage,
+            'config' => $config,
+            'defIcon' => $defIcon,
+            'ticketArray' => $ticketArray,
+        ]);
+    }
+    public function availabilityDate()
+    {
+        $availability = Av::where('id', 1)->first();
+        $hourly = json_decode($availability->hourly, true);
+        $startTimesTemporary = [];
+        $now = Carbon::now();
+        foreach ($hourly as $h) {
+            $startDay = $h['day'];
+            $availabilityDate = Carbon::createFromFormat("d/m/Y", $startDay);
+           // $availabilityDate->toDateTimeString();
+            if($now->timestamp < $availabilityDate->timestamp) {
+                array_push($startTimesTemporary, ["day" => $startDay]);
+            }
+        }
+        return view('panel.availability', ['availability' => $availability, 'startTimesTemporary' => $startTimesTemporary] );
+    }
+
+    public function closeWindow() {
+        return view('panel.close-window');
+    }
+
+}

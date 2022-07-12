@@ -1,0 +1,507 @@
+@include('frontend-partials.head', ['page' => 'home'])
+@include('frontend-partials.header')
+
+<?php
+    $commonFunctions = new \App\Http\Controllers\Helpers\CommonFunctions;
+    $currencyModel = new \App\Currency();
+    $currencyIcon = session()->get('currencyIcon');
+    $productModel = new \App\Product();
+    $languageModel = new \App\Language();
+    $productGalleryModel = new \App\ProductGallery();
+    $productTranslationModel = new \App\ProductTranslation();
+    $attractionModel = new \App\Attraction();
+    $attractionTranslationModel = new \App\AttractionTranslation();
+    $langCode = !is_null(session()->get('userLanguage')) ? session()->get('userLanguage') : 'en';
+    $langID = \App\Language::where('code', $langCode)->first()->id;
+    $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
+?>
+
+<section xmlns:absolute xmlns:font-size="http://www.w3.org/1999/xhtml" xmlns:font-size="http://www.w3.org/1999/xhtml">
+    <?php
+    $config = App\Config::where('userID', -1)->first();
+    $homeBanner = Storage::disk('s3')->url('website-images/'.$config->homeBanner);
+    ?>
+    <div class="tourz-search" style="background: url('{{$homeBanner}}'); background-size: cover;">
+        <div class="container">
+            <div class="row">
+                <div class="tourz-search-1">
+                    <h1>{{__('planYourParisTravelNow')}}</h1>
+                    <p class="hidden-xs hidden-sm">{{__('searchAttractiveThingsEiffel2')}}</p>
+                    <form method="GET" class="tourz-search-form" action="{{url($langCodeForUrl.'/s')}}" autocomplete="off">
+                        <div class="input-field" style="margin-top: 0!important;padding:2px!important;">
+                            <input type="text" id="select-search" name="q" class="searchInput" style="" autocomplete="off">
+                            <div class="suggestions-container" style="">
+
+                            </div>
+                            <label for="select-search" class="search-hotel-type">{{__('searchLocationsAttractions')}}</label>
+                        </div>
+                        <div class="input-field hidden-xs" style="width: 20%!important;margin-top: 0!important;padding:2px!important;">
+                            <input type='text' class='datepicker-from' name="dateFrom" id="select-search2" data-language='en' placeholder="From" />
+                            <label for="select-search2" class="search-hotel-type">{{__('from')}}</label>
+                        </div>
+                        <div class="input-field hidden-xs" style="width: 20%!important;margin-top: 0!important;padding:2px!important;">
+                            <input type='text' class='datepicker-to' name="dateTo" id="select-search3" data-language='en' placeholder="To" />
+                            <label for="select-search3" class="search-hotel-type">{{__('to')}}</label>
+                        </div>
+                        <div class="input-field" style="margin-top: 0!important;padding:2px!important;">
+                            <input type="submit" value="search" class="waves-effect waves-light tourz-sear-btn">
+                        </div>
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input type="hidden" name="type" id="searchType" value="misc">
+                        <input type="hidden" id="suggestionIndex" value="-1">
+                        <input type="hidden" id="productUrl" value="">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="background-color: #f1f8fe;margin: 3%;">
+    <div class="rows tb-space pad-top-o pad-bot-redu">
+        <div class="container">
+            <div class="spe-title">
+                <h2>{!! __('parisTopAttractions') !!}</h2>
+                <div class="title-line">
+                    <div class="tl-1"></div>
+                    <div class="tl-2"></div>
+                    <div class="tl-3"></div>
+                </div>
+            </div>
+            <div class="home-attraction">
+            <nav style="background-color: transparent;height: 100%;">
+                <div class="nav nav-tabs" id="nav-tab" role="tablist" style="border-bottom:0px;text-align: center;">
+                @foreach($attractionModel->where('isActive', 1)->take(8)->get() as $attraction)
+                    <?php $attractionTranslation = $attractionTranslationModel->where('languageID', $langID)->where('attractionID', $attraction->id)->first(); ?>
+                    @if($attractionTranslation)
+                        <a class="nav-item nav-link home-button" id="" data-toggle="tab" href="#{{$attractionTranslation->slug}}" role="tab" aria-controls="nav-home" aria-selected="true" style="border-radius: 5px;">{{$attractionTranslation->name}}</a>
+                    @else
+                        <a class="nav-item nav-link home-button" id="" data-toggle="tab" href="#{{$attraction->slug}}" role="tab" aria-controls="nav-home" aria-selected="true" style="border-radius: 5px;">{{$attraction->name}}</a>
+                    @endif
+                @endforeach
+                </div>
+            </nav>
+            </div>
+            <div class="home-attraction">
+                <div class="tab-content" id="nav-tabContent">
+                    @foreach($activeAttractions as $attraction)
+                        <?php $attractionTranslation = $attractionTranslationModel->where('languageID', $langID)->where('attractionID', $attraction->id)->first(); ?>
+                        <div class="tab-pane fade" id="@if($attractionTranslation){{$attractionTranslation->slug}}@else{{$attraction->slug}}@endif" role="tabpanel" aria-labelledby="nav-home-tab" style="background-color: transparent;">
+                            <div class="col-lg-6">
+                                <a href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization($attraction->slug))}}" target="blank">
+                                    <img src="{{Storage::disk('s3')->url('attraction-images/' . $attraction->image)}}" alt="{{$attraction->name}}" style="width:100%;height: 100%;margin: 23px 0px 21px;border-radius: 5%;">
+                                </a>
+                            </div>
+                            <div class="col-lg-6">
+                                <a href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization($attraction->slug))}}" target="blank">
+                                @if($attractionTranslation)
+                                    <h2>{{$attractionTranslation->name}}</h2>
+                                @else
+                                    <h2>{{$attraction->name}}</h2>
+                                @endif
+                                </a>
+                                <p style="font-size: 20px;">{{__('startingFrom')}}
+                                    <i class="{{$currencyIcon}}"></i>
+                                    {{$currencyModel::calculateCurrencyForVisitor($commonFunctions->calculateAttractionMinPrice($attraction->id))}}
+                                </p>
+                                <p>
+                                    @if($attractionTranslation)
+                                        {{$attractionTranslation->description}}
+                                    @else
+                                        {{$attraction->description}}
+                                    @endif
+                                </p>
+                                <p>
+                                   @if($attractionTranslation)
+                                       @if(!($attractionTranslation->tags==null))
+                                           @for($i=0;$i<count(explode('|', $attractionTranslation->tags));$i++)
+                                               <h4 class="home-tags" style="display:inline;">{{explode('|', $attractionTranslation->tags)[$i]}}</h4>
+                                           @endfor
+                                       @endif
+                                   @else
+                                       @if(!($attraction->tags==null))
+                                           @for($i=0;$i<count(explode('|', $attraction->tags));$i++)
+                                               <h4 class="home-tags" style="display:inline;">{{explode('|', $attraction->tags)[$i]}}</h4>
+                                           @endfor
+                                       @endif
+                                   @endif
+                                </p>
+                            </div>
+                            <div class="col-lg-12 hidden-xs">
+                                <h3>{{__('topToursInThisAttraction')}}</h3>
+                                @foreach($productModel->where('attractions', 'like','%"'.$attraction->id.'"%')->where('isPublished',1)->where('isDraft', 0)->where('isSpecial', 0)->take(4)->get() as $product)
+                                    <?php
+                                    $language = $languageModel::where('code', $langCode)->first();
+                                    $productTranslation = $productTranslationModel::where('productID', $product->id)->where('languageID', $language->id)
+                                        ->where(function($query) {
+                                            $query->where('title', '!=', null)
+                                                ->where('shortDesc', '!=', null)
+                                                ->where('fullDesc', '!=', null)
+                                                ->where('highlights', '!=', null)
+                                                ->where('included', '!=', null)
+                                                ->where('notIncluded', '!=', null)
+                                                ->where('knowBeforeYouGo', '!=', null)
+                                                ->where('category', '!=', null)
+                                                ->where('cancelPolicy', '!=', null);
+                                        })->first();
+                                    ?>
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        @if(!($commonFunctions->getOfferPercentage($product->id) == 0))
+                                            <div class="band">
+                                                <div class="ribbon ribbon--orange" style="margin-top: 0px">% {{$commonFunctions->getOfferPercentage($product->id)}}</div>
+                                            </div>
+                                        @endif
+                                        <a href="@if($productTranslation) {{url($langCodeForUrl.'/'.$productTranslation->url)}} @else {{url($langCodeForUrl.'/'.$product->url)}} @endif">
+                                            <div class="v_place_img">
+                                                <img class="mobile-image" style="height:160px;padding: 2%;"
+                                                     @if ($product->ProductGalleries()->where('product_id', '=', $product->id)->where('id', '=', $product->coverPhoto)->first())
+                                                     src="{{Storage::disk('s3')->url('product-images-xs/' . $product->ProductGalleries()->where('product_id', '=', $product->id)->where('id', '=', $product->coverPhoto)->first()->src)}}"
+                                                     @else
+                                                     src="{{Storage::disk('s3')->url('product-images-xs/default_product.jpg')}}"
+                                                     @endif
+                                                     @if ($productTranslation)
+                                                     alt="{{$productTranslation->title}}"
+                                                     @else
+                                                     alt="{{$product->title}}"
+                                                     @endif
+                                                     title="Tour Booking" />
+                                            </div>
+                                        </a>
+                                        <div class="b_pack rows" style="min-height: 205px;max-height: 205px;">
+                                            <div class="row" style="height: 87px;">
+                                                <div class="col-md-12">
+                                                    <h3>
+                                                        @if ($productTranslation)
+                                                            <a href="{{url($langCodeForUrl.'/'.$productTranslation->url)}}" style="font-size: 15px;font-weight: 500;color: #1A2B50">{{$productTranslation->title}}</a>
+                                                        @else
+                                                            <a href="{{url($langCodeForUrl.'/'.$product->url)}}" style="font-size: 15px;font-weight: 500;color: #1A2B50">{{$product->title}}</a>
+                                                        @endif
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="row" style="height: 30px;">
+                                                        <div class="rating" style="margin-left: 3%;">
+                                                            @if(!($product->rate==null))
+                                                                @for($i=1;$i<=$product->rate;$i++)
+                                                                    <i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>
+                                                                @endfor
+                                                                <label style="font-size: 13px;vertical-align: text-bottom; float:left;color: #1A2B50;">| ({{$product->rate}}/5) </label>
+                                                                <p><span></span></p>
+                                                            @else
+                                                                <div style="font-size: 13px;vertical-align: text-bottom;padding-top: 10%;">No reviews yet</div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row container">
+                                                    <div class="hidden-lg hidden-md hidden-sm col-xs-12 mobile_desc">
+                                                        {!! html_entity_decode(substr($product->shortDesc, 0, 100)) !!} ...
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <div class="mobile_from">
+                                                        <span style="font-size:18px;">{{__('from')}}
+                                                            <?php $specialOffer = $commonFunctions->getOfferPercentage($product->id) ?>
+                                                            @if(auth()->check() && auth()->guard('web')->user()->commission != null && auth()->guard('web')->user()->isActive == '1')
+                                                                @if($specialOffer != 0)
+                                                                    <?php
+                                                                    $specialOfferPrice = round($currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id)) - (($commonFunctions->getMinPrice($product->id)) * ($commonFunctions->getOfferPercentage($product->id)) / 100),2);
+                                                                    ?>
+                                                                    <span class="special-offer-price" style="font-size: 18px;"><i class="{{$currencyIcon}}"></i>{{$specialOfferPrice}}</span>
+                                                                    <i class="{{$currencyIcon}}"></i><span class="strikeout">{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}</span>
+                                                                    <?php
+                                                                    $commissionerEarns = $currencyModel::calculateCurrencyForVisitor(($commonFunctions->getCommissionMinPrice($product->id, auth()->guard('web')->user()->id, $specialOfferPrice)));
+                                                                    ?>
+                                                                @else
+                                                                    <i class="{{$currencyIcon}}"></i>{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}
+                                                                    <?php
+                                                                    $commissionerEarns = $currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id)) - $currencyModel::calculateCurrencyForVisitor(($commonFunctions->getCommissionMinPrice($product->id, auth()->guard('web')->user()->id)));
+                                                                    ?>
+                                                                @endif
+                                                                <i class="{{$currencyIcon}}"></i>{{$commissionerEarns}} COM
+                                                            @else
+                                                                @if($specialOffer != 0)
+                                                                    <span class="special-offer-price" style="font-size: 18px;"><i class="{{$currencyIcon}}"></i>{{round($currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id)) - (($commonFunctions->getMinPrice($product->id)) * ($commonFunctions->getOfferPercentage($product->id)) / 100),2)}}</span>
+                                                                    <i class="{{$currencyIcon}}"></i><span class="strikeout">{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}</span>
+                                                                @else
+                                                                    <i class="{{$currencyIcon}}" style="color: #f4364f;"></i><span style="color:#f4364f;font-size: 18px">{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}</span>
+                                                                @endif
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="rows pad-bot-redu tb-space">
+        <div class="container">
+            <div class="spe-title">
+                <h2>{!! __('topParisTours') !!}</h2>
+                <div class="title-line">
+                    <div class="tl-1"></div>
+                    <div class="tl-2"></div>
+                    <div class="tl-3"></div>
+                </div>
+            </div>
+            <div>
+                <div class="row">
+                    @foreach($homePageProduct as $product)
+                        <?php
+                        $language = $languageModel::where('code', $langCode)->first();
+                        $productTranslation = $productTranslationModel::where('productID', $product->id)->where('languageID', $language->id)
+                            ->where(function($query) {
+                                $query->where('title', '!=', null)
+                                    ->where('shortDesc', '!=', null)
+                                    ->where('fullDesc', '!=', null)
+                                    ->where('highlights', '!=', null)
+                                    ->where('included', '!=', null)
+                                    ->where('notIncluded', '!=', null)
+                                    ->where('knowBeforeYouGo', '!=', null)
+                                    ->where('category', '!=', null)
+                                    ->where('cancelPolicy', '!=', null);
+                            })->first();
+                        ?>
+                        <div class="col-md-3 col-sm-6 col-xs-12 b_packages wow slideInUp" data-wow-duration="0.5s">
+                            @if(!($commonFunctions->getOfferPercentage($product->id) == 0))
+                                <div class="band">
+                                     <div class="ribbon  ribbon--orange" style="margin-top: 0px">% {{$commonFunctions->getOfferPercentage($product->id)}}</div>
+                                </div>
+                            @endif
+                            <a href="@if($productTranslation) {{url($langCodeForUrl.'/'.$productTranslation->url)}} @else {{url($langCodeForUrl.'/'.$product->url)}} @endif">
+                                <div class="v_place_img">
+                                    <img class="mobile-image" style="height:160px;padding: 2%;"
+                                         @if ($product->ProductGalleries()->where('product_id', '=', $product->id)->where('id', '=', $product->coverPhoto)->first())
+                                         src="{{Storage::disk('s3')->url('product-images-xs/' . $product->ProductGalleries()->where('product_id', '=', $product->id)->where('id', '=', $product->coverPhoto)->first()->src)}}"
+                                         @else
+                                         src="{{Storage::disk('s3')->url('product-images-xs/default_product.jpg')}}"
+                                         @endif
+                                         @if ($productTranslation)
+                                         alt="{{$productTranslation->title}}"
+                                         @else
+                                         alt="{{$product->title}}"
+                                         @endif
+                                         title="Tour Booking" />
+                                </div>
+                            </a>
+                            <div class="b_pack rows" style="min-height: 205px;max-height: 205px;">
+                                <div class="row" style="height: 87px;">
+                                    <div class="col-md-12">
+                                        <h3>
+                                            @if ($productTranslation)
+                                                <a href="{{url($langCodeForUrl.'/'.$productTranslation->url)}}" style="font-size: 15px;font-weight: 500;color: #1A2B50">{{$productTranslation->title}}</a>
+                                            @else
+                                                <a href="{{url($langCodeForUrl.'/'.$product->url)}}" style="font-size: 15px;font-weight: 500;color: #1A2B50">{{$product->title}}</a>
+                                            @endif
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row" style="height: 30px;">
+                                            <div class="rating" style="margin-left: 3%;">
+                                                @if(!($product->rate==null))
+                                                   @for($i=1;$i<=$product->rate;$i++)
+                                                        <i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>
+                                                   @endfor
+                                                   <label style="font-size: 13px;vertical-align: text-bottom; float:left;color: #1A2B50;">| ({{$product->rate}}/5) </label>
+                                                   <p><span></span></p>
+                                                @else
+                                                    <div style="font-size: 13px;vertical-align: text-bottom;padding-top: 10%;">No reviews yet</div>
+                                               @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row container">
+                                        <div class="hidden-lg hidden-md hidden-sm col-xs-12 mobile_desc">
+                                            {!! html_entity_decode(substr($product->shortDesc, 0, 100)) !!} ...
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="mobile_from">
+                                            <span style="font-size:18px;">{{__('from')}}
+                                                <?php $specialOffer = $commonFunctions->getOfferPercentage($product->id) ?>
+                                                @if(auth()->check() && auth()->guard('web')->user()->commission != null && auth()->guard('web')->user()->isActive == '1')
+                                                    @if($specialOffer != 0)
+                                                        <?php
+                                                            $specialOfferPrice = round($currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id)) - (($commonFunctions->getMinPrice($product->id)) * ($commonFunctions->getOfferPercentage($product->id)) / 100),2);
+                                                        ?>
+                                                        <span class="special-offer-price" style="font-size: 18px;"><i class="{{$currencyIcon}}"></i>{{$specialOfferPrice}}</span>
+                                                        <i class="{{$currencyIcon}}"></i><span class="strikeout">{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}</span>
+                                                        <?php
+                                                            $commissionerEarns = $currencyModel::calculateCurrencyForVisitor(($commonFunctions->getCommissionMinPrice($product->id, auth()->guard('web')->user()->id, $specialOfferPrice)));
+                                                        ?>
+                                                    @else
+                                                        <i class="{{$currencyIcon}}"></i>{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}
+                                                        <?php
+                                                            $commissionerEarns = $currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id)) - $currencyModel::calculateCurrencyForVisitor(($commonFunctions->getCommissionMinPrice($product->id, auth()->guard('web')->user()->id)));
+                                                        ?>
+                                                    @endif
+                                                    <i class="{{$currencyIcon}}"></i>{{$commissionerEarns}} COM
+                                                @else
+                                                    @if($specialOffer != 0)
+                                                        <span class="special-offer-price" style="font-size: 18px;"><i class="{{$currencyIcon}}"></i>{{round($currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id)) - (($commonFunctions->getMinPrice($product->id)) * ($commonFunctions->getOfferPercentage($product->id)) / 100),2)}}</span>
+                                                        <i class="{{$currencyIcon}}"></i><span class="strikeout">{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}</span>
+                                                    @else
+                                                        <i class="{{$currencyIcon}}" style="color: #f4364f;"></i><span style="color:#f4364f;font-size: 18px">{{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($product->id))}}</span>
+                                                    @endif
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="row" style="text-align: center;">
+                    <a id="seeAllTours" href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('all-products'))}}" class="link-btn">{{__('seeAllTours')}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section>
+    <div class="rows pad-bot-redu tb-space hidden-xs" style="background-color: #4e47480f;">
+        <div class="container">
+            <div class="col-lg-4 col-md-12 col-sm-12 big-bus-banner-text" style="margin-top: 3%;">
+                <div class="row">
+                    <span>{{__('seeAllBigBusTours')}}</span>
+                </div>
+                <div class="row" style="padding: 10px;text-align: center;">
+                    <a id="seeAllTours" href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization('big-bus'))}}" class="link-btn" >{{__('seeAllTours')}}</a>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-12 col-sm-12">
+                <div class="example">
+                    <div class="block">
+                        <div class="side -main"></div>
+                        <div class="side -left"></div>
+                    </div>
+                    <div class="block">
+                        <div class="side -main"></div>
+                        <div class="side -left"></div>
+                    </div>
+                    <div class="block">
+                        <div class="side -main"></div>
+                        <div class="side -left"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="row hidden-xs" style="margin-bottom: 3%;margin-top: 3%;">
+            <div class="col-lg-3 col-md-3 col-sm-6" style="text-align: center;">
+                <i class="icon-cz-like" style="font-size: 30px;text-align: center"></i>
+                <br>
+                <span style="text-align: center;">Free Cancellation</span>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6" style="text-align: center;">
+                <i class="icon-cz-availability" style="font-size: 30px;text-align: center"></i>
+                <br>
+                <span style="text-align: center;">24/7 Support</span>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6" style="text-align: center;">
+                <i class="icon-cz-payment" style="font-size: 30px;text-align: center"></i>
+                <br>
+                <span style="text-align: center;">Secure Payment</span>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6" style="text-align: center;">
+                <i class="icon-cz-disscount" style="font-size: 30px;text-align: center"></i>
+                <br>
+                <span style="text-align: center;">Lowest Price Guarantee</span>
+            </div>
+        </div>
+    </div>
+</section>
+<section>
+    <div class="rows pla pad-bot-redu tb-space">
+        <div class="pla1 p-home container">
+            <div class="spe-title spe-title-1">
+                <h2>{!! __('topParisToursThisMonth') !!}</h2>
+                <div class="title-line">
+                    <div class="tl-1"></div>
+                    <div class="tl-2"></div>
+                    <div class="tl-3"></div>
+                </div>
+                <p>{{__('topParisToursText')}}</p>
+            </div>
+            <div class="col-md-12">
+            @foreach($productsForSeine as $i => $product)
+                <?php
+                    $productTranslation = $productTranslationModel->where('productID', $product->id)->where('languageID', $langID)->first();
+                    ?>
+                    @if($productTranslation)
+                        <a href="{{url($langCodeForUrl.'/'.$productTranslation->url)}}">
+                    @else
+                        <a href="{{url($langCodeForUrl.'/'.$productModel::where('title', '=', $product->title)->first()->url)}}">
+                    @endif
+                    @if($productTranslation)
+                        <a href="{{url($langCodeForUrl.'/'.$productTranslation->url)}}">
+                    @else
+                        <a href="{{url($langCodeForUrl.'/'.$productModel::where('title', '=', $product->title)->first()->url)}}">
+                    @endif
+                    <div class="col-md-6 col-sm-6 col-xs-12 place">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <img
+                                @if($productGalleryModel::where('id', $productModel::where('title', '=', $product->title)->first()->coverPhoto)->first())
+                                src="{{Storage::disk('s3')->url('product-images-xs/' . $productGalleryModel::where('id', $productModel::where('title', '=', $product->title)->first()->coverPhoto)->first()->src)}}"
+                                @else
+                                src="{{Storage::disk('s3')->url('product-images-xs/default_product.jpg')}}"
+                                @endif
+                                alt="{{$product->title}}" style="max-height: 215px;min-width: 260px;min-height: 215px;object-fit: cover;"/>
+                        </div>
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            @if($productTranslation)
+                                <h3><span>{{$productTranslation->title}}</span>{{$productTranslation->category}}</h3>
+                            @else
+                                <h3><span>{{$product->title}}</span>{{$productModel::where('title', '=', $product->title)->first()->category}}</h3>
+                            @endif
+                            @if($productTranslation)
+                                <p>{{$productTranslation->shortDesc}}</p>
+                            @else
+                                <p>{{$productModel::where('title', '=', $product->title)->first()->shortDesc}}</p>
+                            @endif
+                            <span style="font-weight: bold;color: #253d52;font-size:20px;">
+                                <i class="{{$currencyIcon}}"></i>
+                                {{$currencyModel::calculateCurrencyForVisitor($commonFunctions->getMinPrice($productModel::where('title', '=', $product->title)->first()->id))}}
+                            </span>
+                                @if($productTranslation)
+                                    <a href="{{url($langCodeForUrl.'/'.$productTranslation->url)}}" class="link-btn" style="float: right">{{__('moreInfo')}}</a>
+                                @else
+                                    <a href="{{url($langCodeForUrl.'/'.$productModel::where('title', '=', $product->title)->first()->url)}}" class="link-btn" style="float: right">{{__('moreInfo')}}</a>
+                                @endif
+                        </div>
+                    </div>
+                </a>
+            @if ($i % 2 == 1)
+            </div><div class="col-md-12">
+            @endif
+            @endforeach
+            <div class="col-md-12 text-center">
+                <a href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization('eiffel-tower'))}}" class="link-btn">{{__('allEiffelTowerTours')}}</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@include('frontend-partials.footer')
+@include('frontend-partials.general-scripts', ['page' => 'home'])

@@ -1,0 +1,101 @@
+/* this is the box */
+.triangle {
+    background: #fff;
+    border: 1px solid #a00;
+    position: relative;
+    z-index: 99;
+    padding-right: 10%;
+    padding-left: 10%;
+}
+
+/* this CS forms the triangles */
+.triangle:after,
+.triangle:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 100%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+
+/* this border color controlls the color of the triangle (what looks like the fill of the triangle) */
+.triangle:after {
+    top: 37%;
+    border-color: transparent transparent transparent;
+    border-width: 70px;
+}
+
+/* this border color controlls the outside, thin border */
+.triangle:before {
+    top: 37%;
+    border-color: transparent transparent transparent white;
+    border-width: 70px;
+}
+
+.form-group {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+.form-check {
+    padding-left: 0px;
+}
+
+.form-check-label {
+    padding-right: 0px;
+}
+
+table{
+    -moz-box-shadow:    3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow:         3px 3px 5px 6px #ccc;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #00000061;
+    border-color: #f5a605;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #00000061;
+    border-color: #f5a605;
+    font-weight: bold;
+}
+
+.btn-primary:active {
+    color: #fff;
+    background-color: #00000061;
+    border-color: #f5a605;
+    font-weight: bold;
+}
+
+div.feature {
+    position: relative;
+}
+
+div.feature a {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-decoration: none; /* No underlines on the link */
+    z-index: 10; /* Places the link above everything else in the div */
+    background-color: #FFF; /* Fix to make div clickable in IE */
+    opacity: 0; /* Fix to make div clickable in IE */
+    filter: alpha(opacity=1); /* Fix to make div clickable in IE */
+}
+.vertical {
+    writing-mode: vertical-rl;
+}
+
+body {
+    background-image: url('https://image.freepik.com/free-vector/abstract-white-background-vector-illustration_1407-419.jpg');
+    background-size: cover;
+}
