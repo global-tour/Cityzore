@@ -1151,7 +1151,7 @@
                 width: 100%!important;
             }
 
-            .offcanvas-body ul {
+            .offcanvas-body ul.nav {
                 display: flex;
                 align-items: center;
                 overflow-x: scroll;

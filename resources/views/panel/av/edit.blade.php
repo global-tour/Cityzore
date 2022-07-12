@@ -1,5 +1,5 @@
 @include('panel.av.head')
-@include('panel.av.header')
+@include('panel.av.header', ['pageTitle' => $availability->name])
 
 <div style="margin-top: 100px;" class="container-fluid">
     <div class="row pull-right" style="margin-right: 1%;margin-bottom: 10px">
