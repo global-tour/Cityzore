@@ -539,7 +539,7 @@ class  BookingController extends Controller
                     } else {
 
 
-                        if (is_null($option->bigBus)) {  // if bigbus
+                        if (!is_null($option->bigBus)) {  // if bigbus
                             // $bbProducts = $bbBookingResultJsonData->products;
                             // $bbProductsJson = response()->json($bbProducts);
                             // $bbProductsJsonData = $bbProductsJson->getData();

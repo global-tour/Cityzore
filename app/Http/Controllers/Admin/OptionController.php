@@ -1530,6 +1530,7 @@ class OptionController extends Controller
                             'body' => json_encode($product),
                             'units' => json_encode($unitItems)
                         ]);
+                        Option::find($request->option_id)->update(["bigBusID" => $bigbus->id]);
 
                         return response()->json([
                             'status' => true,
@@ -1560,8 +1561,9 @@ class OptionController extends Controller
     {
         try {
             $bigbus = Bigbus::findOrFail($request->id);
-
+            $bigbus->option()->update(["bigBusID" => NULL]);
             $bigbus->delete();
+            
 
             return response()->json([
                 'status' => true,
