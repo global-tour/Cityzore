@@ -8,6 +8,16 @@ class TicketType extends Model
 {
     protected $table = 'ticket_types';
 
+    protected $fillable = [
+        'type',
+        'format',
+        'name',
+        'bladeName',
+        'multipleTicket',
+        'usableAsTicket',
+        'warnTicket'
+    ];
+
     public function av()
     {
         return $this->belongsToMany(Av::class, 'av_tickettype');
@@ -18,9 +28,15 @@ class TicketType extends Model
         return $this->belongsToMany(Option::class, 'option_ttype');
     }
 
-    public function barcodes()
+
+    public function getGeneratorAttribute()
     {
-        return $this->hasMany(Barcode::class, 'ticketType', 'id');
+        $this->attributes['type'] == 'BARCODE';
+
+    }
+
+    public function barcodes(){
+         return $this->hasMany(Barcode::class, 'ticketType', 'id');
     }
 
 }

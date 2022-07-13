@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\TimeRelatedFunctions;
 use App\Http\Controllers\Helpers\ApiRelated;
+use Illuminate\Support\Facades\Validator;
 
 class TicketTypeController extends Controller
 {
@@ -44,11 +45,27 @@ class TicketTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $ticketType = new TicketType();
-        $ticketType->name = $request->name;
-        $ticketType->bladeName = $request->bladeName;
-        $ticketType->save();
-        return redirect('/ticket-type');
+        $request->validate([
+            'name' => 'required',
+            'type' => 'required',
+            'format' => 'required_if:type,==,BARCODE'
+        ], [
+            'required' => 'This field is required.',
+            'required_if' => 'This field is required.'
+        ]);
+
+        $request->merge(['bladeName' => $request->name]);
+
+        if ($request->type == 'QRCODE') {
+            $request->merge(['format' => 'png']);
+        }
+
+
+        if (TicketType::create($request->all())) {
+            return redirect('/ticket-type');
+        }
+
+        return redirect()->back()->with('error', 'An error has occurred');
     }
 
     /**
@@ -68,14 +85,28 @@ class TicketTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (intval($request->warnTicket)<1) return back()->with('warnTicket','You can not enter less than 1');
+        $request->validate([
+            'name' => 'required',
+            'type' => 'required',
+            'format' => 'required_if:type,==,BARCODE'
+        ], [
+            'required' => 'This field is required.',
+            'required_if' => 'This field is required.'
+        ]);
 
-        $ticketType = TicketType::findOrFail($id);
-        $ticketType->name = $request->name;
-        $ticketType->warnTicket = $request->warnTicket;
-        $ticketType->save();
+        $request->merge(['bladeName' => $request->name]);
 
-        return redirect('/ticket-type');
+        if ($request->type == 'QRCODE') {
+            $request->merge(['format' => 'png']);
+        }
+
+        if (intval($request->warnTicket)<1) return back()->with('warnTicket','Minimum Ticket Number Error / You can not enter less than 1');
+
+        if (TicketType::find($id)->update($request->all())) {
+            return redirect('/ticket-type');
+        }
+
+        return redirect()->back()->with('status', 'An error has occurred');
     }
 
     /**
