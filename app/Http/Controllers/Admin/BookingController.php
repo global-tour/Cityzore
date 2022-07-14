@@ -1067,7 +1067,7 @@ class BookingController extends Controller
             }
             $ticket = null;
             if ($status == 3) {
-                $option = Option::where('referenceCode', '=', $booking->optionRefCode)->first();
+                $option = Option::with('bigBus')->where('referenceCode', '=', $booking->optionRefCode)->first();
                 $supplierID = $option->supplierID;
                 $availability = $option->avs;
                 $ticketTypes = [];
@@ -1141,6 +1141,11 @@ class BookingController extends Controller
                         $res->reset();
                     }
                 }
+
+                if (!is_null($option->bigBus)) {
+                    Barcode::where('bookingID', $booking->id)->delete();
+                }
+
                 foreach ($ticketTypes as $ticketType) {
                     if (!is_null($ticketType)) {
 
