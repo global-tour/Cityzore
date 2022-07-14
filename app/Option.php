@@ -8,6 +8,8 @@ class Option extends Model
 
     protected $table = 'options';
 
+    protected $fillable = ["bigBusID"];
+
     public function products()
     {
         return $this->belongsToMany(Product::class, 'option_product');
