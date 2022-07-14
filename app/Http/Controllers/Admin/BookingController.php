@@ -1184,8 +1184,7 @@ class BookingController extends Controller
                                      }*/
 
                         $targetOne = Barcode::where('isUsed', 1)->where('isReserved', 1)
-                            ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)
-                            ->take($totalTicketCount)->first();
+                            ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)->get();
 
                         $cancelReason = $request->cancelReason;
                         $cancelBy = auth()->guard('admin')->user()->email;
@@ -1195,7 +1194,7 @@ class BookingController extends Controller
                         if (!empty($targetOne)) {
 
 
-                            $pastLogs = is_null($targetOne->log) ? [] : json_decode($targetOne->log, true);
+//                            $pastLogs = is_null($targetOne->log) ? [] : json_decode($targetOne->log, true);
 
                             $pastLogs[] = [
 
