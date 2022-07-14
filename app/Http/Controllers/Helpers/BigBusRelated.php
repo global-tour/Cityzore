@@ -38,7 +38,7 @@ class BigBusRelated
     /**
      * @var string $token
      */
-    protected $token = '38f7e980-5df8-4357-b2f9-9925dc377a12';
+    protected $token;
 
     /**
      * @var array $product
@@ -76,7 +76,7 @@ class BigBusRelated
     {
         $this->token = config('app.env') === 'local'
             ? 'febbfcd2-c875-4738-b468-7ad417045883'
-            : 'b50f5299-d379-4fcf-ba04-aa0c3f6c73a0';
+            : '38f7e980-5df8-4357-b2f9-9925dc377a12';
 
         return $this;
     }
