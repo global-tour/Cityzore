@@ -1530,7 +1530,7 @@ class OptionController extends Controller
                             'body' => json_encode($product),
                             'units' => json_encode($unitItems)
                         ]);
-                        Option::find($request->option_id)->update(["bigBusID" => $bigbus->id]);
+                        Option::find($request->option_id)->update(["bigBusID" => $product['id']]);
 
                         return response()->json([
                             'status' => true,
