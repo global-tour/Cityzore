@@ -293,6 +293,7 @@
                         <div>{{$conciergerieBarcode[$i]['code']}}</div>
                     @elseif($ticketType == '3')
                         <div><img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(130)->generate($bigBus[$i]['code'])) !!} "></div>
+                        <div>{{$bigBus[$i]['code']}}</div>
                     @endif
                         </th>
                         </tr>

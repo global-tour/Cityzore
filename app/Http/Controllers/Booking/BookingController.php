@@ -435,11 +435,9 @@ class  BookingController extends Controller
 
                     $uuid = Uuid::uuid4();
 
-                    foreach (json_decode($booking->bookingItems, 1) as $key => $item) {
-                        if ($key == 'count') {
-                            for ($i = 0; $i < $item['count']; $i++) {
-                                $unitItems[]['unitId'] = json_decode($option->bigBus->units, 1)[$item['category']]['id'];
-                            }
+                    foreach (json_decode($booking->bookingItems, 1) as $item) {
+                        for ($i = 0; $i < $item['count']; $i++) {
+                            $unitItems[]['unitId'] = json_decode($option->bigBus->units, 1)[$item['category']]['id'];
                         }
                     }
 

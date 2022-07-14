@@ -12,9 +12,9 @@ use phpDocumentor\Reflection\Types\This;
 /**
  * Ventrata Test
  * https://agent.edinexplore.com/
- * email: xmesut123@gmail.com
- * pw   : Mesut0057
- * Bearer Token: 5a7466ad-b0d5-40d1-a440-ff6d6014130a
+ * email: test123@gmail.com
+ * pw   : Test123
+ * Bearer Token: febbfcd2-c875-4738-b468-7ad417045883
  *
  * Documentation
  * https://docs.ventrata.com/booking
@@ -57,6 +57,8 @@ class BigBusRelated
 
     public function setClient()
     {
+        $this->setToken();
+
         $config = [
             'base_uri'  => $this->base_uri,
             'headers'   => [
@@ -70,9 +72,11 @@ class BigBusRelated
         return $this;
     }
 
-    public function setTokenForTest()
+    public function setToken()
     {
-        $this->token = 'b50f5299-d379-4fcf-ba04-aa0c3f6c73a0';
+        $this->token = config('app.env') === 'local'
+            ? 'febbfcd2-c875-4738-b468-7ad417045883'
+            : 'b50f5299-d379-4fcf-ba04-aa0c3f6c73a0';
 
         return $this;
     }
