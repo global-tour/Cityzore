@@ -1130,7 +1130,7 @@ class BookingController extends Controller
                         $resultBarcode = $res->where('dayFrom', 'dateLte', $bookingDate)
                             ->where('dayTo', 'dateGte', $bookingDate)
                             ->get();
-                        if (count($resultBarcode) == 0) {
+                        if (array_key_exists(key($resultBarcode), $resultBarcode)) {
                             $key = key($resultBarcode);
                             $ticketBarcodeDatabase[$key]['ticket'] += $totalTicketCount;
                             $ticketBarcodeDatabase[$key]['sold'] -= $totalTicketCount;
@@ -1145,10 +1145,10 @@ class BookingController extends Controller
                 if (!is_null($option->bigBus)) {
                     Barcode::where('bookingID', $booking->id)->delete();
                 }
-
+                 $allTickets = [];
                 foreach ($ticketTypes as $ticketType) {
                     if (!is_null($ticketType)) {
-
+                      array_push($allTickets, $ticketType->id);
                         /*        $barcodes =  Barcode::where('isUsed', 1)->where('isReserved', 1)
                                      ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)
                                      ->take($totalTicketCount)->get();
@@ -1188,7 +1188,7 @@ class BookingController extends Controller
 
                                      }*/
 
-                        $targetOne = Barcode::where('isUsed', 1)->where('isReserved', 1)
+                        $targetOne = Barcode::where('isUsed', 1)
                             ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)->get();
 
                         $cancelReason = $request->cancelReason;
@@ -1226,13 +1226,13 @@ class BookingController extends Controller
                         }
 
                         if($ticketType->id == 30) {
-                            Barcode::where('isUsed', 1)->where('isReserved', 1)
+                            Barcode::where('isUsed', 1)
                                 ->where('ownerID', $supplierID)->where(function($q) {
                                     $q->where('ticketType', 30)->orWhere('ticketType', 31);
                                 })->where('bookingID', $booking->id)
                                 ->take($totalTicketCount)->update(['cartID' => null, 'bookingID' => null, 'isUsed' => 0, 'isReserved' => 0, "log" => $insertLog]);
                         } else {
-                            Barcode::where('isUsed', 1)->where('isReserved', 1)
+                            Barcode::where('isUsed', 1)
                                 ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)
                                 ->take($totalTicketCount)->update(['cartID' => null, 'bookingID' => null, 'isUsed' => 0, 'isReserved' => 0, "log" => $insertLog]);
                         }
@@ -1240,7 +1240,7 @@ class BookingController extends Controller
                 }
             }
 
-            return ['success' => 'Successful', 'status' => $status, 'ticket' => $ticket, 'count' => $count, 'message' => 'Status changed successfully'];
+            return ['success' => 'Successful', 'status' => $status, 'ticket' => $ticket, 'count' => $count, 'message' => 'Status changed successfully', 'allTickets' => $allTickets];
         }
     }
 
