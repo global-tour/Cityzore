@@ -1067,8 +1067,52 @@ class BookingController extends Controller
             }
             $ticket = null;
             if ($status == 3) {
+
                 $option = Option::with('bigBus')->where('referenceCode', '=', $booking->optionRefCode)->first();
                 $supplierID = $option->supplierID;
+
+                if (!is_null($option->bigBus)) {
+                    Barcode::where('bookingID', $booking->id)->delete();
+                }
+                $targetOne = Barcode::where('isUsed', 1)
+                    ->where('ownerID', $supplierID)->where('bookingID', $booking->id)->get();
+
+                $cancelReason = $request->cancelReason;
+                $cancelBy = auth()->guard('admin')->user()->email;
+                $cancelDate = Carbon::now()->format('d/m/Y-H:i');
+                if (!empty($targetOne)) {
+
+
+
+                    $pastLogs[] = [
+
+                        "oldBookingID" => $booking->id,
+                        "cancelReason" => $cancelReason,
+                        "cancelBy" => $cancelBy,
+                        "cancelDate" => $cancelDate
+
+
+                    ];
+
+                    $insertLog = json_encode($pastLogs);
+
+                } else {
+                    $insertLog = json_encode([
+
+                        "oldBookingID" => $booking->id,
+                        "cancelReason" => $cancelReason,
+                        "cancelBy" => $cancelBy,
+                        "cancelDate" => $cancelDate
+
+
+                    ]);
+                }
+                Barcode::where('isUsed', 1)
+                        ->where('ownerID', $supplierID)->where('bookingID', $booking->id)
+                        ->update(['cartID' => null, 'bookingID' => null, 'isUsed' => 0, 'isReserved' => 0, "log" => $insertLog]);
+
+
+
                 $availability = $option->avs;
                 $ticketTypes = [];
                 foreach ($availability as $ind => $av) {
@@ -1142,51 +1186,13 @@ class BookingController extends Controller
                     }
                 }
 
-                if (!is_null($option->bigBus)) {
-                    Barcode::where('bookingID', $booking->id)->delete();
-                }
+
+                /*
                  $allTickets = [];
                 foreach ($ticketTypes as $ticketType) {
                     if (!is_null($ticketType)) {
                       array_push($allTickets, $ticketType->id);
-                        /*        $barcodes =  Barcode::where('isUsed', 1)->where('isReserved', 1)
-                                     ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)
-                                     ->take($totalTicketCount)->get();
 
-
-                                     foreach($barcodes as $barcode){
-
-                                         $oldBookingID = $barcode->bookingID;
-                                         $cancelReason = $request->cancelReason ?? 'Cancellation Request';
-                                         $cancelBy = auth()->guard('admin')->user()->email;
-                                         $cancelDate = Carbon::now()->format('d/m/Y H:i');
-                                         $pastLogs = is_null($barcode->pastLog) ? [] : json_decode($barcode->pastLog, true);
-
-                                         $pastLogs[] = [
-
-                                             "oldBookingID" => $oldBookingID,
-                                             "cancelReason" => $cancelReason,
-                                             "cancelBy" => $cancelBy,
-                                             "cancelDate" => $cancelDate
-
-
-                                     ];
-
-
-
-
-
-
-                                         $barcode->cartID = null;
-                                         $barcode->bookingID = null;
-                                         $barcode->isUsed = 0;
-                                         $barcode->isReserved = 0;
-                                         $barcode->log = json_encode($pastLogs);
-                                         $barcode->save();
-
-
-
-                                     }*/
 
                         $targetOne = Barcode::where('isUsed', 1)
                             ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)->get();
@@ -1199,7 +1205,6 @@ class BookingController extends Controller
                         if (!empty($targetOne)) {
 
 
-//                            $pastLogs = is_null($targetOne->log) ? [] : json_decode($targetOne->log, true);
 
                             $pastLogs[] = [
 
@@ -1236,11 +1241,13 @@ class BookingController extends Controller
                                 ->where('ownerID', $supplierID)->where('ticketType', $ticketType->id)->where('bookingID', $booking->id)
                                 ->take($totalTicketCount)->update(['cartID' => null, 'bookingID' => null, 'isUsed' => 0, 'isReserved' => 0, "log" => $insertLog]);
                         }
+
                     }
                 }
+                */
             }
 
-            return ['success' => 'Successful', 'status' => $status, 'ticket' => $ticket, 'count' => $count, 'message' => 'Status changed successfully', 'allTickets' => $allTickets];
+            return ['success' => 'Successful', 'status' => $status, 'ticket' => $ticket, 'count' => $count, 'message' => 'Status changed successfully'];
         }
     }
 
