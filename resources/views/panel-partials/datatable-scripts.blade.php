@@ -3186,23 +3186,25 @@ $(document).on('change', '#access-checkins-form input[type="number"]', function(
                 supplierID: supplierID
             },
             success: function(data) {
-                let options = data.options;
-
+                var options = data.options;
+                var block = '';
+                console.log(options);
                 for (let i = 0; i < options.length; i++) {
-                    let block = '';
+                    
                     block += '<option ';
                     if(options[i].rCodeID){
-                        const opt = options[i].rCodeID.split(',').some(x => {
+                        const opt = options[i].rCodeID.toString().split(',').some(x => {
                             return x === supplierID;
-                        })
+                        });
 
                         if(opt) {
                             block += 'selected ';
                         }
                     }
                     block += 'value="'+options[i].id+'">'+options[i].title+'</option>';
-                    $('#supplierSelect').append(block);
+                    
                 }
+                $('#supplierSelect').html(block);
             }
         });
     });
