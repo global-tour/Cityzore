@@ -601,7 +601,7 @@ class BarcodeController extends Controller
 
             if($request->file('file')->getClientOriginalExtension() == 'pdf') {
 
-                $text = (new Pdf('/opt/homebrew/bin/pdftotext'))
+                $text = (new Pdf())
                     ->setPdf($request->file('file'))
                     ->text();
 
