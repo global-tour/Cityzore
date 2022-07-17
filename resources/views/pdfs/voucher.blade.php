@@ -341,7 +341,7 @@
                                         @endforeach
                                     @else
                                         @foreach(json_decode($booking->bookingItems, true) as $participants)
-                                            {{$participants['category']}} : 1 <br>
+                                            {{$participants['category']}} : {{ ($participants['count'] ?? 1) }} <br>
                                         @endforeach
                                     @endif
                                 </td>
