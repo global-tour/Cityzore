@@ -346,6 +346,13 @@
                                     @endif
                                 </td>
                             </tr>
+                            @if($ticketType == '3')
+                                <tr style="background-color: #FFFAFA;">
+                                    <td colspan="3" align="right">
+                                        <span>{{($i+1)}} / {{$participantSum}}</span>
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
                         <table style="width:100%;">
                             <tr>
