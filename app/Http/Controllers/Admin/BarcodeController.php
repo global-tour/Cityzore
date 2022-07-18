@@ -22,6 +22,7 @@ use App\Imports\BarcodeOperaImport;
 use App\Imports\BarcodePicassoImport;
 use Illuminate\Http\Response;
 use Illuminate\Session\Store;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -616,7 +617,7 @@ class BarcodeController extends Controller
 
             }else{
 
-                (new BarcodeImport($userID, $ticket_type))->import($request->file);
+                (new BarcodeImport($userID, $ticket_type, Auth::user()->id))->import($request->file);
 
             }
 

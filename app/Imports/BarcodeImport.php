@@ -23,11 +23,13 @@ class BarcodeImport implements ToCollection, WithHeadingRow, ShouldQueue, WithBa
     public $failed_data = ["counter" => 0, "items" => []];
     public $ownerID;
     private $ticketType;
+    private $importedBy;
 
-    public function __construct($ownerID, $ticketType)
+    public function __construct($ownerID, $ticketType, $importedBy)
     {
         $this->ticketType = $ticketType;
         $this->ownerID = $ownerID;
+        $this->importedBy = $importedBy;
     }
 
     public function collection(Collection $rows)
@@ -63,7 +65,7 @@ class BarcodeImport implements ToCollection, WithHeadingRow, ShouldQueue, WithBa
             Log::info(json_encode([
                 'status' => 'Success',
                 'ticketType' => $this->ticketType->name,
-                'importedBy' => Auth::user()->id,
+                'importedBy' => $this->importedBy,
             ]));
 
         } catch (\Exception $exception) {
