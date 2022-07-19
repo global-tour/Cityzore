@@ -198,6 +198,7 @@ class PdfController extends Controller
                 'generator' => $generator,
                 'url' => $url,
                 'rCode' => $rCode,
+                'pompidou' => $pompidou,
 
                 'productImage' => ['eiffel-tower-5ab.jpg'],
             ];
