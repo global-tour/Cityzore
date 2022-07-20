@@ -1315,6 +1315,25 @@
             }
         </style>
         @endif
+    @elseif($page == 'voucher-template-create')
+        <style>
+            .input-field label{
+             top: 1.4em;
+            }
+            textarea{
+                min-height: 300px;
+            }
+        </style>
+
+    @elseif($page == 'voucher-template-edit')
+        <style>
+            .input-field label{
+                top: 1.4em;
+            }
+            textarea{
+                min-height: 300px;
+            }
+        </style>
     @elseif($page == 'voucher-create')
         <link rel="stylesheet" type="text/css" href="{{asset('js/airdatepicker/datepicker.css')}}">
     @elseif($page == 'voucher-edit')

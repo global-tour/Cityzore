@@ -49,6 +49,19 @@ class PdfController extends Controller
         return $this->voucherBackend($id);
     }
 
+
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \Picqer\Barcode\Exceptions\BarcodeException
+     */
+    public function voucherBackendv2($id)
+    {
+        $id = $this->cryptRelated->decrypt($id);
+        $booking = Booking::findOrFail($id);
+        return "test";
+    }
+
     /**
      * @param $id
      * @return mixed

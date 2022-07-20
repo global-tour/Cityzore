@@ -4123,6 +4123,26 @@ body.stop().animate({scrollTop:$(target).offset().top-50}, 0, 'swing', function(
             });
         });
     </script>
+@elseif($page == 'voucher-template-create')
+    <script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
+
+    <script>
+        document.querySelectorAll( '.cked' ).forEach(function(element) {
+            CKEDITOR.replace(element.name);
+        });
+
+    </script>
+
+@elseif($page == 'voucher-template-edit')
+    <script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
+
+    <script>
+        document.querySelectorAll( '.cked' ).forEach(function(element) {
+            CKEDITOR.replace(element.name);
+        });
+
+    </script>
+
 @elseif($page == 'voucher-create')
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="{{asset('js/airdatepicker/datepicker.min.js')}}"></script>

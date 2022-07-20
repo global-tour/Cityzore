@@ -319,6 +319,28 @@ if (!is_null($roles)) {
                         </li>
                     @endif
 
+                    @if(in_array("Voucher Template Access", $permissionsArray))
+                    <li>
+                        <a href="javascript:void(0)" class="collapsible-header"><i class="icon-cz-payment"
+                                                                                   aria-hidden="true"></i>
+                            Voucher Templates</a>
+                        <div class="collapsible-body left-sub-menu">
+                            <ul>
+
+                                    <li>
+                                        <a href="{{url('/voucher-template')}}">All Voucher Templates</a>
+                                    </li>
+
+
+                                    <li>
+                                        <a href="{{url('/voucher-template/create')}}">Create Voucher Template</a>
+                                    </li>
+
+                            </ul>
+                        </div>
+
+                    </li>
+                    @endif
 
                     <li>
                         <a href="javascript:void(0)" class="collapsible-header"><i class="icon-cz-payment"

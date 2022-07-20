@@ -298,6 +298,7 @@ class AllBookingsDatatable
                 'info'            => [
                     'id'          => $item->id,
                     'voucher'     => url('/print-pdf/' . (new CryptRelated())->encrypt($item->id)),
+                    'voucherv2'     => url('/print-pdf-v2/' . (new CryptRelated())->encrypt($item->id)),
                     'invoice'     => url('/print-invoice/' . (new CryptRelated())->encrypt($item->id))
                 ]
             ];

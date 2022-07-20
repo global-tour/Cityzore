@@ -262,6 +262,10 @@ Route::group(['domain' => 'admin.'. env('ROUTE_VARIABLE', 'cityzore.com'), 'midd
         });
 
         Route::name('Voucher')->group(function () {
+            Route::middleware('permission:Voucher Template Access')->group(function () {
+                Route::resource('voucher-template', 'VoucherTemplateController');
+            });
+
             Route::middleware('permission:Voucher Create')->group(function () {
                 Route::get('/voucher/create', 'VoucherController@create');
                 Route::post('/voucher/store', 'VoucherController@store');
@@ -650,6 +654,7 @@ Route::group(['domain' => 'admin.'. env('ROUTE_VARIABLE', 'cityzore.com'), 'midd
 
     Route::group(['namespace' => 'Pdfs'], function () {
         Route::get('/print-pdf/{id}', 'PdfController@voucherBackend')->name('print.pdf')->middleware('permission:Show All Bookings');
+        Route::get('/print-pdf-v2/{id}', 'PdfController@voucherBackendv2')->name('print.pdf.v2')->middleware('permission:Show All Bookings');
         Route::get('/print-invoice/{id}', 'PdfController@invoiceBackend')->name('print.invoice')->middleware('permission:Show All Bookings');
         Route::post('/multiple-tickets', 'PdfController@multipleTickets')->name('print.multipleTickets')->middleware('permission:Create Ticket');
         Route::post('/getUsableBarcodeCount', 'PdfController@getUsableBarcodeCount')->middleware('permission:Create Ticket');
@@ -861,6 +866,10 @@ Route::group(['domain' => 'supplier.'. env('ROUTE_VARIABLE'), 'middleware' => ['
         });
 
         Route::name('Voucher')->group(function () {
+            Route::middleware('permission:Voucher Template Access')->group(function () {
+                Route::resource('voucher-template', 'VoucherTemplateController');
+            });
+
             Route::middleware('permission:Voucher Create')->group(function () {
                 Route::get('/voucher/create', 'VoucherController@create');
                 Route::post('/voucher/store', 'VoucherController@store');
@@ -992,6 +1001,7 @@ Route::group(['domain' => 'supplier.'. env('ROUTE_VARIABLE'), 'middleware' => ['
 
     Route::namespace('Pdfs')->group(function () {
         Route::get('/print-pdf/{id}', 'PdfController@voucherBackend')->name('print.pdf');
+        Route::get('/print-pdf-v2/{id}', 'PdfController@voucherBackendv2')->name('print.pdf.v2');
         Route::get('/print-invoice/{id}', 'PdfController@invoiceBackend')->name('print.invoice');
         Route::post('/multiple-tickets', 'PdfController@multipleTickets')->name('print.multipleTickets');
         Route::post('/getUsableBarcodeCount', 'PdfController@getUsableBarcodeCount');

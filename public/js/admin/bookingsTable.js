@@ -454,6 +454,13 @@ let table = $('#all-bookings-table').DataTable({
                                             </a>
                                         </li>
 
+                                           <li class="nav-item">
+                                            <a class="nav-link" href="${full.info.voucherv2}" target="_blank">
+                                                <em class="nav-icon fa fa-download"></em>
+                                                <span class="nav-text">Voucher V2</span>
+                                            </a>
+                                        </li>
+
                                         <li class="nav-item">
                                             <a class="nav-link" href="${full.info.invoice}" target="_blank">
                                                 <em class="nav-icon fa fa-download"></em>
