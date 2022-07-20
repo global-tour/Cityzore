@@ -165,7 +165,7 @@ $langs = \App\Language::where('isActive', 1)->get()->pluck('code')->toArray();
                                     <div class="circle" id="cartCount"></div>
                                 </a>
                                 <div class="mm-pos" style="margin-top: 50px;">
-                                    <div class="about-mm m-menu" style="width:35%; right:0px;">
+                                    <div class="about-mm m-menu" style="width:85%; right:0px;">
                                         <div class="m-menu-inn">
                                             <div id="cartTableDiv" class="mm1-com-cart mm1-s1">
                                                 @include('dynamic-components.header-cart-table')
