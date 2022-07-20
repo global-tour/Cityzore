@@ -159,3 +159,7 @@
 .icon-cz-facebook:before { content: '\f30c'; } /* '' */
 .icon-cz-linkedin:before { content: '\f318'; } /* '' */
 .icon-cz-instagram:before { content: '\f32d'; } /* '' */
+.icon-cz-search:before { content: '\e800'; } /* '' */
+.icon-cz-flashlight:before { content: '\e801'; } /* '' */
+.icon-cz-search-1:before { content: '\e802'; } /* '' */
+.icon-cz-search-circled:before { content: '\e803'; } /* '' */

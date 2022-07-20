@@ -64,43 +64,51 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
 
 
 
- <style>
-                 .tourz-sear-btn > input {
-                width: 100%!important;
-            }
-            .searchInputNotValid {
-                background-color: #ff8066!important;
-            }
-            .suggestions-container {
-                display: none;
-                position: absolute;
-                top: 43px;
-                z-index: 100;
-                background-color: #fff;
-                border: 1px solid #c6c8d0;
-                max-height: 400px;
-                overflow-y: auto;
-                overflow-x: hidden;
-                min-width: 320px;
-                text-align: left;
-            }
-            .suggestion-item {
-                border-top: 1px solid #c6c8d0;
-                min-height: 40px;
-                cursor: pointer;
-                min-width:320px;
-                padding:10px;
-            }
-            .suggestion-item:hover {
-                background-color: #1593ff!important;
-                color: #fff!important;
-            }
- </style>
+    <style>
+        .tourz-sear-btn > input {
+            width: 100%!important;
+        }
+        .searchInputNotValid {
+            background-color: #ff8066!important;
+        }
+        .suggestions-container {
+            display: none;
+            position: absolute;
+            top: 70px;
+            z-index: 100;
+            background-color: #fff;
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-width: 320px;
+            text-align: left;
+            width: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 1px 0 12px rgb(0 0 0 / 13%);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .suggestion-item {
+            min-height: 40px;
+            cursor: pointer;
+            min-width:100%;
+            padding:10px;
+            display: flex;
+            align-items: center;
+            color: #1a2b49;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0!important;
+            color: #000!important;
+            border-radius: 8px;
+        }
+    </style>
 
 
 
 
-<?php
+    <?php
     $language = App\Language::where('code', $langCode)->first();
     $reqUri = $_SERVER['REQUEST_URI'];
     if ($page == 'all-attractions') {
@@ -132,10 +140,10 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
             $keywords = $isTherePageMetaTagTranslation->keywords;
         }
     }
-?>
+    ?>
 
 
-@if($page == 'product')
+    @if($page == 'product')
         <?php
         $languages = \App\Language::where('isActive', '=', 1)->get();
         ?>
@@ -147,7 +155,7 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                 <link href="https://www.cityzore.com/{{$lan->code}}/{{$p->url}}" rel="alternate" hreflang="{{$lan->code}}"/>
             @endforeach
         @endforeach
-            <script type="application/ld+json">
+        <script type="application/ld+json">
             {
               "@context" : "http://schema.org",
               "@type" : "Product",
@@ -155,7 +163,7 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                 "name" : "{{$metaTag->title}}",
                 "description" : "{{$metaTag->description}}",
               @endif
-                "image" : "{{Storage::disk('s3')->url('product-images/' . $image)}}",
+            "image" : "{{Storage::disk('s3')->url('product-images/' . $image)}}",
               "offers" : {
                 "@type" : "Offer",
                 "priceCurrency": "EUR",
@@ -172,51 +180,51 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
             }
         </script>
         @if($metaTag)
-        <title>{{$metaTag->title}}</title>
-        <meta name="description" content="{{$metaTag->description}}">
-        <meta name="keywords" content="{{$metaTag->keywords}}">
-        <meta property="og:url" content="{{url()->current()}}" />
-        <meta property="og:title" content="{{$metaTag->title}}" />
-        <meta property="og:type" content=”website” />
-        <meta property="og:description" content="{{$metaTag->description}}" />
-        <meta property="og:image:secure_url" content="{{Storage::disk('s3')->url('product-images-xs/' . $image)}}" />
-        <meta property="og:image:width" content="400" />
-        <meta property="og:image:height" content="400" />
-        <!-- Twitter cards -->
-        <meta name="twitter:title" content="{{$metaTag->title}}" />
-        <meta name="twitter:description" content="{{$metaTag->description}}" />
-        <meta name="twitter:site" content="@parisviptrips" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="{{Storage::disk('s3')->url('product-images-xs/' . $image)}}" />
+            <title>{{$metaTag->title}}</title>
+            <meta name="description" content="{{$metaTag->description}}">
+            <meta name="keywords" content="{{$metaTag->keywords}}">
+            <meta property="og:url" content="{{url()->current()}}" />
+            <meta property="og:title" content="{{$metaTag->title}}" />
+            <meta property="og:type" content=”website” />
+            <meta property="og:description" content="{{$metaTag->description}}" />
+            <meta property="og:image:secure_url" content="{{Storage::disk('s3')->url('product-images-xs/' . $image)}}" />
+            <meta property="og:image:width" content="400" />
+            <meta property="og:image:height" content="400" />
+            <!-- Twitter cards -->
+            <meta name="twitter:title" content="{{$metaTag->title}}" />
+            <meta name="twitter:description" content="{{$metaTag->description}}" />
+            <meta name="twitter:site" content="@parisviptrips" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:image" content="{{Storage::disk('s3')->url('product-images-xs/' . $image)}}" />
 
         @else
             <title>{!! html_entity_decode($product->title)!!}</title>
             <meta name="description" content="{!! html_entity_decode($product->shortDesc)!!}">
             <meta name="keywords" content="{!! html_entity_decode($product->title)!!}">
         @endif
-            <style>
-                .strikeout {
-                    position: relative;
-                    font-size: 19px;
-                }
-                .strikeout::after {
-                    border-bottom: .13em solid #ffae0d;
-                    content: "";
-                    left: 0px;
-                    line-height: .3em;
-                    margin-top: calc(0.125em / 2 * -1);
-                    position: absolute;
-                    right: 0;
-                    top: 50%;
-                }
-                .special-offer-price{
-                    font-size: 19px;
-                }
-                .datepicker {
-                    width: 100% !important;
-                }
+        <style>
+            .strikeout {
+                position: relative;
+                font-size: 19px;
+            }
+            .strikeout::after {
+                border-bottom: .13em solid #ffae0d;
+                content: "";
+                left: 0px;
+                line-height: .3em;
+                margin-top: calc(0.125em / 2 * -1);
+                position: absolute;
+                right: 0;
+                top: 50%;
+            }
+            .special-offer-price{
+                font-size: 19px;
+            }
+            .datepicker {
+                width: 100% !important;
+            }
 
-            </style>
+        </style>
         <link href="{{asset('js/airdatepicker/datepicker.css')}}" rel="stylesheet" type="text/css">
         <link href="{{asset('css/main/product-styles.css')}}" rel="stylesheet" type="text/css">
         <link href="{{asset('css/lightbox.min.css')}}" rel="stylesheet" type="text/css">
@@ -242,8 +250,8 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
             }
         </style>
     @elseif($page == 'become-a-supplier')
-    <link rel="stylesheet" href="{{asset('css/admin/materialize.css')}}">
-    <link rel="stylesheet" href="{{asset('css/main/become-a-supplier-styles.css')}}">
+        <link rel="stylesheet" href="{{asset('css/admin/materialize.css')}}">
+        <link rel="stylesheet" href="{{asset('css/main/become-a-supplier-styles.css')}}">
     @elseif($page == 'all-products')
 
         @unless($pageMetaTag)
@@ -267,11 +275,11 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                 "name" : "{{$title}}",
                 "description" : "{{$description}}",
               @endif
-              "sameAs": [ "https://www.facebook.com/pariscitytours.fr/",
-                "https://www.instagram.com/pariscitytours.fr/",
-                "https://twitter.com/Parisviptrips" ]
-            }
-        </script>
+            "sameAs": [ "https://www.facebook.com/pariscitytours.fr/",
+              "https://www.instagram.com/pariscitytours.fr/",
+              "https://twitter.com/Parisviptrips" ]
+          }
+</script>
         @if($pageMetaTag)
             <title>{{$title}}</title>
             <meta name="description" content="{{$description}}">
@@ -358,18 +366,18 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
 
         @unless($pageMetaTag)
             <?php
-                $pageMetaTag = App\Page::where('url', '/attraction/'.$attraction->slug)->first();
-                $isTherePageMetaTagTranslation = App\PageMetaTagsTrans::where('pageID', $pageMetaTag->id ?? null)->where('languageID', $language->id)->first();
-                if ($isTherePageMetaTagTranslation) {
-                    $title = $isTherePageMetaTagTranslation->title;
-                    $description = $isTherePageMetaTagTranslation->description;
-                    $keywords = $isTherePageMetaTagTranslation->keywords;
-                }
-                else {
-                    $title = $pageMetaTag->title ?? '';
-                    $description = $pageMetaTag->description ?? '';
-                    $keywords = $pageMetaTag->keywords ?? '';
-                }
+            $pageMetaTag = App\Page::where('url', '/attraction/'.$attraction->slug)->first();
+            $isTherePageMetaTagTranslation = App\PageMetaTagsTrans::where('pageID', $pageMetaTag->id ?? null)->where('languageID', $language->id)->first();
+            if ($isTherePageMetaTagTranslation) {
+                $title = $isTherePageMetaTagTranslation->title;
+                $description = $isTherePageMetaTagTranslation->description;
+                $keywords = $isTherePageMetaTagTranslation->keywords;
+            }
+            else {
+                $title = $pageMetaTag->title ?? '';
+                $description = $pageMetaTag->description ?? '';
+                $keywords = $pageMetaTag->keywords ?? '';
+            }
 
 
             ?>
@@ -398,7 +406,7 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
             <meta property=”og:description” content="{{$description}}" />
             <meta property="og:image:width" content="400" />
             <meta property="og:image:height" content="400" />
-                <meta property="og:image:secure_url" content="{{asset('img/eiffel-tower-attraction-banner.jpg')}}" />
+            <meta property="og:image:secure_url" content="{{asset('img/eiffel-tower-attraction-banner.jpg')}}" />
             <!-- Twitter cards -->
             <meta name="twitter:title" content="{{$title}}" />
             <meta name="twitter:description" content="{{$description}}" />
@@ -559,28 +567,28 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                 width: 30%;right: 0;top: 50%;}
         </style>
     @elseif ($page == 'login' || $page == 'register' || $page == 'booking-confirmation' || $page == 'check-booking')
-    <link rel="stylesheet" href="{{asset('css/admin/style.css')}}">
-    <link rel="stylesheet" href="{{asset('css/admin/bootstrap.css')}}">
-    <link rel="stylesheet" href="{{asset('css/admin/materialize.css')}}">
-    <link rel="stylesheet" href="{{asset('css/app.css')}}">
-    <link rel="stylesheet" href="{{asset('css/main/auth-styles.css')}}">
-    <style>
-        .toast-alert {
-            background-color: #e57373!important;
-            font-size: 14px;
-        }
-        .toast-success{
-            background-color: #0f9d58!important;
-            font-size: 14px;
-        }
-    </style>
+        <link rel="stylesheet" href="{{asset('css/admin/style.css')}}">
+        <link rel="stylesheet" href="{{asset('css/admin/bootstrap.css')}}">
+        <link rel="stylesheet" href="{{asset('css/admin/materialize.css')}}">
+        <link rel="stylesheet" href="{{asset('css/app.css')}}">
+        <link rel="stylesheet" href="{{asset('css/main/auth-styles.css')}}">
+        <style>
+            .toast-alert {
+                background-color: #e57373!important;
+                font-size: 14px;
+            }
+            .toast-success{
+                background-color: #0f9d58!important;
+                font-size: 14px;
+            }
+        </style>
         @if($page == 'check-booking')
             <title>{{__('checkBooking')}}</title>
             <style>
                 @media only screen and (min-width: 768px) {
                     #voucherUrl button, #invoiceUrl button {
-                      width: 50%;
-                      margin-left: 25%;
+                        width: 50%;
+                        margin-left: 25%;
                     }
                 }
 
@@ -647,181 +655,181 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
         </style>
 
     @elseif ($page == 'checkout' || $page == 'external-payment-details')
-    <script>
-        // That script must be on head part of the page
-        window.history.forward();
-        function noBack() {
+        <script>
+            // That script must be on head part of the page
             window.history.forward();
-        }
-    </script>
+            function noBack() {
+                window.history.forward();
+            }
+        </script>
         <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="{{asset('css/admin/materialize.css')}}">
-    <style>
-        .dangerr{
-            background-color: #FADBD8 !important;
-        }
-        .country-code-empty-border{
-            border: 1px solid #900000!important;
-            border-radius: 4px!important;
-        }
-        .toast-alert {
-            background-color: #e57373!important;
-            font-size: 14px;
-        }
-        .toast-success{
-            background-color: #0f9d58!important;
-            font-size: 14px;
-        }
-    </style>
+        <style>
+            .dangerr{
+                background-color: #FADBD8 !important;
+            }
+            .country-code-empty-border{
+                border: 1px solid #900000!important;
+                border-radius: 4px!important;
+            }
+            .toast-alert {
+                background-color: #e57373!important;
+                font-size: 14px;
+            }
+            .toast-success{
+                background-color: #0f9d58!important;
+                font-size: 14px;
+            }
+        </style>
     @elseif ($page == 'cart')
-    <style>
-        .toast-alert{
-            background-color: #e57373!important;
-            font-size: 14px;
-        }
+        <style>
+            .toast-alert{
+                background-color: #e57373!important;
+                font-size: 14px;
+            }
 
-        .toast-success{
-            background-color: #0f9d58!important;
-            font-size: 14px;
-        }
+            .toast-success{
+                background-color: #0f9d58!important;
+                font-size: 14px;
+            }
 
-    </style>
+        </style>
     @elseif($page == 'cities')
-    <style>
-        .cards {
-            display: flex;
-            display: -webkit-flex;
-            justify-content: center;
-            -webkit-justify-content: center;
-            max-width: 820px;
-        }
+        <style>
+            .cards {
+                display: flex;
+                display: -webkit-flex;
+                justify-content: center;
+                -webkit-justify-content: center;
+                max-width: 820px;
+            }
 
-        .card--1 .card__img, .card--1 .card__img--hover {
-            background-image: url('https://images.pexels.com/photos/45202/brownie-dessert-cake-sweet-45202.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260');
-        }
+            .card--1 .card__img, .card--1 .card__img--hover {
+                background-image: url('https://images.pexels.com/photos/45202/brownie-dessert-cake-sweet-45202.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260');
+            }
 
-        .card--2 .card__img, .card--2 .card__img--hover {
-            background-image: url('https://images.pexels.com/photos/307008/pexels-photo-307008.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260');
-        }
+            .card--2 .card__img, .card--2 .card__img--hover {
+                background-image: url('https://images.pexels.com/photos/307008/pexels-photo-307008.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260');
+            }
 
-        .card__like {
-            width: 18px;
-        }
+            .card__like {
+                width: 18px;
+            }
 
-        .card__clock {
-            width: 15px;
-            vertical-align: middle;
-            fill: #AD7D52;
-        }
-        .card__time {
-            font-size: 12px;
-            color: #AD7D52;
-            vertical-align: middle;
-            margin-left: 5px;
-        }
+            .card__clock {
+                width: 15px;
+                vertical-align: middle;
+                fill: #AD7D52;
+            }
+            .card__time {
+                font-size: 12px;
+                color: #AD7D52;
+                vertical-align: middle;
+                margin-left: 5px;
+            }
 
-        .card__clock-info {
-            float: right;
-        }
+            .card__clock-info {
+                float: right;
+            }
 
-        .card__img {
-            visibility: hidden;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 100%;
-            height: 235px;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
+            .card__img {
+                visibility: hidden;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                width: 100%;
+                height: 235px;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
 
-        }
+            }
 
-        .card__info-hover {
-            position: absolute;
-            padding: 16px;
-            width: 100%;
-            opacity: 0;
-            top: 0;
-        }
+            .card__info-hover {
+                position: absolute;
+                padding: 16px;
+                width: 100%;
+                opacity: 0;
+                top: 0;
+            }
 
-        .card__img--hover {
-            transition: 0.2s all ease-out;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 100%;
-            position: absolute;
-            height: 235px;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            top: 0;
+            .card__img--hover {
+                transition: 0.2s all ease-out;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                width: 100%;
+                position: absolute;
+                height: 235px;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+                top: 0;
 
-        }
-        .card {
-            margin-right: 25px;
-            transition: all .4s cubic-bezier(0.175, 0.885, 0, 1);
-            background-color: #fff;
-            width: 100%;
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0px 13px 10px -7px rgba(0, 0, 0,0.1);
-        }
-        .card:hover {
-            box-shadow: 0px 30px 18px -8px rgba(0, 0, 0,0.1);
-            transform: scale(1.10, 1.10);
-        }
+            }
+            .card {
+                margin-right: 25px;
+                transition: all .4s cubic-bezier(0.175, 0.885, 0, 1);
+                background-color: #fff;
+                width: 100%;
+                position: relative;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0px 13px 10px -7px rgba(0, 0, 0,0.1);
+            }
+            .card:hover {
+                box-shadow: 0px 30px 18px -8px rgba(0, 0, 0,0.1);
+                transform: scale(1.10, 1.10);
+            }
 
-        .card__info {
-            z-index: 2;
-            background-color: #fff;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            padding: 16px 24px 24px 24px;
-        }
+            .card__info {
+                z-index: 2;
+                background-color: #fff;
+                border-bottom-left-radius: 12px;
+                border-bottom-right-radius: 12px;
+                padding: 16px 24px 24px 24px;
+            }
 
-        .card__category {
-            font-family: 'Raleway', sans-serif;
-            text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 2px;
-            font-weight: 500;
-            color: #868686;
-        }
+            .card__category {
+                font-family: 'Raleway', sans-serif;
+                text-transform: uppercase;
+                font-size: 13px;
+                letter-spacing: 2px;
+                font-weight: 500;
+                color: #868686;
+            }
 
-        .card__title {
-            margin-top: 5px;
-            margin-bottom: 10px;
-            font-family: 'Roboto Slab', serif;
-        }
+            .card__title {
+                margin-top: 5px;
+                margin-bottom: 10px;
+                font-family: 'Roboto Slab', serif;
+            }
 
-        .card__by {
-            font-size: 12px;
-            font-family: 'Raleway', sans-serif;
-            font-weight: 500;
-        }
+            .card__by {
+                font-size: 12px;
+                font-family: 'Raleway', sans-serif;
+                font-weight: 500;
+            }
 
-        .card__author {
-            font-weight: 600;
-            text-decoration: none;
-            color: #AD7D52;
-        }
+            .card__author {
+                font-weight: 600;
+                text-decoration: none;
+                color: #AD7D52;
+            }
 
-        .card:hover .card__img--hover {
-            height: 100%;
-            opacity: 0.3;
-        }
+            .card:hover .card__img--hover {
+                height: 100%;
+                opacity: 0.3;
+            }
 
-        .card:hover .card__info {
-            background-color: transparent;
-            position: relative;
-        }
+            .card:hover .card__info {
+                background-color: transparent;
+                position: relative;
+            }
 
-        .card:hover .card__info-hover {
-            opacity: 1;
-        }
+            .card:hover .card__info-hover {
+                opacity: 1;
+            }
 
-    </style>
+        </style>
     @elseif($page == 'home')
         <?php
         $languages = \App\Language::where('isActive', '=', 1)->where('id', '!=', 1)->get();
@@ -829,45 +837,45 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
         <meta name="google-site-verification" content="-UpSaeP0l2_xToAewDFympIA95LQ9hypg8kINC7stik" />
         <link href="{{asset('js/airdatepicker/datepicker.css')}}" rel="stylesheet" type="text/css">
         <!-- <link rel="vahtml" href="https://www.cityzore.com/amp"> -->
-            <link rel=”canonical” href="{{url()->current()}}"/>
-            <link href="https://www.cityzore.com/" rel="alternate" hreflang="en" />
+        <link rel=”canonical” href="{{url()->current()}}"/>
+        <link href="https://www.cityzore.com/" rel="alternate" hreflang="en" />
         @foreach($languages as $lan)
-                <link href="https://www.cityzore.com/{{$lan->code}}" rel="alternate" hreflang="{{$lan->code}}" />
+            <link href="https://www.cityzore.com/{{$lan->code}}" rel="alternate" hreflang="{{$lan->code}}" />
         @endforeach
-            @if($pageMetaTag)
-                <title>{{$title}}</title>
-                <meta name="description" content="{{$description}}">
-                <meta name="keywords" content="{{$keywords}}">
-                <!-- OPENGRAPH -->
-                <meta property="og:url" content="{{url()->current()}}" />
-                <meta property="og:title" content="{{$title}}" />
-                <meta property="og:type" content=”website” />
-                <meta property="og:description" content="{{$description}}" />
-                <meta property="og:image:secure_url" content="{{asset('img/eiffel-tower-attraction-banner.jpg')}}" />
-                <meta property="og:image:width" content="400" />
-                <meta property="og:image:height" content="300" />
-                <!-- Twitter cards -->
-                <meta name="twitter:title" content="{{$title}}" />
-                <meta name="twitter:description" content="{{$description}}" />
-                <meta name="twitter:site" content="@parisviptrips" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:image" content="{{asset('img/eiffel-tower-attraction-banner.jpg')}}" />
-            @endif
+        @if($pageMetaTag)
+            <title>{{$title}}</title>
+            <meta name="description" content="{{$description}}">
+            <meta name="keywords" content="{{$keywords}}">
+            <!-- OPENGRAPH -->
+            <meta property="og:url" content="{{url()->current()}}" />
+            <meta property="og:title" content="{{$title}}" />
+            <meta property="og:type" content=”website” />
+            <meta property="og:description" content="{{$description}}" />
+            <meta property="og:image:secure_url" content="{{asset('img/eiffel-tower-attraction-banner.jpg')}}" />
+            <meta property="og:image:width" content="400" />
+            <meta property="og:image:height" content="300" />
+            <!-- Twitter cards -->
+            <meta name="twitter:title" content="{{$title}}" />
+            <meta name="twitter:description" content="{{$description}}" />
+            <meta name="twitter:site" content="@parisviptrips" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:image" content="{{asset('img/eiffel-tower-attraction-banner.jpg')}}" />
+        @endif
 
-            <script type="application/ld+json">
+        <script type="application/ld+json">
                 {
                   "@context": "https://schema.org/",
                   "@type": "TravelAgency",
                   "@image": "{{asset('img/eiffel-tower-attraction-banner.jpg')}}",
                   @if($pageMetaTag)
-                    "name" : "{{$title}}",
+                "name" : "{{$title}}",
                     "description" : "{{$description}}",
                   @endif
-                  "sameAs": [ "https://www.facebook.com/pariscitytours.fr/",
-                    "https://www.instagram.com/pariscitytours.fr/",
-                    "https://twitter.com/Parisviptrips" ]
-                }
-            </script>
+            "sameAs": [ "https://www.facebook.com/pariscitytours.fr/",
+              "https://www.instagram.com/pariscitytours.fr/",
+              "https://twitter.com/Parisviptrips" ]
+          }
+</script>
         <style>
 
             .strikeout {
@@ -904,26 +912,34 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
             .suggestions-container {
                 display: none;
                 position: absolute;
-                top: 43px;
+                top: 70px;
                 z-index: 100;
                 background-color: #fff;
-                border: 1px solid #c6c8d0;
                 max-height: 400px;
                 overflow-y: auto;
                 overflow-x: hidden;
                 min-width: 320px;
                 text-align: left;
+                width: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                box-shadow: 1px 0 12px rgb(0 0 0 / 13%);
+                border-radius: 8px;
+                padding: 16px;
             }
             .suggestion-item {
-                border-top: 1px solid #c6c8d0;
                 min-height: 40px;
                 cursor: pointer;
-                min-width:320px;
+                min-width:100%;
                 padding:10px;
+                display: flex;
+                align-items: center;
+                color: #1a2b49;
             }
             .suggestion-item:hover {
-                background-color: #1593ff!important;
-                color: #fff!important;
+                background-color: #f0f0f0!important;
+                color: #000!important;
+                border-radius: 8px;
             }
             .strikeout {
                 position: relative;
@@ -968,46 +984,46 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
         <link rel="stylesheet" href="{{asset('css/main/become-a-supplier-styles.css')}}">
         <link rel="stylesheet" href="{{asset('css/admin/materialize.css')}}">
         <style>
-        .toast-alert {
-            background-color: #e57373!important;
-            font-size: 14px;
-        }
-        .toast-success{
-            background-color: #0f9d58!important;
-            font-size: 14px;
-        }
+            .toast-alert {
+                background-color: #e57373!important;
+                font-size: 14px;
+            }
+            .toast-success{
+                background-color: #0f9d58!important;
+                font-size: 14px;
+            }
         </style>
 
 
-  @elseif ($page == 'commissions')
+    @elseif ($page == 'commissions')
 
-  <style>
+        <style>
 
-    .affiliated{
-        background: #E8DAEF;
-    }
+            .affiliated{
+                background: #E8DAEF;
+            }
 
-    table > thead{
-        cursor: pointer;
-        border-top: solid 1px #ABB2B9;
-        border-bottom: solid 1px #fafafa;
-        transition: all .3s;
-    }
-      table > thead:hover{
-        background-color: #808B96 !important;
-        transform: scale(1.05);
-      }
-
-
-      table > tbody{
-        display: none;
+            table > thead{
+                cursor: pointer;
+                border-top: solid 1px #ABB2B9;
+                border-bottom: solid 1px #fafafa;
+                transition: all .3s;
+            }
+            table > thead:hover{
+                background-color: #808B96 !important;
+                transform: scale(1.05);
+            }
 
 
-      }
-  </style>
+            table > tbody{
+                display: none;
+
+
+            }
+        </style>
 
     @elseif($page == 'faq')
-    <?php
+        <?php
         $frequentlyAskedQuestions = \App\FAQ::with('translate')->get();
         ?>
 
@@ -1017,40 +1033,40 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                 "@type":"FAQPage",
                 "mainEntity":[
                     @foreach($frequentlyAskedQuestions as $faq)
-                        @if(! is_null($faq->translate))
-                            @php
-                                $faq = $faq->translate;
-                            @endphp
-                            {
-                            "@type":"Question",
-                            "name":"{{$faq->question}}",
+                @if(! is_null($faq->translate))
+                    @php
+                        $faq = $faq->translate;
+                    @endphp
+                    {
+                    "@type":"Question",
+                    "name":"{{$faq->question}}",
                                     "acceptedAnswer":{
                                     "@type":"Answer",
                                     "text":"{{$faq->answer}}"
                                     }
                                 },
                             @else
-                            {
-                                "@type":"Question",
-                                "name":"{{$faq->question}}",
+                    {
+                        "@type":"Question",
+                        "name":"{{$faq->question}}",
                                 "acceptedAnswer":{
                                 "@type":"Answer",
                                 "text":"{{$faq->answer}}"
                                 }
                             },
                         @endif
-                    @endforeach
-                            {
-                                "@type":"Question",
-                                "name":"Is it cheaper to buy Eiffel Tower tickets online?",
-                                "acceptedAnswer":{
-                                "@type":"Answer",
-                                "text":"You can find online the same price that if you buy the tickets the day of your visit a desk.  For this reason, if you buy tickets online, you will be advantageous nevertheless waiting in line and your ticket will be skipping the line."
-                                }
-                            }
-                ]
+            @endforeach
+            {
+                "@type":"Question",
+                "name":"Is it cheaper to buy Eiffel Tower tickets online?",
+                "acceptedAnswer":{
+                "@type":"Answer",
+                "text":"You can find online the same price that if you buy the tickets the day of your visit a desk.  For this reason, if you buy tickets online, you will be advantageous nevertheless waiting in line and your ticket will be skipping the line."
+                }
             }
-        </script>
+]
+}
+</script>
 
     @elseif($page == 'blog')
         <style>
@@ -1408,7 +1424,7 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
             }
         </style>
         <meta name="description" content="{{$blogPost->metaTag()->first()->description}}">
-    <title>{{$blogPost->metaTag()->first()->title}}</title>
+        <title>{{$blogPost->metaTag()->first()->title}}</title>
         <meta name="keywords" content="{{$blogPost->metaTag()->first()->keywords}}">
 
     @elseif($page == 'successful-register')

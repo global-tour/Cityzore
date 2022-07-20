@@ -20,6 +20,7 @@ use App\Route;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Support\Facades\Storage;
 
 
 class HomeController extends Controller
@@ -46,7 +47,7 @@ class HomeController extends Controller
 
         if ($productOrder)
 
-            
+
         {
             $ids = implode(',', $productOrder);
             $sortPageProduct = Product::whereIn('id', $productOrder)->orderByRaw(DB::raw("FIELD(id, $ids)"))->get();
@@ -61,7 +62,7 @@ class HomeController extends Controller
             array_push($homePageProductID, $sp->id);
         }
 
-       if (count($homePageProduct) < 8) {
+        if (count($homePageProduct) < 8) {
             foreach ($products->get() as $product) {
                 if (!in_array($product->id, $homePageProductID) && count($homePageProduct) < 8) {
                     array_push($homePageProduct, $product);
@@ -114,50 +115,180 @@ class HomeController extends Controller
         $productsArray  = [];
         $wordsArray = explode( ' ', $request->value);
         $langCode = session()->get('userLanguage') ? session()->get('userLanguage') : 'en';
+        $language = Language::where('code', $langCode)->first();
+        $various = collect();
+
         if ($langCode == 'en') {
-            $countries = Country::select('countries_name')->where('countries_name', 'like', $request->value.'%')->get();
-            $cities = City::select('name')->where('name', 'like', '%'.$request->value.'%')->pluck('name');
-            $products = Product::select('id', 'title', 'url')->where('isPublished', '1')
-                ->where('isDraft', '0')->where('isSpecial', '!=', 1);
-            $uniquenessKey = 'id';
-            $attractions = Attraction::select('name')->where('isActive', 1)->where('name', 'like', $request->value.'%')->get();
+            Country::where('countries_name', 'like', $request->value.'%')
+                ->get()
+                ->map(function ($item) use ($various) {
+                    $various->push([
+                        'searchableModel'   => 'Country',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->countries_name,
+                        'url'               => null,
+                        'cover'             => 'Location',
+                    ]);
+                });
+
+            City::where('name', 'like', '%'.$request->value.'%')
+                ->get()
+                ->map(function ($item) use ($various) {
+                    $various->push([
+                        'searchableModel'   => 'City',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->name,
+                        'url'               => null,
+                        'cover'             => 'Location',
+                    ]);
+                });
+
+            Attraction::where('isActive', 1)
+                ->where('name', 'like', $request->value.'%')
+                ->get()
+                ->map(function ($item) use ($various, $language)  {
+                    $various->push([
+                        'searchableModel'   => 'Attraction',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->name,
+                        'url'               => url($this->commonFunctions->getRouteLocalization('attraction'). '/' . $this->commonFunctions->getAttractionLocalization($item, $language) . '-' . $item->id),
+                        'cover'             => Storage::disk('s3')->url('attraction-images/' . $item->image),
+                    ]);
+                });
+
+            Product::where('isPublished', '1')
+                ->where('isDraft', '0')
+                ->where('isSpecial', '!=', 1)
+                ->where(function($q) use ($wordsArray){
+                    foreach ($wordsArray as $w){
+                        $q->where('title', 'like', '%'. $w .'%');
+                    }
+                })
+                ->with(['productCover'])
+                ->get()
+                ->map(function ($item) use ($various) {
+                    $various->push([
+                        'searchableModel'   => 'Product',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->title,
+                        'url'               => $item->url,
+                        'cover'             => $item->productCover ? Storage::disk('s3')->url('product-images-xs/' . $item->productCover->src) : '',
+                    ]);
+                });
+
         } else {
             $language = Language::where('code', $langCode)->first();
-            $countries = CountryTranslation::select('countries_name')->where('countries_name', 'like', $request->value.'%')
-                ->where('languageID', $language->id)->get();
-            if (!$countries) {
-                $countries = Country::select('countries_name')->where('countries_name', 'like', $request->value.'%')->get();
+
+            $countries = CountryTranslation::where('countries_name', 'like', $request->value.'%')
+                ->where('languageID', $language->id)
+                ->get()
+                ->map(function ($item) use ($various) {
+                    $various->push([
+                        'searchableModel'   => 'Country',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->countries_name,
+                        'url'               => null,
+                        'cover'             => null,
+                    ]);
+                });
+
+            if (!count($countries)) {
+                Country::where('countries_name', 'like', $request->value.'%')
+                    ->get()
+                    ->map(function ($item) use ($various) {
+                        $various->push([
+                            'searchableModel'   => 'Country',
+                            'searchableId'      => $item->id,
+                            'searchableTitle'   => $item->countries_name,
+                            'url'               => null,
+                            'cover'             => null,
+                        ]);
+                    });
             }
-            $cities = CityTranslation::select('name')->where('name', 'like', '%'.$request->value.'%')
-                ->where('languageID', $language->id)->pluck('name');
-            if (!$cities) {
-                $cities = City::select('name')->where('name', 'like', '%'.$request->value.'%')->pluck('name');
+
+            $cities = CityTranslation::where('name', 'like', '%'.$request->value.'%')
+                ->where('languageID', $language->id)
+                ->get()
+                ->map(function ($item) use ($various) {
+                    $various->push([
+                        'searchableModel'   => 'City',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->name,
+                        'url'               => null,
+                        'cover'             => null,
+                    ]);
+                });
+
+            if (!count($cities)) {
+                City::where('name', 'like', '%'.$request->value.'%')
+                    ->get()
+                    ->map(function ($item) use ($various) {
+                        $various->push([
+                            'searchableModel'   => 'City',
+                            'searchableId'      => $item->id,
+                            'searchableTitle'   => $item->name,
+                            'url'               => null,
+                            'cover'             => null,
+                        ]);
+                    });
             }
-            $products = ProductTranslation::select('productID', 'title', 'url')
-                ->where('languageID', $language->id);
-            $uniquenessKey = 'productID';
-            $attractions = AttractionTranslation::select('name')->where('name', 'like', $request->value.'%')->get();
+
+            AttractionTranslation::where('languageID', $language->id)
+                ->where('name', 'like', $request->value.'%')
+                ->with('attraction')
+                ->get()
+                ->map(function ($item) use ($various) {
+                    $various->push([
+                        'searchableModel'   => 'Attraction',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->name,
+                        'url'               => null,
+                        'cover'             => Storage::disk('s3')->url('attraction-images/' . $item->attraction->image),
+                    ]);
+                });
+
+            ProductTranslation::where('languageID', $language->id)
+                ->where(function ($query){
+                    $query->where('title', '!=', null)
+                        ->where('shortDesc', '!=', null)
+                        ->where('fullDesc', '!=', null)
+                        ->where('highlights', '!=', null)
+                        ->where('included', '!=', null)
+                        ->where('notIncluded', '!=', null)
+                        ->where('knowBeforeYouGo', '!=', null)
+                        ->where('category', '!=', null)
+                        ->where('cancelPolicy', '!=', null);
+                })
+                ->where(function($q) use ($wordsArray){
+                    foreach ($wordsArray as $w){
+                        $q->where('title', 'like', '%'. $w .'%');
+                    }
+                })
+                ->with(['product.productCover'])
+                ->get()
+                ->map(function ($item) use ($various) {
+                    $various->push([
+                        'searchableModel'   => 'Product',
+                        'searchableId'      => $item->id,
+                        'searchableTitle'   => $item->title,
+                        'url'               => $item->url,
+                        'cover'             => $item->product['productCover'] ? Storage::disk('s3')->url('product-images-xs/' . $item->product["productCover"]["src"]) : "",
+                    ]);
+                });
+
         }
 
-        foreach ($wordsArray as $word) {
-            $products->where('title', 'like', '%'.$word.'%');
+        if ($various->count()) {
+            return response()->json([
+                'successful' => true,
+                'data' => $various
+            ]);
         }
-        $products = $products->get();
-        foreach ($products as $p) {
-            array_push($productsArray, $p);
-        }
-        $arr = $this->commonFunctions->unique_multidimensional_array($productsArray, $uniquenessKey);
-        $products = array_values($arr);
 
-        return response()->json(
-            [
-                'successful' => 'Fetched successfully',
-                'countries' => $countries,
-                'cities' => $cities,
-                'products' => $products,
-                'attractions' => $attractions
-            ]
-        );
+        return response()->json([
+            'successful' => false,
+            'message' => __('noMatchSearch', ['val' => $request->value ])
+        ], 422);
     }
 
     /**
