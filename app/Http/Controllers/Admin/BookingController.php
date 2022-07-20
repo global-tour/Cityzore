@@ -2214,6 +2214,9 @@ class BookingController extends Controller
     public function sendMailToCustomer(Request $request)
     {
         try {
+            $files = BookingImage::where('booking_id', $request->booking_id)->pluck('image_base_name')->toArray();
+            $files = $files ? implode(',', $files) : null;
+
             $contactMail = new BookingContactMailLog();
             $contactMail->sender_id = Auth::guard('admin')->id();
             $contactMail->booking_id = $request->booking_id;
@@ -2222,6 +2225,7 @@ class BookingController extends Controller
             $contactMail->mail_to = $request->mail_to;
             $contactMail->logMessage = 'Mail Has Been Queued!';
             $contactMail->code = md5(rand());
+            $contactMail->files = $files;
             $contactMail->check_information = json_encode([
                 'status' => false,
                 'checker' => null,

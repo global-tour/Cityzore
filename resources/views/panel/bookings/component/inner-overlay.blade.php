@@ -338,6 +338,25 @@
                 </button>
             </form>
 
+
+            @if($booking->contacts)
+                <ul class="text-center before_senders_lists" style="margin-top: 12px">
+
+                    @foreach($booking->contacts as $key => $contact)
+                        <li data-contact-message="{{$contact->mail_message}}" style="padding: 4px 8px; width: 100%; border: solid 1px #ccc; background-color: {{ $contact->statusColor }}; cursor: pointer; margin-top: 2px;" data-toggle="collapse" href="#mailCollapse{{$key}}" role="button" aria-expanded="false" aria-controls="mailCollapse{{$key}}">
+                            {{ $contact->status == 0 ? 'Queued' : ($contact->status == 1 ? 'Sent' : 'Failed' ) }} <br>
+                            {{$contact->sender->name}} - {{$contact->sender->surname}} - ({{$contact->created_at->format("d/m/Y H:i:s")}}) <br>
+                            <b>Files: </b> {{$contact->files}}
+                        </li>
+                        <div class="collapse" id="mailCollapse{{$key}}">
+                            <div class="card card-body">
+                                {!! nl2br($contact->mail_message) !!}
+                            </div>
+                        </div>
+                    @endforeach
+
+                </ul>
+            @endif
             @if(!$booking->contact_booking_count)
                 <p style="margin-top: 10px; color: red; text-align: center; font-size: 13px">Please send a message!</p>
             @elseif(!$booking->bookingInformation['mailCheck'])
