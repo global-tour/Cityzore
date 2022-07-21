@@ -463,6 +463,11 @@ class CartController extends Controller
             }
 
             $cart->bookingItems = json_encode($bookingItems);
+
+            $ticketCountDecrement = $this->ticketCountDecrement($request);
+            if($ticketCountDecrement === false){
+                return response()->json(['status' => 0, 'message' => 'Insufficient Number of Tickets']);
+            }
             if ($cart->save()) {
                 foreach ($ticketTypes as $ticketType) {
                     if (!is_null($ticketType)) {
@@ -487,7 +492,7 @@ class CartController extends Controller
             }
         }
 
-        $ticketCountDecrement = $this->ticketCountDecrement($request);
+
 
         $cartItems = Cart::where('userID', '=', $userID)->where('status', '=', 0)->get();
 
@@ -515,8 +520,8 @@ class CartController extends Controller
                 'totalPriceWOSO' => $totalPriceWOSO,
                 'uniqueID' => $uniqueID,
                 'translationArray' => $translationArray,
-                'temporaryTicketCount' => $ticketCountDecrement['temporaryTicketCount'],
-                'totalTicketCount' => $ticketCountDecrement['totalTicketCount']
+                'temporaryTicketCount' => $ticketCountDecrement['temporaryTicketCount'] ?? 0,
+                'totalTicketCount' => $ticketCountDecrement['totalTicketCount'] ?? 0
             ]
         );
     }
@@ -636,6 +641,7 @@ class CartController extends Controller
                             $key = key($result);
                             $ticketHourlyDatabase[$key]['ticket'] = $ticketHourlyDatabase[$key]['ticket'] - $temporaryTicketCount;
                             $ticketState = $ticketHourlyDatabase[$key]['ticket'];
+                            if($ticketState < 0) return false;
                             $av->hourly = json_encode($ticketHourlyDatabase);
                             $av->save();
                             $isDateTimeValid = $this->timeRelatedFunctions->isDateTimeValid($tic['day'], $tic['hour'], 'Europe/Paris');
@@ -661,6 +667,7 @@ class CartController extends Controller
                         $key = key($result);
                         $ticketDailyDatabase[$key]['ticket'] -= $temporaryTicketCount;
                         $ticketState = $ticketDailyDatabase[$key]['ticket'];
+                        if($ticketState < 0) return false;
                         $av->daily = json_encode($ticketDailyDatabase);
                         $av->save();
                         $isDateTimeValid = $this->timeRelatedFunctions->isDateTimeValid($ticketRequest[0]['day'], '00:00', 'Europe/Paris');
@@ -686,6 +693,7 @@ class CartController extends Controller
                         $key = key($result);
                         $ticketDateRangeDatabase[$key]['ticket'] -= $temporaryTicketCount;
                         $ticketState = $ticketDateRangeDatabase[$key]['ticket'];
+                        if($ticketState < 0) return false;
                         $av->dateRange = json_encode($ticketDateRangeDatabase);
                         $av->save();
                         $isDateTimeValid = $this->timeRelatedFunctions->isDateTimeValid($ticketRequest[0]['day'], '00:00', 'Europe/Paris');
@@ -719,6 +727,7 @@ class CartController extends Controller
                     if (array_key_exists($key, $resDecoded)) {
                         $key = array_keys(json_decode($res->toJson(), true))[0];
                         $ticketBarcodeDatabase[$key]['ticket'] -= $temporaryTicketCount;
+                       // if($ticketBarcodeDatabase[$key]['ticket'] < 0) return false;
                         $av->barcode = json_encode($ticketBarcodeDatabase);
                         $av->save();
                         if ($ticketBarcodeDatabase[$key]['ticket'] <= 5) {
@@ -734,6 +743,7 @@ class CartController extends Controller
                                 $barcodeDecodedOfThisTicket = json_decode($avUsingThisTT->barcode, true);
                                 if (count($barcodeDecodedOfThisTicket) > 0) {
                                     $barcodeDecodedOfThisTicket[0]['ticket'] -= $temporaryTicketCount;
+                                    //if($barcodeDecodedOfThisTicket[0]['ticket'] < 0) return false;
                                     $avUsingThisTT->barcode = json_encode($barcodeDecodedOfThisTicket);
                                     $avUsingThisTT->save();
                                 }

@@ -341,11 +341,12 @@
                                         @endforeach
                                     @else
                                         @foreach(json_decode($booking->bookingItems, true) as $participants)
-                                            {{$participants['category']}} : 1 <br>
+                                            {{$participants['category']}} : {{ ($participants['count'] ?? 1) }} <br>
                                         @endforeach
                                     @endif
                                 </td>
                             </tr>
+
                             @if($ticketType == '34')
                                 <tr>
                                     <td colspan="2" style="border-top: 1px solid black; text-align: right; margin-right: 10px">Amount: </td>
@@ -361,6 +362,12 @@
                                                 @endphp
                                             @endif
                                         @endforeach
+
+                            @if($ticketType == '3')
+                                <tr style="background-color: #FFFAFA;">
+                                    <td colspan="3" align="right">
+                                        <span>{{($i+1)}} / {{$participantSum}}</span>
+
                                     </td>
                                 </tr>
                             @endif

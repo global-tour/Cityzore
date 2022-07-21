@@ -42,11 +42,16 @@ class CheckBarcodes extends Command
         $expiredBarcodes = Barcode::where('isUsed', 0)->get();
 
         foreach ($expiredBarcodes as $barcode) {
-           if(Carbon::createFromFormat('d/m/Y H:i:s', $barcode->endTime." 23:59:00")->lt(Carbon::now())){
+            try {
+            if(Carbon::createFromFormat('d/m/Y H:i:s', $barcode->endTime." 23:59:00")->lt(Carbon::now())){
              $barcode->isExpired = 1;
              $barcode->isReserved = 0;
              $barcode->save();
            }
+            } catch (\Exception $e) {
+                
+            }
+         
            
         }
     }

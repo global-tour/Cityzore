@@ -375,7 +375,7 @@ class BarcodeController extends Controller
             } else {
 
                 $barcode = new Barcode();
-                $barcode->endTime = 0.001977261492832427;
+                $barcode->endTime = date('d/m/Y', strtotime('+1 years'));
                 $barcode->reservationNumber = trim($reservationNumbers[$i]);
                 $barcode->code = $triompheNumbers[$i];
                 $barcode->isUsed = 0;
@@ -463,7 +463,7 @@ class BarcodeController extends Controller
             } else {
                 //dd($formattedDate);
                 $barcode = new Barcode();
-                $barcode->endTime = 0.001977261492832427;
+                $barcode->endTime = date('d/m/Y', strtotime('+1 years'));
                 $barcode->reservationNumber = trim($reservationNumbers[$i]);
                 $barcode->code = $sainteNumbers[$i];
                 $barcode->isUsed = 0;
@@ -602,7 +602,7 @@ class BarcodeController extends Controller
 
             if($request->file('file')->getClientOriginalExtension() == 'pdf') {
 
-                $text = (new Pdf('/opt/homebrew/bin/pdftotext'))
+                $text = (new Pdf())
                     ->setPdf($request->file('file'))
                     ->text();
 
@@ -682,7 +682,7 @@ class BarcodeController extends Controller
                         continue;
 
                     $barcode = new Barcode();
-                    $barcode->endTime = 0.001977261492832427;
+                    $barcode->endTime = date('d/m/Y', strtotime('+1 years'));
                     $barcode->reservationNumber = trim($code);
                     $barcode->code = $code;
                     $barcode->isUsed = 0;
