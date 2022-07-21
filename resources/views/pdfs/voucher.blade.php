@@ -348,9 +348,9 @@
                             </tr>
 
                             @if($ticketType == '34')
-                                <tr>
-                                    <td colspan="2" style="border-top: 1px solid black; text-align: right; margin-right: 10px">Amount: </td>
-                                    <td colspan="1" style="border-top: 1px solid black; text-align: center">
+                                <tr style="height: 30px">
+                                    <td colspan="2" style="border-top: 1px solid black" align="right">Amount: </td>
+                                    <td colspan="1" style="border-top: 1px solid black" align="center">
                                         @foreach($montArr as $montKey => $montEl)
                                             @if($montKey == $montIndex)
                                                 @foreach($museedelarmePricing as $mt => $tt)
@@ -364,11 +364,10 @@
                                         @endforeach
                             @endif
 
-                            @if($ticketType == '3')
-                                <tr style="background-color: #FFFAFA;">
-                                    <td colspan="3" align="right">
+                            @if($ticketType == '3' || $ticketType == '34')
+                                <tr style="">
+                                    <td colspan="3" align="right" style="border-top: 1px solid black">
                                         <span>{{($i+1)}} / {{$participantSum}}</span>
-
                                     </td>
                                 </tr>
                             @endif
