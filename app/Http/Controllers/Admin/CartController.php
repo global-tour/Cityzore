@@ -727,7 +727,7 @@ class CartController extends Controller
                     if (array_key_exists($key, $resDecoded)) {
                         $key = array_keys(json_decode($res->toJson(), true))[0];
                         $ticketBarcodeDatabase[$key]['ticket'] -= $temporaryTicketCount;
-                        if($ticketBarcodeDatabase[$key]['ticket'] < 0) return false;
+                       // if($ticketBarcodeDatabase[$key]['ticket'] < 0) return false;
                         $av->barcode = json_encode($ticketBarcodeDatabase);
                         $av->save();
                         if ($ticketBarcodeDatabase[$key]['ticket'] <= 5) {
@@ -743,7 +743,7 @@ class CartController extends Controller
                                 $barcodeDecodedOfThisTicket = json_decode($avUsingThisTT->barcode, true);
                                 if (count($barcodeDecodedOfThisTicket) > 0) {
                                     $barcodeDecodedOfThisTicket[0]['ticket'] -= $temporaryTicketCount;
-                                    if($barcodeDecodedOfThisTicket[0]['ticket'] < 0) return false;
+                                    //if($barcodeDecodedOfThisTicket[0]['ticket'] < 0) return false;
                                     $avUsingThisTT->barcode = json_encode($barcodeDecodedOfThisTicket);
                                     $avUsingThisTT->save();
                                 }
