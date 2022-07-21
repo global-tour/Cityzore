@@ -362,6 +362,7 @@
                                                 @endphp
                                             @endif
                                         @endforeach
+                            @endif
 
                             @if($ticketType == '3')
                                 <tr style="background-color: #FFFAFA;">
