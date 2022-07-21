@@ -346,6 +346,24 @@
                                     @endif
                                 </td>
                             </tr>
+                            @if($ticketType == '34')
+                                <tr>
+                                    <td colspan="2" style="border-top: 1px solid black; text-align: right; margin-right: 10px">Amount: </td>
+                                    <td colspan="1" style="border-top: 1px solid black; text-align: center">
+                                        @foreach($montArr as $montKey => $montEl)
+                                            @if($montKey == $montIndex)
+                                                @foreach($museedelarmePricing as $mt => $tt)
+                                                    @if(strtolower($montEl) == $mt) {{ $tt .' '. $booking->currency->currency }} @endif<br>
+                                                @endforeach
+                                                @php
+                                                    $montIndex++;
+                                                    break;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
                         <table style="width:100%;">
                             <tr>
