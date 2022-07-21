@@ -17,6 +17,7 @@ use App\Supplier;
 use App\TicketType;
 use App\User;
 use App\Voucher;
+use App\VoucherTemplate;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -59,7 +60,10 @@ class PdfController extends Controller
     {
         $id = $this->cryptRelated->decrypt($id);
         $booking = Booking::findOrFail($id);
-        return "test";
+        $html = VoucherTemplate::first();
+
+        $pdf = PDF::loadHTML($html->template["en"]);
+        return $pdf->stream(time() . '.pdf');
     }
 
     /**
@@ -216,6 +220,11 @@ class PdfController extends Controller
                 'productImage' => ['eiffel-tower-5ab.jpg'],
             ];
         }
+//        $view = view('pdfs.voucher', $data)->render();
+//        header("Content-type: text/html");
+//        header("Content-Disposition: attachment; filename=view.html");
+//        return $view;
+//        return dd($view);
         $pdf = PDF::loadView('pdfs.voucher', $data);
         return $pdf->stream($travelerName . $travelerLastname . $bknNumber . '.pdf');
     }

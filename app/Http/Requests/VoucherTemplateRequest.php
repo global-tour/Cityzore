@@ -25,7 +25,7 @@ class VoucherTemplateRequest extends FormRequest
     {
         return [
             "name" => "required|string",
-            "template.*" => "required"
+            "template.en" => "required"
         ];
     }
 }

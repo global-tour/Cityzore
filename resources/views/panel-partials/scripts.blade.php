@@ -4126,9 +4126,15 @@ body.stop().animate({scrollTop:$(target).offset().top-50}, 0, 'swing', function(
 @elseif($page == 'voucher-template-create')
     <script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
 
+
     <script>
+        CKEDITOR.config.allowedContent = true;
+        CKEDITOR.config.fullPage = true;
+        = true;
         document.querySelectorAll( '.cked' ).forEach(function(element) {
-            CKEDITOR.replace(element.name);
+            CKEDITOR.replace(element.name, {
+                allowedContent: true
+            });
         });
 
     </script>
@@ -4137,8 +4143,12 @@ body.stop().animate({scrollTop:$(target).offset().top-50}, 0, 'swing', function(
     <script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
 
     <script>
+        CKEDITOR.config.allowedContent = true;
+        CKEDITOR.config.fullPage = true;
         document.querySelectorAll( '.cked' ).forEach(function(element) {
-            CKEDITOR.replace(element.name);
+            CKEDITOR.replace(element.name, {
+                allowedContent: true
+            });
         });
 
     </script>

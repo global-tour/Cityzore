@@ -55,7 +55,7 @@
                                 @foreach($langs as $lang)
                                     <div id="{{$lang->code}}" class="tab-pane fade in {{($loop->iteration == 1) ? 'active' : ''}}">
                                         <div class="input-field col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <textarea class="cked" id="template-{{$lang->code}}" name="template[{{$lang->code}}]">{!! $template->template[$lang->code] !!}</textarea>
+                                            <textarea class="cked" id="template-{{$lang->code}}" name="template[{{$lang->code}}]">{!! $template->template[$lang->code] ?? '' !!}</textarea>
                                         </div>
                                     </div>
                                 @endforeach
