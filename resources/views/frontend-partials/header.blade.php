@@ -104,9 +104,9 @@ $selectedCurrency = $currencies->where('id', $currentCurrency)->first();
                         @if(strpos(url()->current(), $commonFunctions->getRouteLocalization('credit-card-details-for-shared-cart')) == false)
                             @if(!auth()->user())
                                 <li>
-                                    <a href="#" data-toggle="modal" data-target="#myModal">{{__('signin')}}</a>
+                                    <a href="#" data-toggle="modal" data-target="#myModal"  class="signin-button">{{__('signin')}}</a>
                                 </li>
-                                <li><a href="{{url($langCodeForUrl.'/register')}}">{{__('signup')}}</a>
+                                <li><a href="{{url($langCodeForUrl.'/register')}}"  class="signup-button">{{__('signup')}}</a>
 
 
                             @else

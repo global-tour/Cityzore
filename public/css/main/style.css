@@ -6953,7 +6953,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
 }
 .main-menu ul li a{
     color: #000000;
-    padding: 20px 10px;
+    padding: 10px 15px;
     line-height: 58px;
     font-size: 15px;
     font-weight: 500;
@@ -6962,15 +6962,12 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     position:relative;
     /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
-.main-menu ul li a:hover{
-    color: #e23464;
-}
 .main-menu ul li a:after{
     content: "";
     position: absolute;
     width: 100%;
     height: 3px;
-    bottom: 12px;
+    bottom: 0;
     left: 0;
     color: #e23464;
     background-color: #e23464;
@@ -6980,13 +6977,10 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     transition: all .15s ease-in;
     z-index: 1;
 }
-.main-menu ul li a:hover:after{
+.main-menu ul li a:not(.signin-button, .signup-button):hover:after{
     visibility: visible;
     transform: scaleX(1);
     transition: all .25s ease-out;
-}
-.main-menu ul li:last-child a{
-    padding-right:0px;
 }
 .ed-sub-menu:after{
     content: "\f107";
@@ -9692,6 +9686,29 @@ span.cartCount {
     text-align: center;
     vertical-align: middle;
     color: #fff;
+}
+
+a.signin-button {
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+}
+a.signup-button {
+    background: #1d6db2;
+    color: #fff!important;
+    border-radius: 8px;
+    border: 1px solid #1d6db3;
+}
+
+a.signin-button:hover {
+    border-color: #1d6db3;
+    color: #1d6db3;
+}
+
+a.signup-button:hover {
+    background: #fff;
+    color: #1d6db2!important;
+    border: 1px solid #1d6db2;
+    border-top-style: inset;
 }
 
 @media all and (min-width: 1500px) {
