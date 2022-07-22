@@ -249,7 +249,56 @@
                 }
             })
         });
+
+        $(document).ready(function(){
+
+            $("#remove-old-cart-items-from-on-goings").on("click", function (event) {
+                const waitMeFireArea = $("#datatable_wrapper");
+                if(confirm('This is already done automatically by the cron handler, it is not recommended to use if there is no data older than 1.5 hours in the on goins table, Do you still want to use it?')){
+                    waitMeFireArea.waitMe({
+                        effect : 'bounce',
+                        text : 'This process may take some time, please wait',
+                        bg : 'rgba(255,255,255,0.7)',
+                        color : '#f4364f',
+                        maxSize : '',
+                        waitTime : -1,
+                        textPos : 'vertical',
+                        fontSize : '',
+                        source : '',
+                        onClose : function() {}
+                    });
+
+                    $.ajax({
+                        url: '{{url("/command-delete-carts-manuel")}}',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            _token: '{{csrf_token()}}'
+                        },
+                    })
+                        .done(function(response) {
+                         if(response.status){
+                             Materialize.toast(response.data.message, 6000, 'toast-success');
+
+                             setTimeout(function(){
+                                 window.location.reload();
+                             }, 4000);
+                         }
+                        })
+                        .fail(function(XHR) {
+                            console.log(JSON.parse(XHR.responseText).message);
+                            Materialize.toast(JSON.parse(XHR.responseText).message, 6000, 'toast-alert');
+                        })
+                        .always(function() {
+                            console.log("complete");
+                            waitMeFireArea.waitMe("hide");
+                        });
+                }
+            });
+        })
     </script>
+
+
 
 @elseif($page == 'admins-edit')
 

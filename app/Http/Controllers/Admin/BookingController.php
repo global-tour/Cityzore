@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Adminlog;
 use App\BookingContactMailLog;
+use App\Helpers\Commands\DeleteCarts;
 use App\Http\Controllers\Helpers\ApiRelated;
 use App\Http\Controllers\Helpers\RefCodeGenerator;
 use App\Http\Controllers\Helpers\TimeRelatedFunctions;
@@ -1987,6 +1988,17 @@ class BookingController extends Controller
             default:
                 # code...
                 break;
+        }
+    }
+
+
+    public function removeOldCarts(Request $request){
+        try {
+            $instance = new DeleteCarts();
+            $instance->run(true);
+            return response()->json(['status' => true, 'data' => ['message' => 'Old Cart Items Successfully Removed From On Goings']]);
+        }catch(\Exception $e){
+            return response()->json(['status' => false, 'data' => ['message' => 'Error Message: '.$e->getMessage()]], 500);
         }
     }
 
