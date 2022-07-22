@@ -1,40 +1,9 @@
-// Get the modal
-let modal = document.getElementById("myModal");
-
-// Get the button that opens the modal
-let btn = document.getElementById("myBtn");
-
-// Get the <span> element that closes the modal
-let span = document.getElementsByClassName("close")[0];
-
-if (modal && typeof modal !== 'undefined') {
-    // When the user clicks the button, open the modal
-    btn.onclick = function() {
-        modal.style.display = "block";
-    };
-}
-
-if (typeof span !== 'undefined' && typeof modal !== 'undefined') {
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    };
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-};
-
-
 $(window).on('load', function getCartItems() {
     let fullUrl = window.location.href;
     if (fullUrl.indexOf('admin') < 0) {
         setTimeout(function() {
             getCartItems();
-        }, 1500);
+        }, 1000);
 
         function getCartItems() {
             $.ajax({
@@ -99,10 +68,11 @@ $(window).on('load', function getCartItems() {
                         });
                         $('#cartTable').append(block);
                         $('.mm1-com-cart').show();
-                        $('#cartCount').addClass('circle');
-                        $('#cartCount').html(data.carts.length);
+                        $('.cartCount').fadeIn();
+                        $('.cartCount').html(data.carts.length);
 
                     } else {
+                        $('.cartCount').hide();
                         $('#cartTable').append('<span id="emptyCart">Your cart is empty.</span>');
                     }
                 }
@@ -111,3 +81,27 @@ $(window).on('load', function getCartItems() {
     }
 
 });
+
+$(document).on('click', '.hamburger-menu', function () {
+    $(this).toggleClass('open-menu')
+    $(this).parent().find('.mobile-menu-content').toggleClass('open-menu-content')
+
+    if ($(this).hasClass('open-menu')) {
+        $('body').css({
+            overflow: 'hidden'
+        });
+    }else{
+        $('body').css({
+            overflow: 'unset'
+        })
+    }
+})
+
+$(document).on('click', '.mobile-menu .mobile-menu-content .hasSubmenu', function () {
+    $('.mobile-menu .mobile-menu-content .hasSubmenu').not(this).removeClass('active')
+    if ($(this).hasClass('active')) {
+        $(this).removeClass('active')
+    }else{
+        $(this).addClass('active')
+    }
+})
