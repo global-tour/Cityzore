@@ -376,6 +376,7 @@ Route::group(['domain' => 'admin.'. env('ROUTE_VARIABLE', 'cityzore.com'), 'midd
                 Route::post('/meeting/ajax', 'MeetingController@ajax')->name('bookings.meeting.ajax');
 
                 Route::get('/on-goings', 'BookingController@onGoings');
+                Route::post('/command-delete-carts-manuel', 'BookingController@removeOldCarts');
             });
         });
 

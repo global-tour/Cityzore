@@ -1241,6 +1241,7 @@
             }
         </style>
     @elseif($page == 'on-goings')
+        <link href="{{asset('js/waitme/waitMe.min.css')}}" rel="stylesheet" type="text/css">
         <link rel="stylesheet" type="text/css" href="{{asset('css/select2.min.css')}}">
     @elseif($page == 'availability-index' || $page == 'pricings-index')
     <style>
