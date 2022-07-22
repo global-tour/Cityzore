@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Crypt;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Http\Controllers\Helpers\CryptRelated;
 use Illuminate\Support\Facades\Auth;
+use PHPHtmlParser\Dom;
+use PHPHtmlParser\Options;
 
 
 class PdfController extends Controller
@@ -61,8 +63,17 @@ class PdfController extends Controller
         $id = $this->cryptRelated->decrypt($id);
         $booking = Booking::findOrFail($id);
         $html = VoucherTemplate::first();
+        $dom = new Dom();
+        $dom->setOptions(
+        // this is set as the global option level.
+            (new Options())
+                ->setRemoveStyles(false)
+        );
 
-        $pdf = PDF::loadHTML($html->template["en"]);
+        $template = $html->template["en"];
+        $dom->loadStr($template);
+        //dd($dom->outerHtml);
+        $pdf = PDF::loadHTML($dom->outerHtml);
         return $pdf->stream(time() . '.pdf');
     }
 
@@ -131,7 +142,7 @@ class PdfController extends Controller
                     $title = strtolower($bookingItem['category']);
                     break;
             }
-            if (!is_null($cruiseBarcode) || !is_null($versaillesBarcode) || !is_null($sainteChapelleBarcode) || !is_null($sainteChapelleConciergerieBarcode) || !is_null($conciergerieBarcode) || !is_null($arcdeTriomphe) || !is_null($grevin) || !is_null($picasso) || !is_null($operaBarcode) || !is_null($pantheonBarcode || !is_null($basiliqueBarcode) || !is_null($rodin) || !is_null($montparnasse) || !is_null($orsay) || !is_null($orangerie)|| !is_null($museedelarme))) {
+            if (!is_null($cruiseBarcode) || !is_null($versaillesBarcode) || !is_null($sainteChapelleBarcode) || !is_null($sainteChapelleConciergerieBarcode) || !is_null($conciergerieBarcode) || !is_null($arcdeTriomphe) || !is_null($grevin) || !is_null($picasso) || !is_null($operaBarcode) || !is_null($pantheonBarcode || !is_null($basiliqueBarcode) || !is_null($rodin) || !is_null($montparnasse) || !is_null($orsay) || !is_null($orangerie) || !is_null($museedelarme))) {
                 if (!is_null($pricing->ignoredCategories)) {
                     if (!in_array($title, json_decode($pricing->ignoredCategories, true))) {
                         array_push($participantCountArr, $bookingItem['count']);
@@ -334,7 +345,7 @@ class PdfController extends Controller
             ->where('isUsed', '=', '0')
             ->where('isExpired', '=', 0)
             ->orderBy('id', 'asc')
-            ->where('ownerID', $ownerID)->get()->take($request->barcodeCount)->each(function($item) use ($request){
+            ->where('ownerID', $ownerID)->get()->take($request->barcodeCount)->each(function ($item) use ($request) {
                 $item->isUsed = 1;
                 $item->description = $request->barcodeDescription;
                 $item->booking_date = $request->bookingDate;
@@ -507,7 +518,7 @@ class PdfController extends Controller
      * @param null $commissionerRequest
      * @return mixed
      */
-    public function financeInvoice($month, $year, $totalRate, $companyID, $isPlatform, $commissionerRequest = null )
+    public function financeInvoice($month, $year, $totalRate, $companyID, $isPlatform, $commissionerRequest = null)
     {
         $extraPayment = [];
         if ($commissionerRequest == null || $commissionerRequest == 0) {

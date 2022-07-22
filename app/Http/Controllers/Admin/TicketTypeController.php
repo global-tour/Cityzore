@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Barcode;
+use App\Language;
 use App\TicketType;
+use App\VoucherTemplate;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\TimeRelatedFunctions;
@@ -36,7 +38,8 @@ class TicketTypeController extends Controller
      */
     public function create()
     {
-        return view('panel.ticket-types.create');
+        $voucherTemplates = VoucherTemplate::where('status', 1)->pluck('name', 'id');
+        return view('panel.ticket-types.create', ['voucherTemplates' => $voucherTemplates]);
     }
 
     /**
@@ -59,6 +62,10 @@ class TicketTypeController extends Controller
         if ($request->type == 'QRCODE') {
             $request->merge(['format' => 'png']);
         }
+        if($request->copied_template_from){
+            $voucherTemplate = VoucherTemplate::findOrFail($request->copied_template_from);
+            $request->merge(['template' => $voucherTemplate->template]);
+        }
 
 
         if (TicketType::create($request->all())) {
@@ -74,8 +81,10 @@ class TicketTypeController extends Controller
      */
     public function edit($id)
     {
+        $langs = Language::all();
+        $voucherTemplates = VoucherTemplate::where('status', 1)->pluck('name', 'id');
         $ticketType = TicketType::findOrFail($id);
-        return view('panel.ticket-types.edit', ['ticketType' => $ticketType]);
+        return view('panel.ticket-types.edit', ['langs' => $langs, 'ticketType' => $ticketType, 'voucherTemplates' => $voucherTemplates]);
     }
 
     /**
@@ -101,7 +110,14 @@ class TicketTypeController extends Controller
         }
 
         if (intval($request->warnTicket)<1) return back()->with('warnTicket','Minimum Ticket Number Error / You can not enter less than 1');
-
+         $ticketType = TicketType::find($id);
+        if($request->copied_template_from && ($request->copied_template_from != $ticketType->copied_template_from)){
+            $voucherTemplate = VoucherTemplate::findOrFail($request->copied_template_from);
+            $request['template'] = $voucherTemplate->template;
+        }
+        if(empty($request->copied_template_from)){
+            $request['template'] = null;
+        }
         if (TicketType::find($id)->update($request->all())) {
             return redirect('/ticket-type');
         }

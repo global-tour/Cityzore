@@ -4153,6 +4153,39 @@ body.stop().animate({scrollTop:$(target).offset().top-50}, 0, 'swing', function(
 
     </script>
 
+
+
+@elseif($page == 'ticket-types-create')
+    <script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
+
+
+    <script>
+        CKEDITOR.config.allowedContent = true;
+        CKEDITOR.config.fullPage = true;
+        = true;
+        document.querySelectorAll( '.cked' ).forEach(function(element) {
+            CKEDITOR.replace(element.name, {
+                allowedContent: true
+            });
+        });
+
+    </script>
+
+
+@elseif($page == 'ticket-types-edit')
+    <script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
+
+    <script>
+        CKEDITOR.config.allowedContent = true;
+        CKEDITOR.config.fullPage = true;
+        document.querySelectorAll( '.cked' ).forEach(function(element) {
+            CKEDITOR.replace(element.name, {
+                allowedContent: true
+            });
+        });
+
+    </script>
+
 @elseif($page == 'voucher-create')
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="{{asset('js/airdatepicker/datepicker.min.js')}}"></script>

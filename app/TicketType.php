@@ -7,11 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class TicketType extends Model
 {
     protected $table = 'ticket_types';
+    protected $casts = [
+        'template' => 'array',
+    ];
 
     protected $fillable = [
         'type',
         'format',
         'name',
+        'template',
+        'copied_template_from',
         'bladeName',
         'multipleTicket',
         'usableAsTicket',

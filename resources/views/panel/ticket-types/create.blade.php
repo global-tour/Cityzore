@@ -81,6 +81,19 @@
                     <span class="text-danger text-sm">{{ $message }}</span>
                     @enderror
                 </div>
+
+                <div class="input-field col s12">
+                    <select name="copied_template_from">
+                        <option value="">Clone Voucher Template</option>
+                        @foreach($voucherTemplates as $key => $name)
+                            <option value="{{$key}}">{{$name}}</option>
+                        @endforeach
+                    </select>
+                    @error('copied_template_from')
+                    <span class="text-danger text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+                
             </div>
 
             <div class="row">

@@ -1,5 +1,5 @@
-@include('panel-partials.head', ['page' => 'attraction-edit'])
-@include('panel-partials.header', ['page' => 'attraction-edit'])
+@include('panel-partials.head', ['page' => 'ticket-types-edit'])
+@include('panel-partials.header', ['page' => 'ticket-types-edit'])
 @include('panel-partials.sidebar')
 
 
@@ -103,6 +103,41 @@
                                 <span class="text-danger text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
+
+
+
+                            <div class="input-field col s12">
+                                <select name="copied_template_from">
+                                    <option value="">Clone Voucher Template</option>
+                                    @foreach($voucherTemplates as $key => $name)
+                                        <option {{$ticketType->copied_template_from == $key ? 'selected' : ''}} value="{{$key}}">{{$name}}</option>
+                                    @endforeach
+                                </select>
+                                @error('copied_template_from')
+                                <span class="text-danger text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            @if($ticketType->template && $ticketType->copied_template_from)
+                            <div class="input-field col s12">
+                                <ul class="nav nav-tabs">
+                                    @foreach($langs as $lang)
+                                        <li class="{{($loop->iteration == 1) ? 'active' : ''}}"><a data-toggle="tab" href="#{{$lang->code}}">{{$lang->code}}</a></li>
+                                    @endforeach
+                                </ul>
+
+                                <div class="tab-content">
+                                    @foreach($langs as $lang)
+                                        <div id="{{$lang->code}}" class="tab-pane fade in {{($loop->iteration == 1) ? 'active' : ''}}">
+                                            <div class="input-field col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <textarea class="cked" id="template-{{$lang->code}}" name="template[{{$lang->code}}]">{!! $ticketType->template[$lang->code] ?? '' !!}</textarea>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+
                         </div>
                         <input type="submit" class="btn btn-primary large btn-large" value="Update" style="padding: 10px; font-size: 18px; height: 50px;">
                     </form>
@@ -113,17 +148,28 @@
 </div>
 
 
-@include('panel-partials.scripts', ['page' => 'attraction-edit'])
+@include('panel-partials.scripts', ['page' => 'ticket-types-edit'])
 <script>
     $(document).ready(function () {
+        const currentTemplateID = $('select[name="copied_template_from"]').val();
+        let triggered = 1;
         $('select[name="type"]').on('change', function () {
             const $type_code = $('select[name="format"]').closest('.input-field');
-
             if ($(this).val() === 'BARCODE') {
                 $type_code.show()
             } else {
                 $type_code.hide()
             }
-        })
+        });
+        $('select[name="copied_template_from"]').on('change', function (e){
+            const $this = $(this);
+            if(currentTemplateID && (currentTemplateID != $this.val())){
+                triggered && alert('Are you sure you want to Replace Current Clone, this will cause you to lose the previous clone');
+                triggered = 0;
+                return false;
+
+            }
+
+        });
     });
 </script>

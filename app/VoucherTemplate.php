@@ -11,8 +11,4 @@ class VoucherTemplate extends Model
         'template' => 'array',
     ];
 
-//    public function getTemplateAttribute($value)
-//    {
-//        return json_decode($value, true);
-//    }
 }
