@@ -112,3 +112,8 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
         </div>
     </div>
 </div>
+<div class="whatsapp-button-area">
+    <a href="https://wa.me/+33184208801" target="_blank">
+        <i class="icon-cz-whatsapp"></i>
+    </a>
+</div>
