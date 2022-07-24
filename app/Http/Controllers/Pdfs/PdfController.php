@@ -133,6 +133,7 @@ class PdfController extends Controller
         $travelerLastname = json_decode($booking->travelers, true)[0]['lastName'];
         $participantCountArr = [];
         $participantSum = 0;
+        $museedelarmePricing = [];
         foreach (json_decode($booking->bookingItems, true) as $bookingItem) {
             switch ($bookingItem['category']) {
                 case 'EU_CITIZEN':
@@ -142,7 +143,16 @@ class PdfController extends Controller
                     $title = strtolower($bookingItem['category']);
                     break;
             }
-            if (!is_null($cruiseBarcode) || !is_null($versaillesBarcode) || !is_null($sainteChapelleBarcode) || !is_null($sainteChapelleConciergerieBarcode) || !is_null($conciergerieBarcode) || !is_null($arcdeTriomphe) || !is_null($grevin) || !is_null($picasso) || !is_null($operaBarcode) || !is_null($pantheonBarcode || !is_null($basiliqueBarcode) || !is_null($rodin) || !is_null($montparnasse) || !is_null($orsay) || !is_null($orangerie) || !is_null($museedelarme))) {
+
+
+            if (!is_null($museedelarme)) {
+                $column = $title.'Price';
+                $museedelarmePricing[$title] = json_decode($pricing->$column)[0];
+            }
+
+            if (!is_null($cruiseBarcode) || !is_null($versaillesBarcode) || !is_null($sainteChapelleBarcode) || !is_null($sainteChapelleConciergerieBarcode) || !is_null($conciergerieBarcode) || !is_null($arcdeTriomphe) || !is_null($grevin) || !is_null($picasso) || !is_null($operaBarcode) || !is_null($pantheonBarcode || !is_null($basiliqueBarcode) || !is_null($rodin) || !is_null($montparnasse) || !is_null($orsay) || !is_null($orangerie)|| !is_null($museedelarme))) {
+
+
                 if (!is_null($pricing->ignoredCategories)) {
                     if (!in_array($title, json_decode($pricing->ignoredCategories, true))) {
                         array_push($participantCountArr, $bookingItem['count']);
@@ -157,6 +167,7 @@ class PdfController extends Controller
                 $participantSum = array_sum($participantCountArr);
             }
         }
+
         if ($booking->gygBookingReference == null && $booking->isBokun == 0 && $booking->isViator == 0) {
             $bknNumber = explode("-", $booking->bookingRefCode)[3];
             $productRefCode = explode('-', $booking->bookingRefCode)[0];
@@ -194,6 +205,7 @@ class PdfController extends Controller
                         'generator' => $generator,
                         'url' => $url,
                         'rCode' => $rCode,
+                        'museedelarmePricing' => $museedelarmePricing
                     ];
                 }
             }
@@ -227,6 +239,7 @@ class PdfController extends Controller
                 'url' => $url,
                 'rCode' => $rCode,
                 'pompidou' => $pompidou,
+                'museedelarmePricing' => $museedelarmePricing,
 
                 'productImage' => ['eiffel-tower-5ab.jpg'],
             ];

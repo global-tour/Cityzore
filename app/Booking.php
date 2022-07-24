@@ -72,7 +72,7 @@ class Booking extends Model
 
     public function contacts()
     {
-        return $this->hasMany(BookingContactMailLog::class, 'booking_id');
+        return $this->hasMany(BookingContactMailLog::class, 'booking_id')->orderBy('id');
     }
 
     public function contactBooking()

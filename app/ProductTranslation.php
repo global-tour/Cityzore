@@ -9,4 +9,9 @@ class ProductTranslation extends Model
 
     protected $table = 'product_translations';
 
+    public function product()
+    {
+        return $this->hasOne(Product::class, 'id', 'productID');
+    }
+
 }

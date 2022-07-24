@@ -21,15 +21,15 @@ End of Tawk.to Script-->
 <script src="{{asset('/js/main/jquery-ui.js')}}"></script>
 <script src="{{asset('/js/main/home-scripts.js')}}" defer></script>
 <script src="{{asset('/js/waitme/waitMe.min.js')}}" defer></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <style>
 
     .pagination > li > a, .pagination > li > span{
         color: #1d6db2;
     }
-     .pagination .active {
-         line-height: 16.6px;
-     }
+    .pagination .active {
+        line-height: 16.6px;
+    }
     .pagination > li > a, .pagination > li > span{
         line-height: 17px;
     }
@@ -57,84 +57,6 @@ End of Tawk.to Script-->
 </script>
 
 <script>
-    $(window).on('load', function getLocales() {
-        let fullUrl = window.location.href;
-        if (fullUrl.indexOf('admin') < 0) {
-            $.ajax({
-                type: 'GET',
-                url: '/getLocales',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content') ? $('meta[name="csrf-token"]').attr('content') : "{{csrf_token()}}",
-                },
-                success: function(data) {
-                    if (data.success) {
-                        if ($('#sessionLocale').val() === '') {
-                            $('#sessionLocale').val('en');
-                        }
-                        let languages = data.languages;
-                        let block = '';
-                        block += '<div class="header-dropdownlang" style="border-right: 1px solid #e7ebef!important; padding-left: 10px;">';
-                        let selectedLang = languages.find((o) => { return o['code'] === $('#sessionLocale').val(); });
-                        if (selectedLang) {
-                            block += '<button class="header-dropbtn fromCenter">'+selectedLang.displayName+' &#9660;</button>';
-                        } else {
-                            block += '<button class="header-dropbtn fromCenter">English &#9660;</button>';
-                        }
-                        block += '<div class="header-dropdown-content">';
-                        languages.forEach(function(lang) {
-                            block += '<span style="display: none;" class="languageCodes" data-lang-code="'+lang.code+'">\n';
-                            block += '<img alt="'+lang.displayName+'" style="width: 25px; height: 18px; margin-right: 5px;" src="/img/flag/'+lang.code+'.svg">\n';
-                            block += lang.displayName;
-                            block += '</span>';
-                        });
-                        block += '</div>';
-                        block += '</div>';
-                        $('.languageLi').append(block);
-                    }
-                }
-            });
-        }
-    });
-
-    $(window).on('load', function getCurrencies() {
-        let fullUrl = window.location.href;
-        if (fullUrl.indexOf('admin') < 0) {
-            $.ajax({
-                type: 'GET',
-                url: '/getCurrencies',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                },
-                success: function(data) {
-                    if (data.success) {
-                        if ($('#sessionCurrency').val() === '') {
-                            $('#sessionCurrency').val('2');
-                        }
-                        let currenciesAsStr = {'1': '$', '2': '€', '3': '£', '4': '₺', '5': 'ƒ', '6': 'C$', '7': '₽', '8': 'AED', '9': '₻', '10': '¥', '11': '₹', '12': 'CSK', '13': '₼', '14': '원', '15': 'QAR', '16': '฿'};
-                        let currencies = data.currencies;
-                        let block = '';
-                        block += '<div class="header-dropdowncur" style="border-right: 1px solid #e7ebef!important; width: 80px; padding-left: 10px;">';
-                        let selectedCur = currencies.find((o) => { return o['id'] === parseInt($('#sessionCurrency').val()); });
-                        if (selectedCur) {
-                            block += '<button class="header-dropbtn fromCenter">'+selectedCur.currency+' ('+currenciesAsStr[selectedCur.id]+') &#9660;</button>';
-                        } else {
-                            block += '<button class="header-dropbtn fromCenter">EUR (€) &#9660;</button>';
-                        }
-                        block += '<div class="header-dropdown-content">';
-                        currencies.forEach(function(currency) {
-                            block += '<span style="display: none;" class="currencyCodes" data-cur-code="'+currency.id+'">\n';
-                            block += currency.currency + '('+currenciesAsStr[currency.id]+')';
-                            block += '</span>';
-                        });
-                        block += '</div>';
-                        block += '</div>';
-                        $('.currencyLi').append(block);
-                    }
-                }
-            });
-        }
-    });
-
     $(window).on('load', function uniqueIDForCart() {
         let fullUrl = window.location.href;
         if (fullUrl.indexOf('admin') < 0) {
@@ -206,7 +128,7 @@ End of Tawk.to Script-->
                     if (data.success) {
 
                         if(data.isErrorPage){
-                          window.location.href = window.location.origin +"/"+ data.url;
+                            window.location.href = window.location.origin +"/"+ data.url;
 
                         }
 
@@ -288,18 +210,17 @@ End of Tawk.to Script-->
             dateFormat: 'dd/mm/yy',
             autoClose: true,
             minDate: moment().toDate(),
-            position: 'top right'
+            position: 'bottom right'
         });
 
         $('.datepicker-to').datepicker({
             dateFormat: 'dd/mm/yy',
             autoClose: true,
             minDate: moment().toDate(),
-            position: 'top right'
+            position: 'bottom right'
         });
 
-        $('.searchInput').on('focus', function() {
-            console.log("test");
+        $('.searchInput').on('focus, click', function() {
             let suggestionsContainer = $(this).closest(".input-field").find('.suggestions-container');
             let suggestionItem = suggestionsContainer.find('.suggestion-item');
             if (suggestionItem.length > 0) {
@@ -308,65 +229,93 @@ End of Tawk.to Script-->
         });
 
 
-
-        $('.searchInput').on('keyup', function(e) {
-
+        $('.search-field').on('keyup', function(e) {
             let keyValues = [37, 38, 39, 40];
             let which = e.which;
-            if (!keyValues.includes(which)) {
-                $('#suggestionIndex').val('-1');
-                let value = $(this).val();
-                let suggestionsContainer = $(this).closest(".input-field").find('.suggestions-container');
-                if (value.length > 0) {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/searchVarious',
-                        data:{
-                            _token: $('meta[name="csrf-token"]').attr('content'),
-                            value: value
-                        },
-                        success: function(data) {
-                            let block = '';
-                            suggestionsContainer.html(block);
-                            if (data.successful) {
-                                let totalLength = data.countries.length + data.cities.length + data.attractions.length + data.products.length;
-                                if (totalLength > 0) {
-                                    if (data.countries.length > 0) {
-                                        data.countries.forEach(function(c) {
-                                            block += '<div class="suggestion-item" data-value="'+c.countries_name+'" data-type="country">'+c.countries_name+'</div>';
-                                        });
-                                    }
-                                    if (data.cities.length > 0) {
-                                        data.cities.forEach(function(c) {
-                                            block += '<div class="suggestion-item" data-value="'+c+'" data-type="city">'+c+'</div>';
-                                        });
-                                    }
-                                    if (data.attractions.length > 0) {
-                                        data.attractions.forEach(function(a) {
-                                            block += '<div class="suggestion-item" data-value="'+a.name+'" data-type="attraction">'+a.name+'</div>';
-                                        });
-                                    }
-                                    if (data.products.length > 0) {
-                                        data.products.forEach(function(p) {
-                                            block += '<div class="suggestion-item" data-value="'+p.title+'" data-type="product" data-url="'+p.url+'">'+p.title+'</div>';
-                                        });
-                                    }
-                                    suggestionsContainer.append(block);
-                                    suggestionsContainer.show();
-                                } else {
-                                    suggestionsContainer.hide();
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    $('.suggestions-container').hide();
-                }
-            }else{
-                return false;
-            }
+            let width = screen.width;
+            $('#suggestionIndex').val('-1');
+            let value = $(this).val();
+            let suggestionsContainer = width > 520 ? $(this).parent().find(".suggestions-container") : $(this).parent().find(".mobile-suggestions-container");
+            fillBody(suggestionsContainer, value)
         });
 
+        function fillBody (suggestionsContainer, val) {
+
+            $.ajax({
+                type: 'POST',
+                url: '/searchVarious',
+                data:{
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    value: val
+                },
+                success: function(response) {
+
+                    let block = '';
+                    suggestionsContainer.html(block);
+
+                    response.data.forEach(function (item) {
+                        if(item.searchableModel === 'Product' || item.searchableModel === 'Attraction'){
+                            block += `<a href="${item.url}" class="suggestion-item">
+                                                <div class="suggestion-icon"  style="background: url('${item.cover}') center center no-repeat;background-size:cover"></div>
+                                                ${item.searchableTitle}
+                                            </a>`
+                        }else {
+                            block += `<a class="suggestion-item" href="/s?q=${item.searchableTitle}&m=${item.searchableModel}">
+                                                <div class="icon-cz-location-1 suggestion-icon"></div>
+                                                ${item.searchableTitle}
+                                            </a>`
+                        }
+
+                    })
+
+                    suggestionsContainer.append(block);
+                    suggestionsContainer.show()
+                },
+                error: function (response){
+                    suggestionsContainer.html(`<b style="display: block; text-align: center">${response.responseJSON.message}</b>`)
+                    suggestionsContainer.show()
+                }
+            });
+        }
+
+        $('#mobile-search-button').on('click', function (){
+            $('.mobile-search-overlay').addClass('active-overlay')
+            $('.mobile-search-overlay .mobile-search-area input').focus()
+            $('body').css({
+                overflow: 'hidden'
+            })
+        })
+
+        $('.mobile-search-overlay .mobile-search-area input').on('keyup', function() {
+            if($(this).val().length > 0){
+                $(this).parent().find('.clear-input').css({
+                    display: 'flex'
+                })
+            }else{
+                $(this).parent().find('.clear-input').css({
+                    display: 'none'
+                })
+                $('.mobile-suggestions-container').html('')
+            }
+        })
+
+        $('.clear-input').on('click', function () {
+            $('.mobile-search-overlay .mobile-search-area input').val('')
+            $('.mobile-search-overlay .mobile-search-area input').focus()
+            $(this).css({
+                display: 'none'
+            })
+            $('.mobile-suggestions-container').html('')
+        })
+
+
+
+        $('.overlay-close').on('click', function () {
+            $('.mobile-search-overlay').removeClass('active-overlay')
+            $('body').css({
+                overflow: 'visible'
+            })
+        })
 
 
         $(document).on('keyup', function(e) {
@@ -418,19 +367,7 @@ End of Tawk.to Script-->
         });
 
         $('body').on('click', '.suggestion-item', function() {
-            let $this = $(this);
-            let value = $this.attr('data-value');
-            let type = $this.attr('data-type');
-            if (type !== 'product') {
-                $('#searchType').val(type);
-                $('#select-search').val(value);
-                $('.suggestions-container').hide();
-            } else {
-                var hostname = location.hostname;
-                var fullURL = "http://"+hostname+"/"+$this.attr('data-url');
-                window.location.href = fullURL;
-                //window.location.href = $this.attr('data-url');
-            }
+            $(this).parent().parent().find('.search-button').attr('disabled', 'disabled')
         });
 
         $('.tour-form-one').on('submit', function(e) {
@@ -451,7 +388,7 @@ End of Tawk.to Script-->
         });
 
 
-               $('.tour-form-two').on('submit', function(e) {
+        $('.tour-form-two').on('submit', function(e) {
             e.preventDefault();
 
             let search = $(this).find('.searchInput');
@@ -523,55 +460,55 @@ End of Tawk.to Script-->
         $(document).ready(function(){
 
             $('.optionMovable:first').addClass('movable-active');
-        $("#know-before-you-go-wrap p").each(function(index, el) {
-        if(index  > 3){
-            $(this).css("display", "none");
-            $(this).addClass("read-more-p");
-        }
+            $("#know-before-you-go-wrap p").each(function(index, el) {
+                if(index  > 3){
+                    $(this).css("display", "none");
+                    $(this).addClass("read-more-p");
+                }
 
-      });
+            });
 
-      if($("#know-before-you-go-wrap p").length > 4 && $("#know-before-you-go-read-more").length == 0){
-        $("#know-before-you-go-wrap").append("<b id='know-before-you-go-read-more' data-step='read' style='text-align:center; display:block; width:100px; background-color:#1d6db212; color:#000; cursor:pointer; padding:0 10px 0 10px; margin-bottom: 20px;'> {{__('Read More...')}} </b>");
-      }else{
-        $("#know-before-you-go-read-more").attr("data-step", "read");
+            if($("#know-before-you-go-wrap p").length > 4 && $("#know-before-you-go-read-more").length == 0){
+                $("#know-before-you-go-wrap").append("<b id='know-before-you-go-read-more' data-step='read' style='text-align:center; display:block; width:100px; background-color:#1d6db212; color:#000; cursor:pointer; padding:0 10px 0 10px; margin-bottom: 20px;'> {{__('Read More...')}} </b>");
+            }else{
+                $("#know-before-you-go-read-more").attr("data-step", "read");
 
-      }
-
-
-
-      // know before you go read more if row greater than 3
-
-      function makeReadMoreForKnowBeforeYouGo(){
-
-    $("#know-before-you-go-wrap p.read-more-p").slideToggle(200, function(){
-        $("#know-before-you-go-read-more").attr("data-step", "read");
-        $("#know-before-you-go-read-more").text("{{__('Read More...')}}");
-    });
-
-
-      }
+            }
 
 
 
-   function notMakeReadMoreForKnowBeforeYouGo(){
-    $("#know-before-you-go-wrap p.read-more-p").slideToggle(200, function(){
-        $("#know-before-you-go-read-more").attr("data-step", "hide");
-        $("#know-before-you-go-read-more").text("{{__('Hide')}}");
-    });
-   }
+            // know before you go read more if row greater than 3
 
-   $(document).on('click', '#know-before-you-go-read-more', function(event) {
-       event.preventDefault();
-       var step = $(this).attr("data-step");
+            function makeReadMoreForKnowBeforeYouGo(){
 
-       if(step == 'read'){
-        notMakeReadMoreForKnowBeforeYouGo();
-       }else{
-        makeReadMoreForKnowBeforeYouGo();
-       }
+                $("#know-before-you-go-wrap p.read-more-p").slideToggle(200, function(){
+                    $("#know-before-you-go-read-more").attr("data-step", "read");
+                    $("#know-before-you-go-read-more").text("{{__('Read More...')}}");
+                });
 
-   });
+
+            }
+
+
+
+            function notMakeReadMoreForKnowBeforeYouGo(){
+                $("#know-before-you-go-wrap p.read-more-p").slideToggle(200, function(){
+                    $("#know-before-you-go-read-more").attr("data-step", "hide");
+                    $("#know-before-you-go-read-more").text("{{__('Hide')}}");
+                });
+            }
+
+            $(document).on('click', '#know-before-you-go-read-more', function(event) {
+                event.preventDefault();
+                var step = $(this).attr("data-step");
+
+                if(step == 'read'){
+                    notMakeReadMoreForKnowBeforeYouGo();
+                }else{
+                    makeReadMoreForKnowBeforeYouGo();
+                }
+
+            });
 
 
 
@@ -595,7 +532,7 @@ End of Tawk.to Script-->
             });
         });
     </script>
-       <script src="https://www.google.com/recaptcha/api.js?render=6LeV48kUAAAAAEBarIb7y3KiRw0452xW-5DK3YTr"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeV48kUAAAAAEBarIb7y3KiRw0452xW-5DK3YTr"></script>
     <script>
         grecaptcha.ready(function() {
             grecaptcha.execute('6LeV48kUAAAAAEBarIb7y3KiRw0452xW-5DK3YTr', {action: 'register'}).then(function(token) {
@@ -617,15 +554,15 @@ End of Tawk.to Script-->
 
             });
 
-             lightbox.option({
-              'resizeDuration': 200,
-              'wrapAround': true
+            lightbox.option({
+                'resizeDuration': 200,
+                'wrapAround': true
             });
 
-             $(".all-images").click(function(event) {
+            $(".all-images").click(function(event) {
                 $(".gallery figure").eq(0).find("a").click();
 
-             });
+            });
 
             $(".commentDisplay").slice(0, 4).show(); // select the first 4
 
@@ -650,8 +587,8 @@ End of Tawk.to Script-->
         document.getElementById('book-focus').onclick = function() {
             /*document.getElementById('sidebar').scrollIntoView();*/
             $([document.documentElement, document.body]).animate({
-                    scrollTop: $("#box_style_1").offset().top +200
-                }, 1200);
+                scrollTop: $("#box_style_1").offset().top +200
+            }, 1200);
         };
     </script>
 
@@ -672,46 +609,20 @@ End of Tawk.to Script-->
     <script src="{{asset('js/datatables/pdfmake.min.js')}}" defer></script>
     <script src="{{asset('js/datatables/vfs_fonts.js')}}" defer></script>
     <script src="{{asset('js/main/profile-scripts.js')}}" defer></script>
+
+@elseif($page == 'commissions')
     <script>
-        $(document).ready(function () {
-            $('body').on('click', '[data-booking]', function () {
-                if(confirm('{{ __('cancelByUser') }}')){
-                    $.ajax({
-                        url: '/cancel-by-user',
-                        type: 'POST',
-                        data: {
-                            _token: $('meta[name="csrf-token"]').attr('content'),
-                            id: $(this).data('booking')
-                        },
-                        success: function (response) {
-                            alert(response.message);
-
-                            setTimeout(() => {
-                                location.reload()
-                            }, 1300)
-                        },
-                        error: function (error) {
-                            console.log(error)
-                        }
-                    })
-                }
-            })
-        })
-    </script>
-
-    @elseif($page == 'commissions')
-      <script>
-          $(document).ready(function() {
+        $(document).ready(function() {
             $("[data-toggle='tootip']").tooltip();
 
-          $("thead").click(function(event) {
-            if(!$(this).next("tbody").is(':visible'))
-              $(this).next("tbody").show(400);
-            else
-              $(this).next("tbody").hide(200);
-          });
-          });
-      </script>
+            $("thead").click(function(event) {
+                if(!$(this).next("tbody").is(':visible'))
+                    $(this).next("tbody").show(400);
+                else
+                    $(this).next("tbody").hide(200);
+            });
+        });
+    </script>
 
 @elseif($page == 'home')
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
@@ -731,36 +642,36 @@ End of Tawk.to Script-->
 
 
 
-      $(document).on('click','.add-to-wishlist', function() {
-        let $this = $(this);
-        let productID = $this.attr("data-product-id");
-        let wishlistType = $this.attr('data-type');
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            type: 'POST',
-            url: '/addRemoveWishlist',
-            data: {
-                productID: productID,
-                wishlistType: wishlistType
-            },
-            success: function(data) {
-                if (!data.isLoggedIn) {
-                    Materialize.toast(data.success, 4000, 'toast-alert');
-                    return;
+        $(document).on('click','.add-to-wishlist', function() {
+            let $this = $(this);
+            let productID = $this.attr("data-product-id");
+            let wishlistType = $this.attr('data-type');
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'POST',
+                url: '/addRemoveWishlist',
+                data: {
+                    productID: productID,
+                    wishlistType: wishlistType
+                },
+                success: function(data) {
+                    if (!data.isLoggedIn) {
+                        Materialize.toast(data.success, 4000, 'toast-alert');
+                        return;
+                    }
+                    Materialize.toast(data.success, 4000, 'toast-success');
+                    if (wishlistType === 'add') {
+                        $this.css("color","#ff0000");
+                        $this.attr('data-type', 'remove');
+                    } else {
+                        $this.css("color","#fff");
+                        $this.attr('data-type', 'add');
+                    }
                 }
-                Materialize.toast(data.success, 4000, 'toast-success');
-                if (wishlistType === 'add') {
-                    $this.css("color","#ff0000");
-                    $this.attr('data-type', 'remove');
-                } else {
-                    $this.css("color","#fff");
-                    $this.attr('data-type', 'add');
-                }
-            }
+            });
         });
-    });
 
 
 
@@ -771,7 +682,8 @@ End of Tawk.to Script-->
     <script src="{{asset('js/airdatepicker/datepicker.en.js')}}"></script>
     <script>
         $(window).on('load', function() {
-            makeFilterCall();
+            // console.log('burda')
+            // makeFilterCall();
         });
 
         $('.datepicker-from').datepicker({
@@ -842,54 +754,54 @@ End of Tawk.to Script-->
                     let $rate = item.rate;
 
 
-                           if((parseInt($rate) + 0.5) >= $rate && parseInt($rate) != $rate){
+                    if((parseInt($rate) + 0.5) >= $rate && parseInt($rate) != $rate){
 
                         for (let $i=1; $i <= 5; $i++) {
-                           if(($i < $rate)){
-                            // tam yıldız
-                            block+= '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
+                            if(($i < $rate)){
+                                // tam yıldız
+                                block+= '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
 
-                           }else if(($i > $rate) && (Math.ceil($rate) == $i)){
-                            block+= '<i class="icon-cz-star-half" style="color: #ffad0c; font-size: 15px;"></i>';
-                           // yarım yıldız
-                           }
-                           else{
-                            block+= '<i class="icon-cz-star-empty" style="color: #ffad0c; font-size: 15px;"></i>';
-                           // boş yıldız
-                           }
+                            }else if(($i > $rate) && (Math.ceil($rate) == $i)){
+                                block+= '<i class="icon-cz-star-half" style="color: #ffad0c; font-size: 15px;"></i>';
+                                // yarım yıldız
+                            }
+                            else{
+                                block+= '<i class="icon-cz-star-empty" style="color: #ffad0c; font-size: 15px;"></i>';
+                                // boş yıldız
+                            }
                         }
 
-                       }else if((parseInt($rate) + 0.5) < $rate){
+                    }else if((parseInt($rate) + 0.5) < $rate){
 
                         for (let $i=1; $i <= 5; $i++) {
 
                             if($i <= Math.ceil($rate)){
-                               block+= '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
+                                block+= '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
                             }else{
                                 block+= '<i class="icon-cz-star-empty" style="color: #ffad0c; font-size: 15px;"></i>';
                             }
 
                         }
 
-                       }else{
+                    }else{
 
                         for (let $i=1; $i <= 5; $i++) {
                             if($rate >= $i){
-                           block+= '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
+                                block+= '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
                             }else{
-                           block+= '<i class="icon-cz-star-empty" style="color: #ffad0c; font-size: 15px;"></i>';
+                                block+= '<i class="icon-cz-star-empty" style="color: #ffad0c; font-size: 15px;"></i>';
                             }
                         }
 
-                       }
-
-                       block += '<label style="font-size: 13px;vertical-align: text-bottom; float:right;color: #1A2B50; padding-left: 3px;">'+$rate+'/5 </label>';
-
-
-                 /*   for (let i=0; i<item.rate; i++) {
-                        block += '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
                     }
-                    block += '<label style="font-size: 13px;vertical-align: text-bottom; float:left;color: #1A2B50;">'+(rate)+'/'+5+' |</label>';*/
+
+                    block += '<label style="font-size: 13px;vertical-align: text-bottom; float:right;color: #1A2B50; padding-left: 3px;">'+$rate+'/5 </label>';
+
+
+                    /*   for (let i=0; i<item.rate; i++) {
+                           block += '<i class="icon-cz-star" style="color: #ffad0c; font-size: 15px;"></i>';
+                       }
+                       block += '<label style="font-size: 13px;vertical-align: text-bottom; float:left;color: #1A2B50;">'+(rate)+'/'+5+' |</label>';*/
                 } else {
                     block += '<div style="font-size: 13px;vertical-align: text-bottom;">No reviews yet</div>';
                 }
@@ -1081,69 +993,69 @@ End of Tawk.to Script-->
     <script src="{{asset('js/airdatepicker/datepicker.en.js')}}"></script>
 
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-    $(document).ready(function() {
-
-
-
-
-                setTimeout(function () {
-                    var kelle = $('.select-wrapper');// $('.select-wrapper');
-                    $.each(kelle, function (i, t) {
-                        t.addEventListener('click', e => e.stopPropagation());
-                    });
-                }, 500)
-               $('.mdb-select').material_select();
+        $(document).ready(function() {
 
 
 
-           $('.datepicker-from').datepicker({
-            dateFormat: 'dd/mm/yyyy',
-            autoClose: true,
-            minDate: moment().toDate()
+
+            setTimeout(function () {
+                var kelle = $('.select-wrapper');// $('.select-wrapper');
+                $.each(kelle, function (i, t) {
+                    t.addEventListener('click', e => e.stopPropagation());
+                });
+            }, 500)
+            $('.mdb-select').material_select();
+
+
+
+            $('.datepicker-from').datepicker({
+                dateFormat: 'dd/mm/yyyy',
+                autoClose: true,
+                minDate: moment().toDate()
+            });
+
+            $('.datepicker-to').datepicker({
+                dateFormat: 'dd/mm/yyyy',
+                autoClose: true,
+                minDate: moment().toDate()
+            });
+
+
+            $(document).on('change', 'select[name="sort"]', function(event) {
+                event.preventDefault();
+                $("#filter-form").submit();
+            });
+
+            $(document).on('change', 'select.form-check-input', function(event) {
+                event.preventDefault();
+                $("#filter-form").submit();
+            });
+
+
+            $(document).on('click', '#reset-form', function(event) {
+                event.preventDefault();
+
+
+                $(".form-check-input").prop("checked", false);
+                $('select[name="sort"]').prop("selected", false);
+                $('select[name="sort"]').val("");
+                $('input[name="from_date"]').val("");
+                $('input[name="to_date"]').val("");
+
+                var documentURL = document.URL;
+                var mainURL = documentURL.split('?')[0];
+                console.log(mainURL);
+                window.location = mainURL;
+
+            });
+
         });
-
-        $('.datepicker-to').datepicker({
-            dateFormat: 'dd/mm/yyyy',
-            autoClose: true,
-            minDate: moment().toDate()
-        });
+    </script>
 
 
-        $(document).on('change', 'select[name="sort"]', function(event) {
-            event.preventDefault();
-            $("#filter-form").submit();
-        });
-
-        $(document).on('change', 'select.form-check-input', function(event) {
-            event.preventDefault();
-            $("#filter-form").submit();
-        });
-
-
-        $(document).on('click', '#reset-form', function(event) {
-            event.preventDefault();
-
-
-            $(".form-check-input").prop("checked", false);
-            $('select[name="sort"]').prop("selected", false);
-            $('select[name="sort"]').val("");
-            $('input[name="from_date"]').val("");
-            $('input[name="to_date"]').val("");
-
-            var documentURL = document.URL;
-            var mainURL = documentURL.split('?')[0];
-            console.log(mainURL);
-            window.location = mainURL;
-
-        });
-
-    });
-</script>
-
-
-    @elseif($page == 'faq')
+@elseif($page == 'faq')
     <script>
         var acc = document.getElementsByClassName("accordion");
         var i;
@@ -1164,10 +1076,10 @@ End of Tawk.to Script-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js" defer></script>
 
     <script>
-     $("#checkoutEmail").on('focus', function(event) {
-         event.preventDefault();
-         $(this).removeAttr("style");
-     });
+        $("#checkoutEmail").on('focus', function(event) {
+            event.preventDefault();
+            $(this).removeAttr("style");
+        });
 
 
         $('#placeOrder').on('click', function() {
@@ -1206,13 +1118,13 @@ End of Tawk.to Script-->
                 $isAdmin = auth()->check() && !is_null(auth()->guard('web')->user()->ccEmail) && auth()->guard('web')->user()->commission == null;
             @endphp
             @if($isAdmin || (auth()->guard('web')->check() && auth()->guard('web')->user()->id == 21) || (auth()->guard('web')->check() && auth()->guard('web')->user()->id == 466))
-                let platform = $('#platformID').val();
-                if(!platform || platform == "") {
-                    $(this).waitMe('hide')
-                    $(this).attr('disabled', false)
-                    Materialize.toast('Platform field is required!', 3000, 'toast-alert');
-                    return false;
-                }
+            let platform = $('#platformID').val();
+            if(!platform || platform == "") {
+                $(this).waitMe('hide')
+                $(this).attr('disabled', false)
+                Materialize.toast('Platform field is required!', 3000, 'toast-alert');
+                return false;
+            }
             @endif
 
             $(this).attr('disabled', false)
@@ -1281,14 +1193,14 @@ End of Tawk.to Script-->
     </script>
 
     @if(session()->get('userLanguage') != 'en')
-    <script>
-        var sgment = '/{{session()->get('userLanguage')}}/bookit';
-    </script>
+        <script>
+            var sgment = '/{{session()->get('userLanguage')}}/bookit';
+        </script>
     @else
 
-    <script>
-        var sgment = '/bookit';
-    </script>
+        <script>
+            var sgment = '/bookit';
+        </script>
 
     @endif
 
@@ -1671,19 +1583,19 @@ End of Tawk.to Script-->
                             $('#cover-spin').hide();
                         },
                     })
-                    .done(function(data) {
-                        $('#conCodeBlock').show();
-                        $('#conCodeInformation').text(data.message);
+                        .done(function(data) {
+                            $('#conCodeBlock').show();
+                            $('#conCodeInformation').text(data.message);
 
-                        $('#checkLevel').val(2);
-                        $('#tryAnotherCodeButton').parent().show();
-                    })
-                    .fail(function(xhr, status, error) {
-                        $('#conCodeBlock').hide();
+                            $('#checkLevel').val(2);
+                            $('#tryAnotherCodeButton').parent().show();
+                        })
+                        .fail(function(xhr, status, error) {
+                            $('#conCodeBlock').hide();
 
-                        var err = JSON.parse(xhr.responseText);
-                        Materialize.toast(err.error, 5000, 'toast-alert');
-                    })
+                            var err = JSON.parse(xhr.responseText);
+                            Materialize.toast(err.error, 5000, 'toast-alert');
+                        })
                 } else if($('#checkLevel').val() == 2) {
                     if($('#confirmationCode').val() == "" || $('#confirmationCode').val() == null) {
                         Materialize.toast('{{__('confirmationCodeFieldIsRequired')}}', 5000, 'toast-alert');
@@ -1696,36 +1608,36 @@ End of Tawk.to Script-->
 
             $('#cancelBookingButton').on('click', function() {
                 Swal.fire({
-                  title: '{{__('areYouSure')}}',
-                  text: "{{__('theBookingWillBeCancelled')}}",
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#d33',
-                  cancelButtonColor: '#87a1ad',
-                  confirmButtonText: '{{__('cancelBooking')}}',
-                  cancelButtonText: '{{__('back')}}'
+                    title: '{{__('areYouSure')}}',
+                    text: "{{__('theBookingWillBeCancelled')}}",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#87a1ad',
+                    confirmButtonText: '{{__('cancelBooking')}}',
+                    cancelButtonText: '{{__('back')}}'
                 }).then((result) => {
-                  if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/cancel-booking',
-                        type: 'POST',
-                        data: {
-                            _token: $('meta[name="csrf-token"]').attr('content')
-                        },
-                    })
-                    .done(function(data) {
-                        Swal.fire(
-                          '{{__('cancelled')}}',
-                          data.message,
-                          'success'
-                        )
-                        checkBookingAjax("conCodeNotMatter");
-                    })
-                    .fail(function(xhr, status, error) {
-                        var err = JSON.parse(xhr.responseText);
-                        Materialize.toast(err.error, 5000, 'toast-alert');
-                    })
-                  }
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/cancel-booking',
+                            type: 'POST',
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            },
+                        })
+                            .done(function(data) {
+                                Swal.fire(
+                                    '{{__('cancelled')}}',
+                                    data.message,
+                                    'success'
+                                )
+                                checkBookingAjax("conCodeNotMatter");
+                            })
+                            .fail(function(xhr, status, error) {
+                                var err = JSON.parse(xhr.responseText);
+                                Materialize.toast(err.error, 5000, 'toast-alert');
+                            })
+                    }
                 })
             });
 
@@ -1745,13 +1657,13 @@ End of Tawk.to Script-->
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                 })
-                .done(function(data) {
-                    console.log(data);
-                })
-                .fail(function(xhr, status, error) {
-                    var err = JSON.parse(xhr.responseText);
-                    console.log(err.error);
-                })
+                    .done(function(data) {
+                        console.log(data);
+                    })
+                    .fail(function(xhr, status, error) {
+                        var err = JSON.parse(xhr.responseText);
+                        console.log(err.error);
+                    })
             });
 
             function checkBookingAjax(conCodeStatus) {
@@ -1765,51 +1677,51 @@ End of Tawk.to Script-->
                         conCodeStatus: conCodeStatus
                     },
                 })
-                .done(function(data) {
-                    $('#bookingDetailsCard').show();
+                    .done(function(data) {
+                        $('#bookingDetailsCard').show();
 
-                    let booking = data.booking;
-                    $('#bookingTitle').text(booking.title);
-                    $('#bookingDateTime').text(booking.datetime);
-                    $('#totalPrice').text(booking.totalPrice);
-                    $('#bookingItems').text(booking.bookingItems);
+                        let booking = data.booking;
+                        $('#bookingTitle').text(booking.title);
+                        $('#bookingDateTime').text(booking.datetime);
+                        $('#totalPrice').text(booking.totalPrice);
+                        $('#bookingItems').text(booking.bookingItems);
 
-                    if(booking.invoiceUrl == "#") {
-                        $('#invoiceUrl').hide();
-                        $('#voucherUrl').hide();
-                        $('#cancelBookingButton').hide();
-                        $('#vouInvInformation').text('{{__('theBookingIsCancelled')}}');
-                        if(booking.extraFiles.length) {
-                            $('#extra-files').css({display: 'flex'});
-
-                            $.each(booking.extraFiles, function (k,v) {
-                                $(`<a href="${v.base}" target="_blank">${v.name}</a>`).appendTo($('#extra-files'))
-                            })
-                        }
-                    } else {
-                        $('#invoiceUrl').show();
-                        if(booking.voucherUrl != "#") {
-                            $('#voucherUrl').show();
-                            $('#cancelBookingButton').hide();
-                            $('#vouInvInformation').text('{{__('downloadVoucherAndInvoice')}}');
-                        } else {
+                        if(booking.invoiceUrl == "#") {
+                            $('#invoiceUrl').hide();
                             $('#voucherUrl').hide();
-                            $('#cancelBookingButton').show();
-                            $('#vouInvInformation').text('{{__('downloadInvoice')}}');
+                            $('#cancelBookingButton').hide();
+                            $('#vouInvInformation').text('{{__('theBookingIsCancelled')}}');
+                            if(booking.extraFiles.length) {
+                                $('#extra-files').css({display: 'flex'});
+
+                                $.each(booking.extraFiles, function (k,v) {
+                                    $(`<a href="${v.base}" target="_blank">${v.name}</a>`).appendTo($('#extra-files'))
+                                })
+                            }
+                        } else {
+                            $('#invoiceUrl').show();
+                            if(booking.voucherUrl != "#") {
+                                $('#voucherUrl').show();
+                                $('#cancelBookingButton').hide();
+                                $('#vouInvInformation').text('{{__('downloadVoucherAndInvoice')}}');
+                            } else {
+                                $('#voucherUrl').hide();
+                                $('#cancelBookingButton').show();
+                                $('#vouInvInformation').text('{{__('downloadInvoice')}}');
+                            }
                         }
-                    }
-                    $('#invoiceUrl').attr("href", booking.invoiceUrl);
-                    $('#voucherUrl').attr("href", booking.voucherUrl);
+                        $('#invoiceUrl').attr("href", booking.invoiceUrl);
+                        $('#voucherUrl').attr("href", booking.voucherUrl);
 
-                    $('#confirmationCode').val("");
-                    window.location = "#bookingDetailsCard";
-                })
-                .fail(function(xhr, status, error) {
-                    cleanFields();
+                        $('#confirmationCode').val("");
+                        window.location = "#bookingDetailsCard";
+                    })
+                    .fail(function(xhr, status, error) {
+                        cleanFields();
 
-                    var err = JSON.parse(xhr.responseText);
-                    Materialize.toast(err.error, 5000, 'toast-alert');
-                })
+                        var err = JSON.parse(xhr.responseText);
+                        Materialize.toast(err.error, 5000, 'toast-alert');
+                    })
             }
 
             function cleanFields() {
@@ -2036,49 +1948,49 @@ End of Tawk.to Script-->
     </script>
 @elseif($page == 'licence-files')
     <script>
-         $(function() {
+        $(function() {
 
 
-        $('#newFile').on('click', function() {
-            let block =
-                '<div class="row s6">' +
-                '<div class="input-field col s6">' +
-                '<input type="text" class="validate title" name="title[]" value="">' +
-                '<label for="bankName">{{__("title")}}</label>' +
-                '</div>' +
-                '<div class="input-field col s6">' +
-                '<button type="button" class="deleteFiles waves-effect waves-light btn-danger" style="font-size:26px;padding:2px 20px;border:none;float: right">-</button>' +
-                '<input type="file" class="fileName validate" name="fileName[]" >' +
-                '</div>' +
-                '</div>' ;
-            $('#licenceFilesContainer').append(block);
+            $('#newFile').on('click', function() {
+                let block =
+                    '<div class="row s6">' +
+                    '<div class="input-field col s6">' +
+                    '<input type="text" class="validate title" name="title[]" value="">' +
+                    '<label for="bankName">{{__("title")}}</label>' +
+                    '</div>' +
+                    '<div class="input-field col s6">' +
+                    '<button type="button" class="deleteFiles waves-effect waves-light btn-danger" style="font-size:26px;padding:2px 20px;border:none;float: right">-</button>' +
+                    '<input type="file" class="fileName validate" name="fileName[]" >' +
+                    '</div>' +
+                    '</div>' ;
+                $('#licenceFilesContainer').append(block);
+            });
+
+            $('body').on('click', '.deleteFiles', function() {
+                let id = $(this).attr('data-id');
+                let $this = $(this);
+                if (typeof(id) === undefined) {
+                    $this.parent().parent().html('');
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/deleteLicense',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            id: id,
+                        },
+                        success: function(data) {
+                            $this.parent().parent().html('');
+                            Materialize.toast(data.success, 4000, 'toast-success');
+                        },
+                        error: function(data) {
+                            Materialize.toast(data.error, 4000, 'toast-alert');
+                        }
+                    });
+                }
+            });
         });
-
-        $('body').on('click', '.deleteFiles', function() {
-            let id = $(this).attr('data-id');
-            let $this = $(this);
-            if (typeof(id) === undefined) {
-                $this.parent().parent().html('');
-            } else {
-                $.ajax({
-                    type: 'POST',
-                    url: '/deleteLicense',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        id: id,
-                    },
-                    success: function(data) {
-                        $this.parent().parent().html('');
-                        Materialize.toast(data.success, 4000, 'toast-success');
-                    },
-                    error: function(data) {
-                        Materialize.toast(data.error, 4000, 'toast-alert');
-                    }
-                });
-            }
-        });
-          });
     </script>
-@endif
-</body>
-</html>
+    @endif
+    </body>
+    </html>

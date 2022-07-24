@@ -270,7 +270,7 @@ class AllBookingsDatatable
         });
 
         $recordsFiltered = $queryC->count();
-        $data['data'] = $query->with(['bookingProduct', 'bookingOption', 'platform', 'invoc'])->get()->map(function ($item) {
+        $data['data'] = $query->with(['bookingProduct', 'bookingOption', 'platform', 'invoc', 'contacts'])->get()->map(function ($item) {
 
 
             if (!is_null($item->bookingItems)) {

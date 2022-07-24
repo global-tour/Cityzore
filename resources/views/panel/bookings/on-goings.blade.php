@@ -36,12 +36,12 @@
                                 <div class="col-md-12">
                                     <div class="col-md-12">
                                         <select class="browser-default custom-select select2" name="option" id="optionSelect">
-                                           
+
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
                     </div>
                     <div class="col-md-12" style="margin-bottom: 25px; margin-top: 25px;">
                         <div class="col-md-1">
@@ -49,6 +49,9 @@
                         </div>
                         <div class="col-md-2">
                             <button id="clearFiltersButton" class="btn btn-primary">Clear</button>
+                        </div>
+                        <div class="col-md-3 col-md-offset-4">
+                            <button id="remove-old-cart-items-from-on-goings" class="btn btn-danger">Remove Old Cart Items From On goings</button>
                         </div>
                     </div>
                 </div>
@@ -65,7 +68,7 @@
                 @endif
 
                 @if(session()->has('success'))
-                
+
                 <div class="alert-success" style="margin: 20px; padding: 20px;">
                     {{session()->get('success')}}
                 </div>

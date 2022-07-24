@@ -49,11 +49,10 @@
 }
 
 .header-dropbtn {
-    background-color: #f5f7f9!important;
-    color: #7a8088!important;
-    padding: 2px!important;
-    font-size: 13px!important;
+    background-color: unset!important;
+    color: #333!important;
     border: none!important;
+    font-weight: 500;
 }
 
 .header-dropdownlang {
@@ -88,7 +87,3 @@
 .header-dropdownlang:hover .header-dropdown-content {display: block!important;}
 
 .header-dropdowncur:hover .header-dropdown-content {display: block!important;}
-
-.header-dropdownlang:hover .header-dropbtn {background-color: #f5f7f9!important;}
-
-.header-dropdowncur:hover .header-dropbtn {background-color: #f5f7f9!important;}

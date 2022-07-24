@@ -21,43 +21,23 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
     $config = App\Config::where('userID', -1)->first();
     $homeBanner = Storage::disk('s3')->url('website-images/' . $config->homeBanner);
     ?>
-    <div class="tourz-search" style="background: url('{{$homeBanner}}'); background-size: cover;height: 600px;">
+    <div class="tourz-search" style="background: url('{{$homeBanner}}') center center no-repeat; background-size: cover;height: 600px;">
         <div class="container" style="float: left;">
             <div class="row">
                 <div class="tourz-search-1">
-                    <h1 style="background-color: #ffd700ed;">{{__('planYourParisTravelNow')}}</h1>
+                    <h1>{{__('planYourParisTravelNow')}}</h1>
                     <p class="hidden-xs hidden-sm">{{__('searchAttractiveThingsEiffel2')}}</p>
                     <form method="GET" class="tourz-search-form tour-form-two" action="{{url($langCodeForUrl.'/s')}}"
                           autocomplete="off">
                         <div class="home-banner-search">
-                            <div class="input-field" style="margin-top: 0!important;padding:2px!important;">
-                                <input type="text" id="select-search-another" name="q" class="searchInput" style=""
-                                       autocomplete="off">
-                                <div class="suggestions-container" style="">
-
-                                </div>
-                                <label for="select-search-another"
-                                       class="search-hotel-type">{{__('searchLocationsAttractions')}}</label>
+                            <div class="search-bar">
+                                <input type="text" placeholder="{{__('searchLocationsAttractions')}}" name="q" class="search-field" id="searchInput">
+                                <button type="submit" class="search-button">SEARCH</button>
+                                <div class="suggestions-container"></div>
                             </div>
-                            <div class="input-field hidden-xs"
-                                 style="width: 20%!important;margin-top: 0!important;padding:2px!important;">
-                                <input type='text' class='datepicker-from' name="dateFrom" id="select-search2"
-                                       data-language='en' placeholder="{{ __('FromDate') }}"/>
-                                <label for="select-search2" class="search-hotel-type">{{__('From')}}</label>
+                            <div class="mobile-search-bar">
+                                <button type="button" class="search-field" id="mobile-search-button">{{__('searchLocationsAttractions')}}</button>
                             </div>
-                            <div class="input-field hidden-xs"
-                                 style="width: 20%!important;margin-top: 0!important;padding:2px!important;">
-                                <input type='text' class='datepicker-to' name="dateTo" id="select-search3"
-                                       data-language='en' placeholder="{{ __('to') }}"/>
-                                <label for="select-search3" class="search-hotel-type">{{__('to')}}</label>
-                            </div>
-                            <div class="input-field" style="margin-top: 0!important;padding:2px!important;">
-                                <input type="submit" value="search" class="waves-effect waves-light tourz-sear-btn">
-                            </div>
-                            <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-                            <input type="hidden" name="type" id="searchType" value="misc">
-                            <input type="hidden" id="suggestionIndex" value="-1">
-                            <input type="hidden" id="productUrl" value="">
                         </div>
                     </form>
                 </div>
@@ -197,26 +177,26 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                                     </a>
                                 </div>
                                 <div class="col-lg-6" style="max-height: 300px;min-height: 300px;">
-                                   <div class="row">
-                                       <div class="col-lg-12">
-                                           <a href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization($attraction, $language)) .'-'.$attraction->id}}"
-                                              target="blank">
-                                               @if($attractionTranslation)
-                                                   <h2 class="attraction" >{{$attractionTranslation->name}}</h2>
-                                               @else
-                                                   <h2 class="attraction" >{{$attraction->name}}</h2>
-                                               @endif
-                                           </a>
-                                           <p>
-                                               @if($attractionTranslation)
-                                                   {!! explode('.', html_entity_decode($attractionTranslation->description))[0] !!}
-                                                   .
-                                               @else
-                                                   {!! explode('.', html_entity_decode($attraction->description))[0] !!}.
-                                               @endif
-                                           </p>
-                                       </div>
-                                   </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <a href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization($attraction, $language)) .'-'.$attraction->id}}"
+                                               target="blank">
+                                                @if($attractionTranslation)
+                                                    <h2 class="attraction" >{{$attractionTranslation->name}}</h2>
+                                                @else
+                                                    <h2 class="attraction" >{{$attraction->name}}</h2>
+                                                @endif
+                                            </a>
+                                            <p>
+                                                @if($attractionTranslation)
+                                                    {!! explode('.', html_entity_decode($attractionTranslation->description))[0] !!}
+                                                    .
+                                                @else
+                                                    {!! explode('.', html_entity_decode($attraction->description))[0] !!}.
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
                                     <div class="row home-tags-row">
                                         <div class="col-md-6 col-sm-12">
                                             @if($attractionTranslation)
@@ -524,15 +504,15 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                                         @else
                                             <p class="product-category">{{$product->category}}</p>
                                         @endif
-                                            <h3 style="position: absolute;color: #1d6db2;text-decoration: revert;font-weight: 400;margin-top: 0px;">
-                                                @if ($productTranslation)
-                                                    <a href="{{url($langCodeForUrl.'/'.$productTranslation->url)}}"
-                                                       style="font-size: 16px; font-weight: 600;color: #1d6db2;text-decoration: underline #cdcdcd;">{{$productTranslation->title}}</a>
-                                                @else
-                                                    <a href="{{url($langCodeForUrl.'/'.$product->url)}}"
-                                                       style="font-size: 16px; font-weight: 600;color: #1d6db2;text-decoration: underline #cdcdcd;">{{$product->title}}</a>
-                                                @endif
-                                            </h3>
+                                        <h3 style="position: absolute;color: #1d6db2;text-decoration: revert;font-weight: 400;margin-top: 0px;">
+                                            @if ($productTranslation)
+                                                <a href="{{url($langCodeForUrl.'/'.$productTranslation->url)}}"
+                                                   style="font-size: 16px; font-weight: 600;color: #1d6db2;text-decoration: underline #cdcdcd;">{{$productTranslation->title}}</a>
+                                            @else
+                                                <a href="{{url($langCodeForUrl.'/'.$product->url)}}"
+                                                   style="font-size: 16px; font-weight: 600;color: #1d6db2;text-decoration: underline #cdcdcd;">{{$product->title}}</a>
+                                            @endif
+                                        </h3>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -843,11 +823,11 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
         @endif
         @endforeach
         <div class="col-md-12 text-center" style="height: 43px;">
-        @php
-            $attr = \App\Attraction::with('translations')->whereSlug('eiffel-tower')->first();
-        @endphp
-        <a href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization($attr, $language))}}" class="link-btn">{{__('allEiffelTowerTours')}}</a>
-    </div>
+            @php
+                $attr = \App\Attraction::with('translations')->whereSlug('eiffel-tower')->first();
+            @endphp
+            <a href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization($attr, $language))}}" class="link-btn">{{__('allEiffelTowerTours')}}</a>
+        </div>
     </div>
     </div>
     <div class="col-lg-12 hidden-xs hidden-sm hidden-md" style="background-color: white;height: 340px;">

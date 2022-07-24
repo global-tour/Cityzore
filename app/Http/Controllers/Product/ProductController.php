@@ -103,9 +103,9 @@ class ProductController extends Controller
 
 
         }
-       /* $attractionId = explode("-", $attractionId);
-        $attractionId = count($attractionId)-1;
-        $attraction = Attraction::findOrFail($attractionId);*/
+        /* $attractionId = explode("-", $attractionId);
+         $attractionId = count($attractionId)-1;
+         $attraction = Attraction::findOrFail($attractionId);*/
 
         $path = request()->path();
         $arr = explode('/', $path);
@@ -122,81 +122,61 @@ class ProductController extends Controller
         $attraction = Attraction::findOrFail($translationData->attractionID);
 
 
-
         $attractionID = $attraction->id == $lastItem ? $attraction->id : $lastItem;
 
 
-
-
-       $langCode = !is_null(session()->get('userLanguage')) ? session()->get('userLanguage') : 'en';
-       $langID = \App\Language::where('code', $langCode)->first()->id;
+        $langCode = !is_null(session()->get('userLanguage')) ? session()->get('userLanguage') : 'en';
+        $langID = \App\Language::where('code', $langCode)->first()->id;
         $routeTrans = RouteLocalization::where('routeID', 27)->where('languageID', $langID)->first();
-          if ($routeTrans)
-            {
-                $routeTrans = $routeTrans->route;
-            }
-            else
-            {
-                $routeTrans = 'attraction';
-            }
-
-
-       if($langCode != "en"){
-
-        $targetAttractionTranslation  = AttractionTranslation::where('attractionID',$translationData->attarctionID)->where('languageID',$langID)->first();
-
-        if($targetAttractionTranslation){
-
-
-            if($targetAttractionTranslation->slug != urldecode(($originalSlug))){
-                return redirect($langCode.'/'.$routeTrans.'/'.$targetAttractionTranslation->slug.'-'.$attractionID, 301);
-            }
-
-
-        }else{
-
+        if ($routeTrans) {
+            $routeTrans = $routeTrans->route;
+        } else {
+            $routeTrans = 'attraction';
         }
 
 
-       }
+        if ($langCode != "en") {
+
+            $targetAttractionTranslation = AttractionTranslation::where('attractionID', $translationData->attarctionID)->where('languageID', $langID)->first();
+
+            if ($targetAttractionTranslation) {
 
 
+                if ($targetAttractionTranslation->slug != urldecode(($originalSlug))) {
+                    return redirect($langCode . '/' . $routeTrans . '/' . $targetAttractionTranslation->slug . '-' . $attractionID, 301);
+                }
+
+
+            } else {
+
+            }
+
+
+        }
 
 
         return view('frontend.attractions', ['categories' => $categories, 'attraction' => $attraction]);
     }
 
 
+    public function paginateAttractionPage($lang, $slug)
+    {
 
 
-     public function paginateAttractionPage($lang, $slug){
+        $categories_from_form = request()->category;
+        $prices_from_form = request()->price;
+        $fromDate_from_form = request()->from_date;
+        $toDate_from_form = request()->to_date;
+        $sort_from_form = request()->sort;
 
 
-      $categories_from_form = request()->category;
-      $prices_from_form = request()->price;
-      $fromDate_from_form = request()->from_date;
-      $toDate_from_form = request()->to_date;
-      $sort_from_form = request()->sort;
+        if (!empty($fromDate_from_form) && !empty($toDate_from_form)) {
+            $fromDate_from_form = Carbon::createFromFormat('d/m/Y', request()->from_date)->format('Y-m-d');
+            $toDate_from_form = Carbon::createFromFormat('d/m/Y', request()->to_date)->format('Y-m-d');
+        }
 
 
-
-
-     if(!empty($fromDate_from_form) && !empty($toDate_from_form)){
-         $fromDate_from_form = Carbon::createFromFormat('d/m/Y', request()->from_date)->format('Y-m-d');
-         $toDate_from_form = Carbon::createFromFormat('d/m/Y', request()->to_date)->format('Y-m-d');
-     }
-
-
-
-
-
-
-
-
-
-
-
-         $categoriesOfProduct = Product::select('category')->where('isPublished', '1')->where('isDraft', '0')->distinct('category')->get();
+        $categoriesOfProduct = Product::select('category')->where('isPublished', '1')->where('isDraft', '0')->distinct('category')->get();
         $categories = [];
         foreach ($categoriesOfProduct as $category) {
             array_push($categories, $category['category']);
@@ -206,116 +186,86 @@ class ProductController extends Controller
 
         $slugArr = explode("-", $slug);
         array_pop($slugArr);
-        $slug = join("-",$slugArr);
+        $slug = join("-", $slugArr);
 
 
+        $searchURL = "attraction/" . $slug;
 
-        $searchURL = "attraction/".$slug;
 
-
-         $productOrder = [1];
-        if(Page::where('url', "like", "%".$searchURL."%")->count()){
-          $productOrder =  Page::where('url', "like", "%".$searchURL."%")->first()->productOrder;
-          if(!empty($productOrder) && $productOrder != "null"){
-            $productOrder = json_decode($productOrder, true);
-          }else{
-            $productOrder = [1];
-          }
+        $productOrder = [1];
+        if (Page::where('url', "like", "%" . $searchURL . "%")->count()) {
+            $productOrder = Page::where('url', "like", "%" . $searchURL . "%")->first()->productOrder;
+            if (!empty($productOrder) && $productOrder != "null") {
+                $productOrder = json_decode($productOrder, true);
+            } else {
+                $productOrder = [1];
+            }
         }
         $idss = implode(',', array_reverse($productOrder));
 
 
+        if ($langCode == 'en') {
+            $attraction = Attraction::where("slug", $slug)->first();
+            $attractionID = $attraction->id;
+        } else {
+            $attraction = AttractionTranslation::where("slug", $slug)->first();
 
-
-
-
-
-
-
-
-
-        if($langCode == 'en'){
-         $attraction = Attraction::where("slug", $slug)->first();
-         $attractionID = $attraction->id;
-        }else{
-          $attraction = AttractionTranslation::where("slug", $slug)->first();
-
-          $attractionID = $attraction->attractionID;
+            $attractionID = $attraction->attractionID;
         }
 
 
+        $products = Product::whereJsonContains('attractions', ['' . $attractionID . ''])->where('isPublished', '1')->where('isDraft', '0')->where(function ($q) use ($categories_from_form, $langCode) {
 
 
-
-
-
-           $products = Product::whereJsonContains('attractions',[''.$attractionID.''])->where('isPublished', '1')->where('isDraft', '0')->where(function($q) use($categories_from_form, $langCode){
-
-
-            if(!empty($categories_from_form)){
+            if (!empty($categories_from_form)) {
                 $counter = 0;
 
                 foreach ($categories_from_form as $category) {
-                   if($langCode != 'en')
+                    if ($langCode != 'en')
                         $category = \App\Category::where('id', \App\CategoryTranslation::where('categoryName', $category)->first()->categoryID)->first()->categoryName;
-                   array_push($this->requestCategories, $category);
-                   $queryStr = $counter === 0 ? 'where' : 'orWhere';
-                   $q->$queryStr('category', $category);
-                   $counter++;
+                    array_push($this->requestCategories, $category);
+                    $queryStr = $counter === 0 ? 'where' : 'orWhere';
+                    $q->$queryStr('category', $category);
+                    $counter++;
                 }
 
             }
 
-           })->orderByRaw(DB::raw("FIELD(id, $idss) desc"))->get()->filter(function($model) use($prices_from_form){
+        })->orderByRaw(DB::raw("FIELD(id, $idss) desc"))->get()->filter(function ($model) use ($prices_from_form) {
             $min_price = $this->commonFunctions->getMinPrice($model->id);
             $specialOffer = $this->commonFunctions->getOfferPercentage($model);
 
 
-            if($specialOffer){
-              $min_price = ($min_price - $min_price*($specialOffer/100));
+            if ($specialOffer) {
+                $min_price = ($min_price - $min_price * ($specialOffer / 100));
             }
 
-            if(!empty($prices_from_form)){
-              $control = 0;
-             foreach ($prices_from_form as $pr) {
-                $prArr = explode("-", $pr);
-                $prMin = (int)$prArr[0];
-                $prMax = (int)$prArr[1];
+            if (!empty($prices_from_form)) {
+                $control = 0;
+                foreach ($prices_from_form as $pr) {
+                    $prArr = explode("-", $pr);
+                    $prMin = (int)$prArr[0];
+                    $prMax = (int)$prArr[1];
 
-                if($min_price >= $prMin && $min_price <= $prMax){
-                   $control = 1;
+                    if ($min_price >= $prMin && $min_price <= $prMax) {
+                        $control = 1;
+                    }
                 }
-             }
-             if($control){
-              return true;
-             }else{
-              return false;
-             }
+                if ($control) {
+                    return true;
+                } else {
+                    return false;
+                }
 
-            }else{
-              return true;
+            } else {
+                return true;
             }
 
 
+        });
 
 
-
-           });
-
-
-
-
-
-
-
-
-
-
-
-      if(!empty($fromDate_from_form) && !empty($toDate_from_form)){
-
-
-
+        if (!empty($fromDate_from_form) && !empty($toDate_from_form)) {
 
 
             $availabilities = [];
@@ -323,76 +273,73 @@ class ProductController extends Controller
             $productsBetweenDates = [];
             $productsIdArr = [];
 
-            $avdates = Avdate::whereHas("av", function($q){
-                $q->where("id",1);
-            })->where(function($q) use($fromDate_from_form, $toDate_from_form){
+            $avdates = Avdate::whereHas("av", function ($q) {
+                $q->where("id", 1);
+            })->where(function ($q) use ($fromDate_from_form, $toDate_from_form) {
                 $q->where('valid_from', '<=', $fromDate_from_form);
                 $q->where('valid_to', '>=', $toDate_from_form);
 
-            })->orWhere(function($q)use($fromDate_from_form, $toDate_from_form){
+            })->orWhere(function ($q) use ($fromDate_from_form, $toDate_from_form) {
 
                 $q->where('valid_from', '>=', $fromDate_from_form);
                 $q->where('valid_to', '<=', $toDate_from_form);
             })
-            ->orWhere(function($q)use($fromDate_from_form, $toDate_from_form){
+                ->orWhere(function ($q) use ($fromDate_from_form, $toDate_from_form) {
 
-                $q->where('valid_from', '>=', $fromDate_from_form);
-                $q->where('valid_from', '<=', $toDate_from_form);
-            })
+                    $q->where('valid_from', '>=', $fromDate_from_form);
+                    $q->where('valid_from', '<=', $toDate_from_form);
+                })
+                ->orWhere(function ($q) use ($fromDate_from_form, $toDate_from_form) {
 
-            ->orWhere(function($q)use($fromDate_from_form, $toDate_from_form){
-
-                $q->where('valid_to', '>=', $fromDate_from_form);
-                $q->where('valid_to', '<=', $toDate_from_form);
-            })
-            ->get();
+                    $q->where('valid_to', '>=', $fromDate_from_form);
+                    $q->where('valid_to', '<=', $toDate_from_form);
+                })
+                ->get();
 
             //dd($avdates);
 
 
             foreach ($avdates as $avdate) {
-              if(Carbon::parse($avdate->valid_to)->timestamp < Carbon::now()->timestamp){
-                continue;
-              }
+                if (Carbon::parse($avdate->valid_to)->timestamp < Carbon::now()->timestamp) {
+                    continue;
+                }
 
                 $availability = $avdate->av()->first();
 
 
+                if (!empty($availability)) {
+                    $control = [];
 
-          if(!empty($availability)){
-           $control = [];
-
-            $jsonq = $this->apiRelated->prepareJsonQ();
-            if($availability->availabilityType == "Starting Time"){
-            $res = $jsonq->json($availability->hourly == "[]" ? "[{}]" : $availability->hourly);
-            }else{
-            $res = $jsonq->json($availability->daily == "[]" ? "[{}]" : $availability->daily);
-            }
-              $disabled_days = json_decode($availability->disabledDays, true);
-               $start_date = \Carbon\Carbon::parse($avdate->valid_from);
-                $end_date = \Carbon\Carbon::parse($avdate->valid_to);
-                while(!$start_date->eq($end_date))
-                {
-                   $result = $res->where("day", "=", $start_date->format("d/m/Y"))->where("isActive", "=", 1)->where("ticket", "!=", 0)->get();
-                    if(count($result) > 0){
-                     $result_day = $result[key($result)]["day"];
-                     $result_timestamp = Carbon::createFromFormat("d/m/Y", $result_day)->timestamp;
-                     $today_timestamp = Carbon::now()->timestamp;
-                     if($result_timestamp >= $today_timestamp){
-                         if(!in_array($start_date->format("d/m/Y"), $disabled_days)){
-                            $control[] = 1;
-                         }else{
-                            $control[] = 0;
-                         }
-                     }
-                    }else{
-                       $control[] = 0;
+                    $jsonq = $this->apiRelated->prepareJsonQ();
+                    if ($availability->availabilityType == "Starting Time") {
+                        $res = $jsonq->json($availability->hourly == "[]" ? "[{}]" : $availability->hourly);
+                    } else {
+                        $res = $jsonq->json($availability->daily == "[]" ? "[{}]" : $availability->daily);
                     }
-                    $start_date->addDay();
+                    $disabled_days = json_decode($availability->disabledDays, true);
+                    $start_date = \Carbon\Carbon::parse($avdate->valid_from);
+                    $end_date = \Carbon\Carbon::parse($avdate->valid_to);
+                    while (!$start_date->eq($end_date)) {
+                        $result = $res->where("day", "=", $start_date->format("d/m/Y"))->where("isActive", "=", 1)->where("ticket", "!=", 0)->get();
+                        if (count($result) > 0) {
+                            $result_day = $result[key($result)]["day"];
+                            $result_timestamp = Carbon::createFromFormat("d/m/Y", $result_day)->timestamp;
+                            $today_timestamp = Carbon::now()->timestamp;
+                            if ($result_timestamp >= $today_timestamp) {
+                                if (!in_array($start_date->format("d/m/Y"), $disabled_days)) {
+                                    $control[] = 1;
+                                } else {
+                                    $control[] = 0;
+                                }
+                            }
+                        } else {
+                            $control[] = 0;
+                        }
+                        $start_date->addDay();
 
+                    }
+                    $res->reset();
                 }
-           $res->reset();
-       }
                 if ($availability && array_sum($control) > 0) {
                     array_push($availabilities, $availability);
                 }
@@ -405,7 +352,7 @@ class ProductController extends Controller
             }
             foreach ($options as $option) {
                 $productsOfOpt = $option->products()->get();
-                 foreach ($productsOfOpt as $productOfOpt) {
+                foreach ($productsOfOpt as $productOfOpt) {
                     if ($productOfOpt->isPublished == 1 && $productOfOpt->isDraft == 0) {
                         array_push($productsBetweenDates, $productOfOpt);
                     }
@@ -413,70 +360,67 @@ class ProductController extends Controller
             }
             $productsBetweenDates = array_values($this->commonFunctions->unique_multidimensional_array($productsBetweenDates, 'id'));
 
-            $products = $products->filter(function($model) use($productsBetweenDates){
+            $products = $products->filter(function ($model) use ($productsBetweenDates) {
 
-             $productID = $model->id;
-             $control =  0;
+                $productID = $model->id;
+                $control = 0;
 
-             foreach ($productsBetweenDates as $prbd) {
-                if($prbd->id == $productID){
-                    $control = 1;
-                    break;
+                foreach ($productsBetweenDates as $prbd) {
+                    if ($prbd->id == $productID) {
+                        $control = 1;
+                        break;
+                    }
+
                 }
-
-             }
-             if($control){
-                return true;
-             }else{
-               return false;
-             }
+                if ($control) {
+                    return true;
+                } else {
+                    return false;
+                }
 
             });
 
-         }
-
-     $products = $products->map(function($model){
-      $price =  $this->commonFunctions->getMinPrice($model->id);
-      $rating = $model->rate;
-      $specialOffer = $this->commonFunctions->getOfferPercentage($model);
-
-      return [
-        'sortPrice' => !$specialOffer ? $price : ($price - $price*($specialOffer/100)),
-        'price' => $price,
-        'rating' => $rating,
-        'special' => (int)$specialOffer,
-        'm' => $model
-      ];
-
-     });
-
-     if(!empty($sort_from_form)){
-        if($sort_from_form == "price-asc"){
-          $products = $products->sortBy('sortPrice');
         }
 
-        if($sort_from_form == "price-desc"){
-         $products = $products->sortByDesc('sortPrice');
-        }
+        $products = $products->map(function ($model) {
+            $price = $this->commonFunctions->getMinPrice($model->id);
+            $rating = $model->rate;
+            $specialOffer = $this->commonFunctions->getOfferPercentage($model);
 
-        if($sort_from_form == "rating-desc"){
-           $products = $products->sortByDesc('rating');
+            return [
+                'sortPrice' => !$specialOffer ? $price : ($price - $price * ($specialOffer / 100)),
+                'price' => $price,
+                'rating' => $rating,
+                'special' => (int)$specialOffer,
+                'm' => $model
+            ];
+
+        });
+
+        if (!empty($sort_from_form)) {
+            if ($sort_from_form == "price-asc") {
+                $products = $products->sortBy('sortPrice');
+            }
+
+            if ($sort_from_form == "price-desc") {
+                $products = $products->sortByDesc('sortPrice');
+            }
+
+            if ($sort_from_form == "rating-desc") {
+                $products = $products->sortByDesc('rating');
+            }
         }
-     }
 
         $original = collect($products)->paginate(10);
 
-      return view('frontend.paginate-attractions', ['categories' => $categories, 'attraction' => $attraction, 'attractionID' => $attractionID, 'products' => $original, 'requestCategories' => $this->requestCategories]);
-     }
+        return view('frontend.paginate-attractions', ['categories' => $categories, 'attraction' => $attraction, 'attractionID' => $attractionID, 'products' => $original, 'requestCategories' => $this->requestCategories]);
+    }
 
 
+    public function paginateAttractionPageOtherLanguage(Request $request, $lang, $slug)
+    {
 
-
-
-
-     public function paginateAttractionPageOtherLanguage(Request $request, $lang, $slug){
-
-         $categoriesOfProduct = Product::select('category')->where('isPublished', '1')->where('isDraft', '0')->distinct('category')->get();
+        $categoriesOfProduct = Product::select('category')->where('isPublished', '1')->where('isDraft', '0')->distinct('category')->get();
         $categories = [];
         foreach ($categoriesOfProduct as $category) {
             array_push($categories, $category['category']);
@@ -486,43 +430,33 @@ class ProductController extends Controller
 
         $slugArr = explode("-", $slug);
         array_pop($slugArr);
-        $slug = join("-",$slugArr);
+        $slug = join("-", $slugArr);
 
 
+        if ($langCode == 'en') {
+            $attraction = Attraction::where("slug", $slug)->first();
+            $attractionID = $attraction->id;
+        } else {
+            $attraction = AttractionTranslation::where("slug", $slug)->first();
 
-
-        if($langCode == 'en'){
-         $attraction = Attraction::where("slug", $slug)->first();
-         $attractionID = $attraction->id;
-        }else{
-          $attraction = AttractionTranslation::where("slug", $slug)->first();
-
-          $attractionID = $attraction->attractionID;
+            $attractionID = $attraction->attractionID;
         }
 
 
+        if ($langCode == 'en') {
+
+            $products = Product::whereJsonContains('attractions', ['' . $attractionID . ''])->where('isPublished', '1')->where('isDraft', '0')->paginate(6);
 
 
+        } else {
 
-        if($langCode == 'en'){
-
-           $products = Product::whereJsonContains('attractions',[''.$attractionID.''])->where('isPublished', '1')->where('isDraft', '0')->paginate(6);
-
-
-        }else{
-
-         $products = Product::whereJsonContains('attractions',[''.$attractionID.''])->where('isPublished', '1')->where('isDraft', '0')->paginate(6);
+            $products = Product::whereJsonContains('attractions', ['' . $attractionID . ''])->where('isPublished', '1')->where('isDraft', '0')->paginate(6);
 
         }
 
 
-
-
-
-
-
-      return view('frontend.paginate-attractions', ['categories' => $categories, 'attraction' => $attraction, 'products' => $products]);
-     }
+        return view('frontend.paginate-attractions', ['categories' => $categories, 'attraction' => $attraction, 'products' => $products]);
+    }
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -551,19 +485,19 @@ class ProductController extends Controller
         // This function is created only for testing purposes. It will be deleted after availability is truly functional.
         // product_id must be changed for testing S, O, S+S, O+O, S+O
         $products = Product::where('isDraft', '=', '0')->where('isPublished', '=', '1');
-        $product = Product::where('url', $location.'/'.$slug)->first();
+        $product = Product::where('url', $location . '/' . $slug)->first();
 
         // Check for broken and old urls (without id at the end)
         if (is_null($product)) {
             if ($lang != 'en') {
-                $isOldProductTranslationUrl = OldProductTranslation::where('oldUrl', $location.'/'.$slug)->first();
+                $isOldProductTranslationUrl = OldProductTranslation::where('oldUrl', $location . '/' . $slug)->first();
                 if ($isOldProductTranslationUrl) {
                     $newProductTranslation = ProductTranslation::findOrFail($isOldProductTranslationUrl->productTranslationID);
-                    return redirect('/'. $lang . '/' . $newProductTranslation->url, 301);
+                    return redirect('/' . $lang . '/' . $newProductTranslation->url, 301);
                 }
             }
 
-            $isOldProductUrl = OldProduct::where('oldUrl', $location.'/'.$slug)->first();
+            $isOldProductUrl = OldProduct::where('oldUrl', $location . '/' . $slug)->first();
             if ($isOldProductUrl) {
                 $newProduct = Product::findOrFail($isOldProductUrl->productID);
                 return redirect('/' . $newProduct->url, 301);
@@ -572,7 +506,7 @@ class ProductController extends Controller
 
         // Check for product translations
         if (is_null($product)) {
-            $isProductTranslationSlug = ProductTranslation::where('url', $location.'/'.$slug)->first();
+            $isProductTranslationSlug = ProductTranslation::where('url', $location . '/' . $slug)->first();
             if (!is_null($isProductTranslationSlug)) {
                 $product = Product::findOrFail($isProductTranslationSlug->productID);
             }
@@ -634,17 +568,11 @@ class ProductController extends Controller
             $specials = SpecialOffers::where('productID', '=', $product->id)->where('optionID', $o->id)->first();
 
 
-
-
-
-            if(auth()->check()){
-        if(auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)){
-            $specials = null;
-        }
-      }
-
-
-
+            if (auth()->check()) {
+                if (auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)) {
+                    $specials = null;
+                }
+            }
 
 
             $pricing = $o->pricings()->first();
@@ -696,14 +624,14 @@ class ProductController extends Controller
             $optionName = $options->where('id', '=', $optionID)->first()->title;
 
             $optionTranslation = OptionTranslation::where('optionID', $opt->id)->where('languageID', $language->id)
-            ->where(function ($query) {
-                $query->where('title', '!=', null)
-                    ->where('description', '!=', null)
-                    ->where('meetingComment', '!=', null)
-                    ->where('included', '!=', null)
-                    ->where('notIncluded', '!=', null)
-                    ->where('knowBeforeYouGo', '!=', null);
-            })->first();
+                ->where(function ($query) {
+                    $query->where('title', '!=', null)
+                        ->where('description', '!=', null)
+                        ->where('meetingComment', '!=', null)
+                        ->where('included', '!=', null)
+                        ->where('notIncluded', '!=', null)
+                        ->where('knowBeforeYouGo', '!=', null);
+                })->first();
 
             array_push($optionsTranslation, $optionTranslation);
         }
@@ -719,7 +647,7 @@ class ProductController extends Controller
         $productAttraction = [];
         foreach (json_decode($product->attractions, true) as $attraction) {
             foreach ($products->where('isSpecial', '!=', 1)->get() as $productForYouMightAlsoLike) {
-                foreach (array(json_decode($productForYouMightAlsoLike->attractions, true)) as  $otherProductAttraction) {
+                foreach (array(json_decode($productForYouMightAlsoLike->attractions, true)) as $otherProductAttraction) {
                     if ($otherProductAttraction == $attraction) {
                         array_push($productTempArray, $productForYouMightAlsoLike);
                     }
@@ -732,7 +660,7 @@ class ProductController extends Controller
             $keysArray = array_rand($productTempArray, 4);
             $youMightAlsoLikeArray = [];
             foreach ($keysArray as $key) {
-                array_push($youMightAlsoLikeArray,   $productTempArray[$key]);
+                array_push($youMightAlsoLikeArray, $productTempArray[$key]);
             }
         } else {
             $youMightAlsoLikeArray = $products->take(4)->get();
@@ -750,7 +678,7 @@ class ProductController extends Controller
 
         return view('frontend.product', [
             'items' => $items,
-            'cart'=> $cart,
+            'cart' => $cart,
             'product' => $product,
             'productTranslation' => $productTranslation,
             'youMightAlsoLikeArray' => $youMightAlsoLikeArray,
@@ -788,235 +716,191 @@ class ProductController extends Controller
         $option = Option::findOrFail($request->productOption);
 
 
-     if($option->tootbus()->count()){
+        if ($option->tootbus()->count()) {
 
-        try{
-
-
+            try {
 
 
-        $product_body = json_decode($option->tootbus->body, true);
+                $product_body = json_decode($option->tootbus->body, true);
 
 
-        //$toot_q = $this->apiRelated->prepareJsonQ();
-        //$res = $toot_q->json($option->tootbus->body);
-        // $product_body["availabilityType"];
-        //return response()->json($res->from("options")->where("id", $option->tootbus->tootbus_option_id)->first()["units"]);
-        $formattedDate = Carbon::createFromFormat("d/m/Y",$request->selectedDate)->format("Y-m-d");
-         $tootbusRelated = new TootbusRelated();
-       $tootbusAvailabilityResponse = $tootbusRelated->checkAvailability($option->tootbus->tootbus_product_id, $option->tootbus->tootbus_option_id, $formattedDate, 0);
+                //$toot_q = $this->apiRelated->prepareJsonQ();
+                //$res = $toot_q->json($option->tootbus->body);
+                // $product_body["availabilityType"];
+                //return response()->json($res->from("options")->where("id", $option->tootbus->tootbus_option_id)->first()["units"]);
+                $formattedDate = Carbon::createFromFormat("d/m/Y", $request->selectedDate)->format("Y-m-d");
+                $tootbusRelated = new TootbusRelated();
+                $tootbusAvailabilityResponse = $tootbusRelated->checkAvailability($option->tootbus->tootbus_product_id, $option->tootbus->tootbus_option_id, $formattedDate, 0);
 
-       if($tootbusAvailabilityResponse["status"] === false){
-        return response()->json(["status" => false, "message" => $tootbusAvailabilityResponse["message"]]);
-       }
-
-
-       if($tootbusAvailabilityResponse["status"] === true){
-        $option_av_for_tootbus = $option->avs()->first();
+                if ($tootbusAvailabilityResponse["status"] === false) {
+                    return response()->json(["status" => false, "message" => $tootbusAvailabilityResponse["message"]]);
+                }
 
 
-
-
-
+                if ($tootbusAvailabilityResponse["status"] === true) {
+                    $option_av_for_tootbus = $option->avs()->first();
 
 
 // önce hedef günün  verilerini pasif hale getireiyoruz daha sonra apiden gelen istekle güncelleyeceğiz (start)
-if($product_body["availabilityType"] === "START_TIME"){
-    $res_json_decoded = json_decode($option_av_for_tootbus->hourly, true);
-    $toot_q = $this->apiRelated->prepareJsonQ();
-    $res = $toot_q->json($option_av_for_tootbus->hourly);
-      $results = $res->where("day", "=", $request->selectedDate)->get();
+                    if ($product_body["availabilityType"] === "START_TIME") {
+                        $res_json_decoded = json_decode($option_av_for_tootbus->hourly, true);
+                        $toot_q = $this->apiRelated->prepareJsonQ();
+                        $res = $toot_q->json($option_av_for_tootbus->hourly);
+                        $results = $res->where("day", "=", $request->selectedDate)->get();
 
 
-    foreach($results as $key => $r){
-        $res_json_decoded[$key]["isActive"] = 0;
-    }
-    $option_av_for_tootbus->hourly = json_encode($res_json_decoded);
+                        foreach ($results as $key => $r) {
+                            $res_json_decoded[$key]["isActive"] = 0;
+                        }
+                        $option_av_for_tootbus->hourly = json_encode($res_json_decoded);
 
 
+                    } else {
+
+                        $res_json_decoded = json_decode($option_av_for_tootbus->daily, true);
+                        $toot_q = $this->apiRelated->prepareJsonQ();
+                        $res = $toot_q->json($option_av_for_tootbus->daily);
+                        $results = $res->where("day", "=", $request->selectedDate)->get();
+
+                        foreach ($results as $key => $r) {
+                            $res_json_decoded[$key]["isActive"] = 0;
+                        }
+                        $option_av_for_tootbus->daily = json_encode($res_json_decoded);
 
 
-}else{
-
-       $res_json_decoded = json_decode($option_av_for_tootbus->daily, true);
-       $toot_q = $this->apiRelated->prepareJsonQ();
-      $res = $toot_q->json($option_av_for_tootbus->daily);
-      $results = $res->where("day", "=", $request->selectedDate)->get();
-
-    foreach($results as $key => $r){
-        $res_json_decoded[$key]["isActive"] = 0;
-    }
-    $option_av_for_tootbus->daily = json_encode($res_json_decoded);
-
-
-
-
-
-}
-
-
-
-
+                    }
 
 
 // önce hedef günün  verilerini pasif hale getireiyoruz daha sonra apiden gelen istekle güncelleyeceğiz (end)
 
-     $tootbus_response_message = json_decode($tootbusAvailabilityResponse["message"], true);
-       if(count($tootbus_response_message) == 0){
-        return response()->json(["status" => "0", "message" => "There is No Availability for This Day"]);
-       }
+                    $tootbus_response_message = json_decode($tootbusAvailabilityResponse["message"], true);
+                    if (count($tootbus_response_message) == 0) {
+                        return response()->json(["status" => "0", "message" => "There is No Availability for This Day"]);
+                    }
 
-      foreach($tootbus_response_message as $toot){
+                    foreach ($tootbus_response_message as $toot) {
 
-      if($product_body["availabilityType"] === "START_TIME"){  // if Has Start Time
-        //$res->reset();
-        $day = Carbon::parse($toot["id"])->format("d/m/Y");
-        $hour = Carbon::parse($toot["id"])->format("H:i");
+                        if ($product_body["availabilityType"] === "START_TIME") {  // if Has Start Time
+                            //$res->reset();
+                            $day = Carbon::parse($toot["id"])->format("d/m/Y");
+                            $hour = Carbon::parse($toot["id"])->format("H:i");
 
-        $toot_q = $this->apiRelated->prepareJsonQ();
-        $res = $toot_q->json(json_encode($res_json_decoded));
-        $result = $res->where("day", "=", $day)->where("hour", "=", $hour)->get();
-        //return response()->json(key($result));
-        if(count($result) == 1){
-         $key_q = key($result);
+                            $toot_q = $this->apiRelated->prepareJsonQ();
+                            $res = $toot_q->json(json_encode($res_json_decoded));
+                            $result = $res->where("day", "=", $day)->where("hour", "=", $hour)->get();
+                            //return response()->json(key($result));
+                            if (count($result) == 1) {
+                                $key_q = key($result);
 
-         $res_json_decoded[$key_q]["ticket"] = $toot["capacity"] === null ? 9999 : $toot["capacity"];
-         $res_json_decoded[$key_q]["isActive"] = $toot["available"] === true ? 1 : 0;
-         $res_json_decoded[$key_q]["sold"] = !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0;
-         $res_json_decoded[$key_q]["hour"] = $hour;
-         $res_json_decoded[$key_q]["day"] = $day;
-         //return response()->json($res_json_decoded);
+                                $res_json_decoded[$key_q]["ticket"] = $toot["capacity"] === null ? 9999 : $toot["capacity"];
+                                $res_json_decoded[$key_q]["isActive"] = $toot["available"] === true ? 1 : 0;
+                                $res_json_decoded[$key_q]["sold"] = !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0;
+                                $res_json_decoded[$key_q]["hour"] = $hour;
+                                $res_json_decoded[$key_q]["day"] = $day;
+                                //return response()->json($res_json_decoded);
 
-        }else{
+                            } else {
 
-          $res_json_decoded[] = [
-           "id" => $toot["id"],
-           "day" => $day,
-           "hour" => $hour,
-           "ticket" => $toot["capacity"] === null ? 9999 : $toot["capacity"],
-           "sold" => count($result) == 1 && !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0,
-           "isActive" => $toot["available"] === true ? 1 : 0
-          ];
+                                $res_json_decoded[] = [
+                                    "id" => $toot["id"],
+                                    "day" => $day,
+                                    "hour" => $hour,
+                                    "ticket" => $toot["capacity"] === null ? 9999 : $toot["capacity"],
+                                    "sold" => count($result) == 1 && !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0,
+                                    "isActive" => $toot["available"] === true ? 1 : 0
+                                ];
 
-        }
-
-
+                            }
 
 
+                        } else { // if Has Opening Hours
 
 
+                            if (count($toot["openingHours"]) == 0) {
+                                $toot["openingHours"][] = ["from" => "00:00", "to" => "23:59"];
+                            }
 
 
-
-      }else{ // if Has Opening Hours
-
-
-
-        if(count($toot["openingHours"]) == 0){
-            $toot["openingHours"][] = ["from" => "00:00", "to" => "23:59"];
-        }
+                            foreach ($toot["openingHours"] as $h) {
+                                $day = Carbon::parse($toot["id"])->format("d/m/Y");
 
 
-
-        foreach($toot["openingHours"] as $h){
-        $day = Carbon::parse($toot["id"])->format("d/m/Y");
-
-
-         $toot_q = $this->apiRelated->prepareJsonQ();
-          $res = $toot_q->json(json_encode($res_json_decoded));
-         $result = $res->where("day", "=", $day)->where("hourFrom", "=", $h["from"])->where("hourTo", "=", $h["to"])->get();
+                                $toot_q = $this->apiRelated->prepareJsonQ();
+                                $res = $toot_q->json(json_encode($res_json_decoded));
+                                $result = $res->where("day", "=", $day)->where("hourFrom", "=", $h["from"])->where("hourTo", "=", $h["to"])->get();
 
 
-        if(count($result) == 1){
-         $key_q = key($result);
-         $res_json_decoded[$key_q]["ticket"] = $toot["capacity"] === null ? 9999 : $toot["capacity"];
-         $res_json_decoded[$key_q]["isActive"] = $toot["available"] === true ? 1 : 0;
-         $res_json_decoded[$key_q]["sold"] = !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0;
-         $res_json_decoded[$key_q]["hourFrom"] = $h["from"];
-         $res_json_decoded[$key_q]["hourTo"] = $h["to"];
-         $res_json_decoded[$key_q]["day"] = $day;
+                                if (count($result) == 1) {
+                                    $key_q = key($result);
+                                    $res_json_decoded[$key_q]["ticket"] = $toot["capacity"] === null ? 9999 : $toot["capacity"];
+                                    $res_json_decoded[$key_q]["isActive"] = $toot["available"] === true ? 1 : 0;
+                                    $res_json_decoded[$key_q]["sold"] = !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0;
+                                    $res_json_decoded[$key_q]["hourFrom"] = $h["from"];
+                                    $res_json_decoded[$key_q]["hourTo"] = $h["to"];
+                                    $res_json_decoded[$key_q]["day"] = $day;
 
-        }else{
+                                } else {
 
-          $res_json_decoded[] = [
-           "id" => $toot["id"],
-           "day" => $day,
-           "hourFrom" => $h["from"],
-           "hourTo" => $h["to"],
-           "ticket" => $toot["capacity"] === null ? 9999 : $toot["capacity"],
-           "sold" => count($result) == 1 && !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0,
-           "isActive" => $toot["available"] === true ? 1 : 0
-          ];
+                                    $res_json_decoded[] = [
+                                        "id" => $toot["id"],
+                                        "day" => $day,
+                                        "hourFrom" => $h["from"],
+                                        "hourTo" => $h["to"],
+                                        "ticket" => $toot["capacity"] === null ? 9999 : $toot["capacity"],
+                                        "sold" => count($result) == 1 && !empty($result[key($result)]["sold"]) ? $result[key($result)]["sold"] : 0,
+                                        "isActive" => $toot["available"] === true ? 1 : 0
+                                    ];
 
-        }
-
-
-
-        }
+                                }
 
 
+                            }
 
 
-      } // end of else
+                        } // end of else
 
 
+                    }
+                    $res->reset();
+
+                    if ($product_body["availabilityType"] === "START_TIME") {
+                        $option_av_for_tootbus->hourly = json_encode($res_json_decoded);
+                    } else {
+                        $option_av_for_tootbus->daily = json_encode($res_json_decoded);
+                    }
+
+                    if ($option_av_for_tootbus->save()) {
+
+                    }
 
 
+                }
 
-      }
-      $res->reset();
+            } catch (\Exception $e) {
+                return response()->json(["status" => "0", "message" => $e->getMessage()]);
+            }
 
-      if($product_body["availabilityType"] === "START_TIME"){
-       $option_av_for_tootbus->hourly = json_encode($res_json_decoded);
-      }else{
-       $option_av_for_tootbus->daily = json_encode($res_json_decoded);
-      }
-
-      if($option_av_for_tootbus->save()){
-
-      }
-
-
-
-
-
-
-
-
-       }
-
-   }catch(\Exception $e){
-    return response()->json(["status" => "0", "message" => $e->getMessage()]);
-   }
-
-     } // end of tootbuscount
-
-
-
-
-
+        } // end of tootbuscount
 
 
         $commission = auth()->guard('web')->check() ? Commission::where('optionID', $request->productOption)->where('commissionerID', auth()->guard('web')->user()->id)->first() : 0;
 
 
-if($commission){
+        if ($commission) {
 
-        if($option->supplierID != -1){
-            $supp = \App\Supplier::findOrFail($option->supplierID);
+            if ($option->supplierID != -1) {
+                $supp = \App\Supplier::findOrFail($option->supplierID);
 
-            if($supp->comission){
+                if ($supp->comission) {
 
-                if($supp->comission < $commission->commission){
-                    $commission->commission = $supp->comission;
+                    if ($supp->comission < $commission->commission) {
+                        $commission->commission = $supp->comission;
+                    }
+
                 }
-
             }
+
         }
-
-}
-
-
 
 
         $maxPersonCount = $option->maxPerson;
@@ -1028,12 +912,9 @@ if($commission){
         $mixedAv['valid_weekly_datetimes'] = [];
         $mixedAv['only_selected_times'] = [];
         $ticketCount = $request->ticket;
-        if (strpos($request->selectedDate, '.'))
-        {
+        if (strpos($request->selectedDate, '.')) {
             $selectedDate = str_replace('.', '/', $request->selectedDate);
-        }
-        else
-        {
+        } else {
             $selectedDate = $request->selectedDate;
         }
         $productID = $request->productID;
@@ -1069,7 +950,9 @@ if($commission){
                 } else {
                     return response()->json(['mixedAv' => null]);
                 }
-                usort($validTimes, function ($a, $b) { return strtotime($a['hourFrom']) > strtotime($b['hourFrom']); });
+                usort($validTimes, function ($a, $b) {
+                    return strtotime($a['hourFrom']) > strtotime($b['hourFrom']);
+                });
                 array_push($mixedAv['only_selected_times'], $validTimes);
                 $validTimes = [];
                 $res->reset();
@@ -1135,7 +1018,7 @@ if($commission){
                     if ($availability->availabilityType == 'Starting Time') {
                         $desiredCol = $availability->hourly;
                         $hourColKey = 'hour';
-                    }  else {
+                    } else {
                         $desiredCol = $availability->daily;
                         $hourColKey = 'hourTo';
                     }
@@ -1171,11 +1054,11 @@ if($commission){
 
         $specialOffers = SpecialOffers::where('productID', $request->productID)->where('optionID', $request->productOption)->first();
 
-         if(auth()->check()){
-        if(auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)){
-            $specialOffers = null;
+        if (auth()->check()) {
+            if (auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)) {
+                $specialOffers = null;
+            }
         }
-      }
 
         $specials = [];
         if ($specialOffers && (!is_null($specialOffers->dateRange) || !is_null($specialOffers->weekDay) || !is_null($specialOffers->randomDay) || !is_null($specialOffers->dateTimes))) {
@@ -1209,7 +1092,7 @@ if($commission){
             }
             if (!is_null($specialOffers->weekDay) && count($weekDayDecoded) > 0) {
                 $datetime = DateTime::createFromFormat('d/m/Y', $request->selectedDate);
-                $dayName =  strtolower($datetime->format('l'));
+                $dayName = strtolower($datetime->format('l'));
                 $res = $jsonq->json($specialOffers->weekDay);
                 $result = $res->where('dayName', $dayName)->get();
                 if (count($result) > 0) {
@@ -1256,11 +1139,14 @@ if($commission){
 
         $specialOffer = SpecialOffers::where('optionID', $option->id)->where('productID', $request->productID)->first();
 
-         if(auth()->check()){
-        if(auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)){
-            $specialOffer = null;
+        if ($option->bigBus()->count()) {
+
         }
-      }
+        if (auth()->check()) {
+            if (auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)) {
+                $specialOffer = null;
+            }
+        }
 
         // Calculating Cut of Time
         $cutOfTime = $option->cutOfTime;
@@ -1272,7 +1158,7 @@ if($commission){
             $cotDateString = 'minutes';
         }
         $cotString = $cutOfTime . ' ' . $cotDateString;
-        $cotDateTime = new DateTime('now + '. $cotString);
+        $cotDateTime = new DateTime('now + ' . $cotString);
         $cotDateTime->setTimezone(new \DateTimeZone($option->products()->first()->countryName->timezone));
         $cotDay = $cotDateTime->format('d/m/Y');
         $cotHour = $cotDateTime->format('H:i');
@@ -1295,7 +1181,7 @@ if($commission){
 
         foreach ($option_availabilities as $i => $availability) {
             if ($availability->hourly == '[]' && $availability->daily == '[]' && $availability->dateRange == '[]' && $availability->barcode == '[]') {
-                return(['error' => 'There is no availability for this option !']);
+                return (['error' => 'There is no availability for this option !']);
             }
             $avdate = $availability->avdates()->get();
             array_push($avdatesMin, $avdate->min('valid_from'));
@@ -1307,10 +1193,10 @@ if($commission){
             $disabledYears = json_decode($availability->disabledYears, true);
             if (!is_null($disabledYears)) {
                 foreach ($disabledYears as $dy) {
-                    $begin = DateTime::createFromFormat('Y-m-d', $dy.'-01-01');
+                    $begin = DateTime::createFromFormat('Y-m-d', $dy . '-01-01');
                     $begin = $begin->format('d/m/Y');
                     $begin = DateTime::createFromFormat('d/m/Y', $begin);
-                    $end = DateTime::createFromFormat('Y-m-d', $dy.'-12-31');
+                    $end = DateTime::createFromFormat('Y-m-d', $dy . '-12-31');
                     $end = $end->format('d/m/Y');
                     $end = DateTime::createFromFormat('d/m/Y', $end);
                     $interval = new DateInterval('P1D');
@@ -1334,10 +1220,10 @@ if($commission){
                 $yearRange = range($minYear, $maxYear);
                 foreach ($yearRange as $rangedYear) {
                     foreach ($disabledMonths as $dM) {
-                        $begin = DateTime::createFromFormat('Y-m-d', $rangedYear.'-'.$dM.'-01');
+                        $begin = DateTime::createFromFormat('Y-m-d', $rangedYear . '-' . $dM . '-01');
                         $begin = $begin->format('d/m/Y');
                         $begin = DateTime::createFromFormat('d/m/Y', $begin);
-                        $end = DateTime::createFromFormat('Y-m-d', $rangedYear.'-'.$dM.'-01')->modify('last day of this month');
+                        $end = DateTime::createFromFormat('Y-m-d', $rangedYear . '-' . $dM . '-01')->modify('last day of this month');
                         $end = $end->format('d/m/Y');
                         $end = DateTime::createFromFormat('d/m/Y', $end);
                         $interval = new DateInterval('P1D');
@@ -1531,29 +1417,29 @@ if($commission){
                         $dayTo->add($interval);
                         $period = new DatePeriod($dayFrom, $interval, $dayTo);
                         foreach ($period as $dt) {
-                                foreach ($avdate as $avd) {
-                                    $isThisAvdate = Avdate::where('id', $avd->id)->where('valid_from', '<=', $dt->format('Y-m-d'))
-                                        ->where('valid_to', '>=', $dt->format('Y-m-d'))->first();
-                                    if ($isThisAvdate) {
-                                        if ($availability->availabilityType == 'Starting Time') {
-                                            $requestedCol = $availability->hourly;
-                                            $queryStr = 'hour';
-                                        } else {
-                                            $requestedCol = $availability->daily;
-                                            $queryStr = 'hourTo';
-                                        }
-                                        $jsonq2 = $this->apiRelated->prepareJsonQ();
-                                        $res2 = $jsonq2->json($requestedCol);
-                                        if ($dt->format('d/m/Y') == $cotDay)
-                                            $result2 = $res2->where($queryStr, 'timeGte', $cotHour)->where('isActive', 1)->where('day', $dt->format('d/m/Y'))->get();
-                                        else {
-                                            $result2 = $res2->where('isActive', 1)->where('day', $dt->format('d/m/Y'))->get();
-                                        }
-                                        if (count($result2) > 0) {
-                                            array_push($validDates, $dt->format('d/m/Y'));
-                                        }
+                            foreach ($avdate as $avd) {
+                                $isThisAvdate = Avdate::where('id', $avd->id)->where('valid_from', '<=', $dt->format('Y-m-d'))
+                                    ->where('valid_to', '>=', $dt->format('Y-m-d'))->first();
+                                if ($isThisAvdate) {
+                                    if ($availability->availabilityType == 'Starting Time') {
+                                        $requestedCol = $availability->hourly;
+                                        $queryStr = 'hour';
+                                    } else {
+                                        $requestedCol = $availability->daily;
+                                        $queryStr = 'hourTo';
+                                    }
+                                    $jsonq2 = $this->apiRelated->prepareJsonQ();
+                                    $res2 = $jsonq2->json($requestedCol);
+                                    if ($dt->format('d/m/Y') == $cotDay)
+                                        $result2 = $res2->where($queryStr, 'timeGte', $cotHour)->where('isActive', 1)->where('day', $dt->format('d/m/Y'))->get();
+                                    else {
+                                        $result2 = $res2->where('isActive', 1)->where('day', $dt->format('d/m/Y'))->get();
+                                    }
+                                    if (count($result2) > 0) {
+                                        array_push($validDates, $dt->format('d/m/Y'));
                                     }
                                 }
+                            }
                         }
                     }
                     $validDates = array_values(array_unique($validDates));
@@ -1587,20 +1473,19 @@ if($commission){
         $specials = SpecialOffers::where('productID', '=', $request->productID)->where('optionID', '=', $request->productOption)->first();
 
 
-        if(auth()->check()){
-        if(auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)){
-            $specials = null;
+        if (auth()->check()) {
+            if (auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)) {
+                $specials = null;
+            }
         }
-      }
-
 
 
         if ($specials) {
             $dtSpecial = json_decode($specials->dateTimes, true);
             if (!is_null($dtSpecial)) {
                 foreach ($dtSpecial as $dt) {
-                    if(Carbon::createFromFormat('d/m/Y', $dt['day'])->timestamp >= Carbon::today()->timestamp) {
-                        if($dt['isActive'] == 1) {
+                    if (Carbon::createFromFormat('d/m/Y', $dt['day'])->timestamp >= Carbon::today()->timestamp) {
+                        if ($dt['isActive'] == 1) {
                             array_push($daysSpecOffs, $dt['day']);
                             $dayToPrice[$dt['day']] = $dt["discountType"] == "money" ? Currency::calculateCurrencyForVisitor($dt['discount']) : $dt['discount'];
                             $typeToPrice[$dt['day']] = $dt['discountType'];
@@ -1611,8 +1496,8 @@ if($commission){
             $rdSpecial = json_decode($specials->randomDay, true);
             if (!is_null($rdSpecial)) {
                 foreach ($rdSpecial as $rd) {
-                    if(Carbon::createFromFormat('d/m/Y', $rd['day'])->timestamp >= Carbon::today()->timestamp) {
-                        if($rd['isActive'] == 1) {
+                    if (Carbon::createFromFormat('d/m/Y', $rd['day'])->timestamp >= Carbon::today()->timestamp) {
+                        if ($rd['isActive'] == 1) {
                             array_push($daysSpecOffs, $rd['day']);
                             $dayToPrice[$rd['day']] = $rd["discountType"] == "money" ? Currency::calculateCurrencyForVisitor($rd['discount']) : $rd['discount'];
                             $typeToPrice[$rd['day']] = $rd['discountType'];
@@ -1634,8 +1519,8 @@ if($commission){
             if (!is_null($wdSpecial)) {
                 foreach ($wdSpecial as $wd) {
                     for ($i = strtotime(ucfirst($wd['dayName']), $minDate); $i <= $maxDate; $i = strtotime('+1 week', $i)) {
-                        if($i >= Carbon::today()->timestamp) {
-                            if($wd['isActive'] == 1) {
+                        if ($i >= Carbon::today()->timestamp) {
+                            if ($wd['isActive'] == 1) {
                                 array_push($daysSpecOffs, date('d/m/Y', $i));
                                 $dayToPrice[date('d/m/Y', $i)] = $wd["discountType"] == "money" ? Currency::calculateCurrencyForVisitor($wd['discount']) : $wd['discount'];
                                 $typeToPrice[date('d/m/Y', $i)] = $wd["discountType"];
@@ -1651,8 +1536,8 @@ if($commission){
                     $to = $dr['to'];
                     $datePeriod = $this->timeRelatedFunctions->returnDates($from, $to);
                     foreach ($datePeriod as $date) {
-                        if($date->getTimestamp() >= Carbon::today()->timestamp) {
-                            if($dr['isActive'] == 1) {
+                        if ($date->getTimestamp() >= Carbon::today()->timestamp) {
+                            if ($dr['isActive'] == 1) {
                                 array_push($daysSpecOffs, $date->format('d/m/Y'));
                                 $dayToPrice[$date->format('d/m/Y')] = $dr["discountType"] == "money" ? Currency::calculateCurrencyForVisitor($dr['discount']) : $dr['discount'];
                                 $typeToPrice[$date->format('d/m/Y')] = $dr['discountType'];
@@ -1665,16 +1550,16 @@ if($commission){
 
         $daysSpecOffs = array_values(array_unique($daysSpecOffs));
 
-        $dayToTimestamp = array_map(function($item){
-          $items = array_reverse(explode('/', $item));
-          $item = join('/', $items);
+        $dayToTimestamp = array_map(function ($item) {
+            $items = array_reverse(explode('/', $item));
+            $item = join('/', $items);
 
-          return strtotime($item);
+            return strtotime($item);
         }, $daysSpecOffs);
         sort($dayToTimestamp);
 
-        $daysSpecOffs = array_map(function($item){
-          return date('d/m/Y', $item);
+        $daysSpecOffs = array_map(function ($item) {
+            return date('d/m/Y', $item);
         }, $dayToTimestamp);
 
 
@@ -1688,10 +1573,6 @@ if($commission){
         // Get desired currency value
         $currency = Currency::findOrFail($request->visitorCurrencyCode);
         $currencyValue = $currency->value;
-
-
-
-
 
 
         $data = [
@@ -1727,11 +1608,11 @@ if($commission){
 
         $specialOffers = SpecialOffers::where('productID', $request->productID)->where('optionID', $request->productOption)->first();
 
-         if(auth()->check()){
-        if(auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)){
-            $specialOffers = null;
+        if (auth()->check()) {
+            if (auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)) {
+                $specialOffers = null;
+            }
         }
-      }
 
         $specials = [];
         if ($specialOffers && (!is_null($specialOffers->dateRange) || !is_null($specialOffers->weekDay) || !is_null($specialOffers->randomDay) || !is_null($specialOffers->dateTimes))) {
@@ -1758,7 +1639,7 @@ if($commission){
                 $res->reset();
             } else if (!is_null($specialOffers->weekDay) && count($weekDayDecoded) > 0) {
                 $datetime = DateTime::createFromFormat('d/m/Y', $request->selectedDate);
-                $dayName =  strtolower($datetime->format('l'));
+                $dayName = strtolower($datetime->format('l'));
                 $res = $jsonq->json($specialOffers->weekDay);
                 $result = $res->where('dayName', $dayName)->get();
                 if (count($result) > 0) {
@@ -1779,7 +1660,7 @@ if($commission){
         }
 
 
-         $translationArray = [
+        $translationArray = [
             'chooseTime' => __('chooseTime'),
             'totalPrice' => __('totalPrice'),
             'adult' => __('adult'),
@@ -1798,13 +1679,13 @@ if($commission){
     public function specialOffers()
     {
 
-          $productOrder = Page::find(3)->productOrder;
-          if(!empty($productOrder)){
+        $productOrder = Page::find(3)->productOrder;
+        if (!empty($productOrder)) {
             $productOrder = json_decode($productOrder, true);
-          }else{
+        } else {
             $productOrder = [1];
-          }
-          $idss = implode(',', array_reverse($productOrder));
+        }
+        $idss = implode(',', array_reverse($productOrder));
 
         $specialOffers = SpecialOffers::where('weekDay', 'like', '%"isActive":1%')->orWhere('dateRange', 'like', '%"isActive":1%')->get();
         $soProducts = SpecialOffers::where(function ($query) {
@@ -1814,14 +1695,12 @@ if($commission){
         $pids = [];
 
 
-        if(auth()->check()){
-        if(auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)){
-            $specialOffers = null;
-            $soProducts = [];
+        if (auth()->check()) {
+            if (auth()->guard("web")->user()->commission != 0 || !is_null(auth()->guard("web")->user()->commission)) {
+                $specialOffers = null;
+                $soProducts = [];
+            }
         }
-      }
-
-
 
 
         // Döngüde dateRange içerisindeki diziyi from ve to indexlerindeki tarihleri alıp
@@ -1917,48 +1796,52 @@ if($commission){
         $categoriesArr = explode(' | ', $categories);
         $attractions = $request->attractions;
         $attractionsArr = explode(' | ', $attractions);
+
         if ($searchType == 'attraction') {
             if ($langCode == 'en') {
-                $searchAttraction = Attraction::where('name', 'like', '%'.$searchValue.'%')->first();
+                $searchAttraction = Attraction::where('name', 'like', '%' . $searchValue . '%')->first();
                 array_push($attractionsArr, $searchAttraction->id);
                 $attractions = $searchAttraction->id;
             } else {
-                $searchAttraction = AttractionTranslation::where('name', 'like', '%'.$searchValue.'%')->first();
+                $searchAttraction = AttractionTranslation::where('name', 'like', '%' . $searchValue . '%')->first();
                 array_push($attractionsArr, $searchAttraction->id);
                 $attractions = $searchAttraction->id;
             }
         }
+
         if ($searchType == 'country') {
             if ($langCode == 'en') {
-                $searchCountry = Country::where('countries_name', 'like', '%'.$searchValue.'%')->first();
+                $searchCountry = Country::where('countries_name', 'like', '%' . $searchValue . '%')->first();
             } else {
-                $countryTranslation = CountryTranslation::where('countries_name', 'like', '%'.$searchValue.'%')->first();
+                $countryTranslation = CountryTranslation::where('countries_name', 'like', '%' . $searchValue . '%')->first();
                 if ($countryTranslation) {
                     $searchCountry = Country::findOrFail($countryTranslation->countryID);
                 } else {
-                    $searchCountry = Country::where('countries_name', 'like', '%'.$searchValue.'%')->first();
+                    $searchCountry = Country::where('countries_name', 'like', '%' . $searchValue . '%')->first();
                 }
             }
         }
+
         if ($searchType == 'city') {
             if ($langCode == 'en') {
-                $searchCity = City::where('name', 'like', '%'.$searchValue.'%')->first();
+                $searchCity = City::where('name', 'like', '%' . $searchValue . '%')->first();
             } else {
-                $cityTranslation = CityTranslation::where('name', 'like', '%'.$searchValue.'%')->first();
+                $cityTranslation = CityTranslation::where('name', 'like', '%' . $searchValue . '%')->first();
                 if ($cityTranslation) {
                     $searchCity = City::findOrFail($cityTranslation->cityID);
                 } else {
-                    $searchCity = City::where('name', 'like', '%'.$searchValue.'%')->first();
+                    $searchCity = City::where('name', 'like', '%' . $searchValue . '%')->first();
                 }
             }
         }
+
         $prices = $request->prices;
         $sortType = $request->sortType;
 
         if ($from == '' && $to == '') {
             $page = Page::findOrFail(2);
             $products = [];
-            $productOrder = json_decode($page->productOrder,true);
+            $productOrder = json_decode($page->productOrder, true);
             if ($productOrder == null) {
                 $productOrder = [];
             }
@@ -2038,9 +1921,9 @@ if($commission){
                     foreach ($productOrder as $productID) {
                         array_push($products, Product::findOrFail($productID));
                     }
-                    $unsortedProducts = Product::whereNotIn('id', $productOrder)->where('attractions', 'like', '%"'.$attr.'"%')
+                    $unsortedProducts = Product::whereNotIn('id', $productOrder)->where('attractions', 'like', '%"' . $attr . '"%')
                         ->where('isPublished', '1')->where('isDraft', '0')->where('isSpecial', '!=', 1)->paginate($perPage, $columns, $pageName, $pagiPage);
-                        $totalProduct = $unsortedProducts->total();
+                    $totalProduct = $unsortedProducts->total();
                     $paginatorView = view('frontend.product_paginator', ['paginator' => $unsortedProducts])->render();
                     foreach ($unsortedProducts as $product) {
                         array_push($products, $product);
@@ -2062,17 +1945,17 @@ if($commission){
             if ($searchType == 'misc') {
                 $products = Product::where('isPublished', '1')->where('isDraft', '0')->where('isSpecial', '!=', 1);
                 $products = $products->where(function ($query) use ($searchValue) {
-                    $query->where('title', 'like', '%'.$searchValue.'%')
-                        ->orWhere('shortDesc', 'like', '%'.$searchValue.'%')
-                         ->orWhereHas("options", function($q) use($searchValue){
-                              $q->where("title", "like", '%'.$searchValue.'%');
-                            });
-                        //->orWhere('fullDesc', 'like', '%'.$searchValue.'%')
-                        //->orWhere('highlights', 'like', '%'.$searchValue.'%')
-                        //->orWhere('included', 'like', '%'.$searchValue.'%')
-                        //->orWhere('notIncluded', 'like', '%'.$searchValue.'%')
-                        //->orWhere('knowBeforeYouGo', 'like', '%'.$searchValue.'%')
-                        //->orWhere('cancelPolicy', 'like', '%'.$searchValue.'%');
+                    $query->where('title', 'like', '%' . $searchValue . '%')
+                        ->orWhere('shortDesc', 'like', '%' . $searchValue . '%')
+                        ->orWhereHas("options", function ($q) use ($searchValue) {
+                            $q->where("title", "like", '%' . $searchValue . '%');
+                        });
+                    //->orWhere('fullDesc', 'like', '%'.$searchValue.'%')
+                    //->orWhere('highlights', 'like', '%'.$searchValue.'%')
+                    //->orWhere('included', 'like', '%'.$searchValue.'%')
+                    //->orWhere('notIncluded', 'like', '%'.$searchValue.'%')
+                    //->orWhere('knowBeforeYouGo', 'like', '%'.$searchValue.'%')
+                    //->orWhere('cancelPolicy', 'like', '%'.$searchValue.'%');
                 })->paginate($perPage, $columns, $pageName, $pagiPage);
                 $totalProduct = $products->total();
                 $paginatorView = view('frontend.product_paginator', ['paginator' => $products])->render();
@@ -2087,17 +1970,17 @@ if($commission){
             $language = \App\Language::where('code', $langCode)->first();
             $langID = $language->id;
             $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
-            foreach($allAttraction as $attraction) {
-                $attraction["onFailUrl"] = url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('attraction').'/'.$commonFunctions->getAttractionLocalization($attraction, $language)) .'-'.$attraction->id;
+            foreach ($allAttraction as $attraction) {
+                $attraction["onFailUrl"] = url($langCodeForUrl . '/' . $commonFunctions->getRouteLocalization('attraction') . '/' . $commonFunctions->getAttractionLocalization($attraction, $language)) . '-' . $attraction->id;
 
                 $attractionTranslation = $attractionTranslationModel->where('languageID', $langID)->where('attractionID', $attraction->id)->first();
-                if($attractionTranslation)
+                if ($attractionTranslation)
                     $attraction["onFailName"] = $attractionTranslation->name;
                 else
                     $attraction["onFailName"] = $attraction->name;
             }
 
-            if($request->prices){
+            if ($request->prices) {
                 $totalProduct = count($products);
             }
 
@@ -2142,7 +2025,7 @@ if($commission){
                 if ($attractions != '') {
                     $productsOfOpt = $productsOfOpt->where(function ($query) use ($attractionsArr) {
                         foreach ($attractionsArr as $att) {
-                            $query->orWhere('attractions', 'like', '%"'.$att.'"%');
+                            $query->orWhere('attractions', 'like', '%"' . $att . '"%');
                         }
                     });
                 }
@@ -2150,27 +2033,27 @@ if($commission){
                     $productsOfOpt = $productsOfOpt->where('country', $searchCountry->id);
                 }
                 if ($searchType == 'city') {
-                    $productsOfOpt = $productsOfOpt->where('city', 'like', '%'.$searchValue.'%');
+                    $productsOfOpt = $productsOfOpt->where('city', 'like', '%' . $searchValue . '%');
                 }
                 if ($searchType == 'misc') {
                     $productsOfOpt = $productsOfOpt->where(function ($query) use ($searchValue) {
-                        $query->where('title', 'like', '%'.$searchValue.'%')
-                            ->orWhere('shortDesc', 'like', '%'.$searchValue.'%')
-                            ->orWhereHas("options", function($q) use($searchValue){
-                              $q->where("title", "like", '%'.$searchValue.'%');
+                        $query->where('title', 'like', '%' . $searchValue . '%')
+                            ->orWhere('shortDesc', 'like', '%' . $searchValue . '%')
+                            ->orWhereHas("options", function ($q) use ($searchValue) {
+                                $q->where("title", "like", '%' . $searchValue . '%');
                             });
 
-                            //->orWhere('fullDesc', 'like', '%'.$searchValue.'%')
-                            //->orWhere('highlights', 'like', '%'.$searchValue.'%')
-                            //->orWhere('included', 'like', '%'.$searchValue.'%')
-                            //->orWhere('notIncluded', 'like', '%'.$searchValue.'%')
-                            //->orWhere('knowBeforeYouGo', 'like', '%'.$searchValue.'%')
-                            //->orWhere('cancelPolicy', 'like', '%'.$searchValue.'%');
+                        //->orWhere('fullDesc', 'like', '%'.$searchValue.'%')
+                        //->orWhere('highlights', 'like', '%'.$searchValue.'%')
+                        //->orWhere('included', 'like', '%'.$searchValue.'%')
+                        //->orWhere('notIncluded', 'like', '%'.$searchValue.'%')
+                        //->orWhere('knowBeforeYouGo', 'like', '%'.$searchValue.'%')
+                        //->orWhere('cancelPolicy', 'like', '%'.$searchValue.'%');
                     });
                 }
 
                 $productsOfOpt = $productsOfOpt->paginate($perPage, $columns, $pageName, $pagiPage);
-                $totalProduct =  count($productsOfOpt);
+                $totalProduct = count($productsOfOpt);
                 $paginatorView = view('frontend.product_paginator', ['paginator' => $productsOfOpt])->render();
 
                 foreach ($productsOfOpt as $productOfOpt) {
@@ -2186,6 +2069,11 @@ if($commission){
 
             return response()->json(['successful' => __('productsFetchedSuccessfully'), 'products' => $products, 'paginator' => $paginatorView, 'totalProduct' => $totalProduct]);
         }
+    }
+
+    public function newCheckAvailability(Request $request)
+    {
+
     }
 
     /**
@@ -2306,13 +2194,19 @@ if($commission){
         }
         if ($sortType != 'recommended') {
             if ($sortType == 'priceAsc') {
-                usort($preparedProducts, function($a, $b) {return $a['misc']['normalPrice'] > $b['misc']['normalPrice'];});
+                usort($preparedProducts, function ($a, $b) {
+                    return $a['misc']['normalPrice'] > $b['misc']['normalPrice'];
+                });
             }
             if ($sortType == 'priceDesc') {
-                usort($preparedProducts, function($a, $b) {return $a['misc']['normalPrice'] < $b['misc']['normalPrice'];});
+                usort($preparedProducts, function ($a, $b) {
+                    return $a['misc']['normalPrice'] < $b['misc']['normalPrice'];
+                });
             }
             if ($sortType == 'ratingDesc') {
-                usort($preparedProducts, function($a, $b) {return $a['item']['rate'] > $b['item']['rate'];});
+                usort($preparedProducts, function ($a, $b) {
+                    return $a['item']['rate'] > $b['item']['rate'];
+                });
             }
         }
         return $preparedProducts;
@@ -2325,11 +2219,78 @@ if($commission){
     public function searchSpecific(Request $request)
     {
         $q = $request->q;
-        $dateFrom = $request->dateFrom;
-        $dateTo = $request->dateTo;
+        $dateFrom = $request->has('dateFrom') ? $request->dateFrom : Carbon::now()->format('d/m/Y');
+        $dateTo = $request->has('dateTo') ? $request->dateTo : Carbon::now()->format('d/m/Y');
         $type = $request->type;
+        $wordsArray = explode(' ', $q);
+        $isCommissioner = auth()->check() && auth()->guard('web')->user()->commission != null && auth()->guard('web')->user()->isActive == '1';
 
-        $categoriesOfProduct = Product::select('category')->where('isPublished', '1')->where('isDraft', '0')->distinct('category')->get();
+        $langCode = session()->get('userLanguage') ? session()->get('userLanguage') : 'en';
+
+        if ($request->has('m')) {
+
+            switch ($request->m) {
+                case 'Country':
+                    $country = Country::where('countries_name', 'like', '%' . $q . '%')->first();
+                    $items = Product::where('isPublished', '1')
+                        ->where('isDraft', '0')
+                        ->where('isSpecial', '!=', 1)
+                        ->with(['productCover'])
+                        ->where('country', $country->id);
+                    break;
+                case 'City':
+                    $items = Product::where('isPublished', '1')
+                        ->where('isDraft', '0')
+                        ->where('isSpecial', '!=', 1)
+                        ->with(['productCover'])
+                        ->where('city', 'like', '%' . $q. '%');
+                    break;
+                default:
+                    $items = Product::where('isPublished', '1')
+                        ->where('isDraft', '0')
+                        ->where('isSpecial', '!=', 1)
+                        ->with(['productCover'])
+                        ->where(function($q) use ($wordsArray){
+                            foreach ($wordsArray as $w){
+                                $q->where('title', 'like', '%'. $w .'%');
+                            }
+                        });
+                    break;
+            }
+
+        }else{
+
+            $items = Product::where('isPublished', '1')
+                ->where('isDraft', '0')
+                ->where('isSpecial', '!=', 1)
+                ->with(['productCover', 'translations']);
+
+            if ($langCode != 'en') {
+                $items->whereHas('translations', function($q) use ($wordsArray){
+                    foreach ($wordsArray as $w){
+                        $q->where('title', 'like', '%'. $w .'%');
+                    }
+                });
+            }else{
+                $items->where(function($q) use ($wordsArray){
+                    foreach ($wordsArray as $w){
+                        $q->where('title', 'like', '%'. $w .'%');
+                    }
+                });
+            }
+
+        }
+
+        $total = $items->count();
+        $p = $items->paginate(15);
+
+        $categoriesOfProduct = Product::select('category')->where('isPublished', '1')
+            ->where(function($q) use ($wordsArray){
+                foreach ($wordsArray as $w){
+                    $q->where('title', 'like', '%'. $w .'%');
+                }
+            })->where('isDraft', '0')->distinct('category')->get();
+
         $categories = [];
         foreach ($categoriesOfProduct as $category) {
             array_push($categories, $category['category']);
@@ -2354,7 +2315,9 @@ if($commission){
                 'q' => $q,
                 'dateFrom' => $dateFrom,
                 'dateTo' => $dateTo,
-                'type' => $type
+                'type' => $type,
+                'items' => $p,
+                'total' => $total
             ]
         );
     }
@@ -2396,13 +2359,13 @@ if($commission){
     public function downloadProductFile($file)
     {
         $fs = Storage::disk('s3');
-        $stream = $fs->readStream('/product-files/'.$file);
-        return response()->stream(function() use($stream) {
+        $stream = $fs->readStream('/product-files/' . $file);
+        return response()->stream(function () use ($stream) {
             fpassthru($stream);
         }, 200, [
             "Content-Type" => $fs->getMimetype('/product-files/' . $file),
             "Content-Length" => $fs->getSize('/product-files/' . $file),
-            "Content-disposition" => "attachment; filename=\"" .basename($file) . "\"",
+            "Content-disposition" => "attachment; filename=\"" . basename($file) . "\"",
         ]);
     }
 

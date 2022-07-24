@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Adminlog;
 use App\BookingContactMailLog;
+use App\Helpers\Commands\DeleteCarts;
 use App\Http\Controllers\Helpers\ApiRelated;
 use App\Http\Controllers\Helpers\RefCodeGenerator;
 use App\Http\Controllers\Helpers\TimeRelatedFunctions;
@@ -1990,6 +1991,17 @@ class BookingController extends Controller
         }
     }
 
+
+    public function removeOldCarts(Request $request){
+        try {
+            $instance = new DeleteCarts();
+            $instance->run(true);
+            return response()->json(['status' => true, 'data' => ['message' => 'Old Cart Items Successfully Removed From On Goings']]);
+        }catch(\Exception $e){
+            return response()->json(['status' => false, 'data' => ['message' => 'Error Message: '.$e->getMessage()]], 500);
+        }
+    }
+
     public function onGoings() {
         $products = Product::pluck('title', 'id');
         return view('panel.bookings.on-goings', compact('products'));
@@ -2214,6 +2226,9 @@ class BookingController extends Controller
     public function sendMailToCustomer(Request $request)
     {
         try {
+            $files = BookingImage::where('booking_id', $request->booking_id)->pluck('image_base_name')->toArray();
+            $files = $files ? implode(',', $files) : null;
+
             $contactMail = new BookingContactMailLog();
             $contactMail->sender_id = Auth::guard('admin')->id();
             $contactMail->booking_id = $request->booking_id;
@@ -2222,6 +2237,7 @@ class BookingController extends Controller
             $contactMail->mail_to = $request->mail_to;
             $contactMail->logMessage = 'Mail Has Been Queued!';
             $contactMail->code = md5(rand());
+            $contactMail->files = $files;
             $contactMail->check_information = json_encode([
                 'status' => false,
                 'checker' => null,

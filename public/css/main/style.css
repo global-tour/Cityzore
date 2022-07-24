@@ -32,7 +32,7 @@
     url("../../font/GT-Eesti-Pro-Display-Bold.woff") format("woff")
 }
 body {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
     font-size: 14px;
     color: #727070;
 }
@@ -67,11 +67,11 @@ a:hover {
 a, p, li, td, span {
     font-size: 14.5px;
     line-height: 24px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 400;
 }
 h1, h2, h3, h4, h5, th {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 500;
 }
 .link-btn {
@@ -81,7 +81,7 @@ h1, h2, h3, h4, h5, th {
     padding: 6px 15px;
     border-radius: 2px;
     display: inline-block;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     text-decoration: none;
     display: inline-block;
     cursor: pointer;
@@ -205,7 +205,7 @@ h1, h2, h3, h4, h5, th {
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .head_right ul li:first-child a {
     padding-right: 7px;
@@ -271,7 +271,7 @@ h1, h2, h3, h4, h5, th {
     color: #4a4d51;
     font-size: 44px !important;
     font-weight: 400;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .spe-title p {
     margin-bottom: 0px;
@@ -279,7 +279,7 @@ h1, h2, h3, h4, h5, th {
     font-weight: 400;
     padding-top: 12px;
     color: #1a2b50;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .spe-title-1 {
 }
@@ -319,9 +319,6 @@ h1, h2, h3, h4, h5, th {
 }
 
 
-.icon-cz-cart {
-    position: absolute;
-}
 
 .ribbon {
     line-height: 0.8em;
@@ -361,13 +358,14 @@ h1, h2, h3, h4, h5, th {
 }
 
 .circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     padding: 1px;
-    margin-top: 5px;
-    margin-left:25px;
 
     background: #ffad0c;
     border: 2px solid #ffad0c;
@@ -375,6 +373,8 @@ h1, h2, h3, h4, h5, th {
     text-align: center;
 
     font: 12px Arial, sans-serif;
+    top: 3px;
+    left: 25px;
 }
 
 .circle-attraction {
@@ -441,12 +441,12 @@ h1, h2, h3, h4, h5, th {
 .nav > li > a {
     font-weight: 600;
     font-size: 14px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .dropdown-menu > li > a {
     font-weight: 500;
     font-size: 14px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .menu_book a {
     font-weight: 700;
@@ -457,7 +457,7 @@ h1, h2, h3, h4, h5, th {
     display: inline-block;
     background: #1aa5d8;
     background: linear-gradient(to bottom, #1aa5d8, #1386b1);
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .menu_book a:hover {
     color: #fff;
@@ -631,7 +631,7 @@ h1, h2, h3, h4, h5, th {
     font-size: 18px;
     color: white;
     font-weight: 300;
-    font-family: "Raleway", sans-serif;
+    /*font-family: "Raleway", sans-serif;*/
     letter-spacing: 0.2px;
     transition: all 0.3s ease-out;
 }
@@ -648,7 +648,7 @@ h1, h2, h3, h4, h5, th {
     font-size: 18px;
     color: white;
     font-weight: 300;
-    font-family: "Raleway", sans-serif;
+    /*font-family: "Raleway", sans-serif;*/
     letter-spacing: 0.2px;
     transition: all 0.3s ease-out;
 }
@@ -776,7 +776,7 @@ h1, h2, h3, h4, h5, th {
     width: 100%;
     max-width: 150px;
     line-height: 30px;
-    font-family: "Helvetica";
+    /*font-family: "Helvetica";*/
     font-size: 14px;
     color: #0047ba;
     text-transform: uppercase;
@@ -870,7 +870,7 @@ section.c3 {
     float: right;
 }
 .slider-cap {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .slider-cap h1 {
     font-size: 40px;
@@ -1010,7 +1010,7 @@ section.c3 {
 /*-------------------------------------------------------*/
 
 .btn {
-    font-family: "Mukta", sans-serif;
+    /*font-family: "Mukta", sans-serif;*/
     font-size: 18px;
     color: #003A5F;
     text-transform: uppercase;
@@ -1133,7 +1133,7 @@ section.c3 {
 }
 
 .ticket__title {
-    font-family: "Mukta", sans-serif;
+    /*font-family: "Mukta", sans-serif;*/
     font-size: 39px;
     text-transform: uppercase;
     line-height: 1;
@@ -1141,7 +1141,7 @@ section.c3 {
     margin: 0 0 18px;
 }
 .ticket__title strong {
-    font-family: "Dancing Script", script;
+    /*font-family: "Dancing Script", script;*/
     font-size: 125%;
     color: #003A5F;
     text-transform: none;
@@ -1249,7 +1249,7 @@ section.c3 {
 }
 .rating {
     unicode-bidi: bidi-override;
-   /* direction: rtl;*/
+    /* direction: rtl;*/
 }
 .rating > span {
     display: inline-block;
@@ -1266,7 +1266,7 @@ section.c3 {
 .b_pack h4 a {
     color: #1A2B50;
     text-decoration: none;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 600;
 }
 .v_pl_name {
@@ -1362,7 +1362,7 @@ section.c3 {
     text-decoration:none;
     color:#000;
     font-weight:bold;
-    font-family:Arial, sans-serif;
+    /*font-family:Arial, sans-serif;*/
     text-shadow:0 0 3em #04b3df, 0 0 4px #0077e5;
     font-size:1em;
     -moz-transition: all 0.3s ease-out;
@@ -1531,7 +1531,7 @@ input.qty2 {
     left: 31px;
     font-size: 12px;
     padding: 5px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 
 .box_style_1 {
@@ -1566,7 +1566,7 @@ input.qty2 {
     font-size: 20px;
     font-weight: bold;
     text-transform: uppercase;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 
 .table.table_summary td {
@@ -1576,7 +1576,7 @@ input.qty2 {
 
 a.btn_full, .btn_full {
     border: none;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: inherit;
     color: #fff;
     width: 100%;
@@ -1601,7 +1601,7 @@ a.btn_full, .btn_full {
 
 a.btn_full_outline {
     border: none;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: inherit;
     background: none;
     border: 2px solid #2d5d73;
@@ -1681,7 +1681,7 @@ a.btn_full_outline {
     font-weight: bold;
     font-size: 4rem;
     margin-right: 0.5rem;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     line-height: 1;
 }
 
@@ -1848,7 +1848,7 @@ a.btn_full_outline {
     color: #fff;
     border-radius: 25px;
     border: 1px solid #253747;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .hom-hot-av-tic-list {
     left: 10px;
@@ -1957,7 +1957,7 @@ a.btn_full_outline {
      */
     /* margin-bottom: 25px;
      */
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 600;
 }
 .tour-consul p {
@@ -1993,7 +1993,7 @@ a.btn_full_outline {
     display: inline-block;
     background: #1aa5d8;
     background: linear-gradient(to bottom, #2e9da2, #13b194);
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .to-con-3 {
     text-transform: uppercase;
@@ -2004,7 +2004,7 @@ a.btn_full_outline {
     display: inline-block;
     background: #1aa5d8;
     background: linear-gradient(to bottom, #1aa5d8, #1386b1);
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .to-con-4 {
     text-transform: uppercase;
@@ -2015,7 +2015,7 @@ a.btn_full_outline {
     display: inline-block;
     background: #1aa5d8;
     background: linear-gradient(to bottom, #1aa5d8, #1386b1);
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .ho-con-cont {
 }
@@ -2052,7 +2052,7 @@ a.btn_full_outline {
     font-size: 18px;
     line-height: 40px;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .events table tr td {
     color: #727070;
@@ -2075,7 +2075,7 @@ a.btn_full_outline {
     padding: 6px 15px;
     border-radius: 2px;
     display: inline-block;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .events table tr td a:hover {
     background: #e23464;
@@ -2086,7 +2086,7 @@ a.btn_full_outline {
     padding-right: 5px;
 }
 .events-1 {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .events-1 h1 {
     margin-top: 0px;
@@ -2192,14 +2192,14 @@ a.btn_full_outline {
     line-height: 34px;
     margin-top: 0px;
     margin-bottom: 0px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 600;
 }
 .place h3 span {
     color: #253d52;
     display: block;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     text-transform: capitalize;
 }
 .place p {
@@ -2296,7 +2296,7 @@ a.btn_full_outline {
     display: inline-block;
     background: #1aa5d8;
     background: linear-gradient(to bottom, #1aa5d8, #1386b1);
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     border: 0px;
     text-transform: uppercase;
 }
@@ -2525,7 +2525,7 @@ footer ul li a {
 .foot-spec span {
     color: #acadaf;
     text-transform: uppercase;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 700;
     font-size: 18px;
 }
@@ -2682,7 +2682,7 @@ footer ul li a {
     padding: 6px 15px;
     border-radius: 2px;
     display: inline-block;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     /* padding: 6px;
      */
     transition: all 0.5s ease;
@@ -2808,7 +2808,7 @@ footer ul li a {
 }
 .inner_banner h2 span {
     color: #FFF;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: 28px;
     font-weight: 600;
 }
@@ -2845,10 +2845,8 @@ footer ul li a {
 }
 
 .home-banner-search {
-    background-color: #1d6db25c;
     padding: 2%;
     width: 100% !important;
-    border-radius: 3px;
 }
 
 /*-------------------------------------------------------*/
@@ -3065,7 +3063,7 @@ footer ul li a {
     text-transform: capitalize;
 }
 .posts h5 {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 600;
     font-size: 16px;
     margin-bottom: 8px;
@@ -3080,7 +3078,7 @@ footer ul li a {
 .posts a {
 }
 .post_author {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 700;
 }
 .post_date {
@@ -3193,7 +3191,7 @@ footer ul li a {
     margin: 25px 0px 15px 0px;
     font-size: 16px;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     color: #213d44;
 }
 .days h4 span {
@@ -3769,7 +3767,7 @@ footer ul li a {
 .tips_travel_2 h4 {
     color: #253d52;
     margin-top: 25px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: 18px;
     font-weight: 600;
     text-transform: capitalize;
@@ -4255,7 +4253,7 @@ fieldset, label {
     margin-bottom: 2px;
     color: #343c42;
     font-size: 16px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 600;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
@@ -4317,7 +4315,7 @@ fieldset, label {
     font-size: 28px;
     /* font-family: 'Montserrat', sans-serif;
      */
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-weight: 600;
 }
 .hot-page2-hom-pre-tit h3 span {
@@ -4417,7 +4415,6 @@ fieldset, label {
 .hot-page2-alp-con {
     position: relative;
     background: #ffffff;
-    box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.36);
 }
 .hot-page2-alp-con-left {
     padding-left: 0px !important;
@@ -4547,7 +4544,7 @@ fieldset, label {
     -moz-border-radius: 3px;
     border-radius: 3px;
     font-size: 12px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     padding: 5px 10px;
     text-decoration: none;
     text-shadow: -1px -1px 0 rgba(177, 177, 177, 0.3);
@@ -4732,7 +4729,7 @@ fieldset, label {
     -moz-border-radius: 3px;
     border-radius: 3px;
     font-size: 12px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     padding: 5px 10px;
     text-decoration: none;
     text-shadow: -1px -1px 0 rgba(177, 177, 177, 0.3);
@@ -5004,7 +5001,7 @@ fieldset, label {
     -moz-border-radius: 3px;
     border-radius: 3px;
     font-size: 12px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     padding: 5px 10px;
     text-decoration: none;
     text-shadow: -1px -1px 0 rgba(177, 177, 177, 0.3);
@@ -5349,7 +5346,14 @@ code, pre {
     justify-self: bottom;
 }
 
-.tourz-search {
+.tourz-search:after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-blend-mode: hue;
+    background: linear-gradient(90deg, rgb(43 43 43 / 38%) 0%, rgb(43 43 43 / 17%) 42%, rgba(255,255,255,0) 60%);
+    z-index: 0;
 }
 #select-city {
     background: #fff;
@@ -5419,7 +5423,7 @@ code, pre {
     position: relative;
 }
 .tourz-search-1 h1 {
-    color: #fff;
+    color: #ffe70b;
     font-size: 50px;
 }
 .tourz-search-1 p {
@@ -5436,18 +5440,6 @@ code, pre {
     white-space: pre;
     overflow: hidden;
     right: 15px;
-}
-.tourz-search-form div:nth-child(1) {
-    width: 40%;
-    float: left;
-}
-.tourz-search-form div:nth-child(2) {
-    width: 20%;
-    float: left;
-}
-.tourz-search-form div:nth-child(3) {
-    width: 20%;
-    float: left;
 }
 
 .home-attraction-responsive {
@@ -5489,6 +5481,7 @@ code, pre {
     }
     .tourz-search-1 {
         padding: 50px 0px 100px 0px;
+        width: 100%;
     }
     .tour-mig-lc-img img {
         height: 175px !important;
@@ -5527,7 +5520,7 @@ code, pre {
     }
 }
 .suggestions-container > div {
-    width: 20%!important;
+    width: 100%!important;
     float: left!important;
 }
 .tourz-search:before {
@@ -5552,7 +5545,7 @@ code, pre {
     display: block !important;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     text-transform: uppercase;
 }
 .tourz-hom-ser {
@@ -5584,7 +5577,7 @@ code, pre {
     text-align: center;
     color: #fff;
     border-radius: 5px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     /* position: relative;
      */
     /* overflow: hidden;
@@ -5624,7 +5617,7 @@ code, pre {
     color: #fff;
     padding: 2px 10px;
     border-radius: 2px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     background: #e8095a;
     background: linear-gradient(to bottom, #e8095a, #d40852);
 }
@@ -5696,7 +5689,7 @@ code, pre {
     padding: 12px 20px;
     font-weight: 500;
     cursor: pointer;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .mob-top {
 }
@@ -5938,7 +5931,7 @@ code, pre {
 .db-2-main-com span {
     font-size: 24px;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .db-2-main-com ul {
     margin-bottom: 0px;
@@ -6047,7 +6040,7 @@ code, pre {
     display: block !important;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     text-transform: uppercase;
     text-align: center;
 }
@@ -6284,15 +6277,6 @@ code, pre {
     transition-delay: 1s;
 }
 
-/* Modal Content */
-.modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 30%;
-    transition-delay: 1s;
-}
 
 /* The Close Button */
 .close {
@@ -6318,7 +6302,7 @@ code, pre {
 .v2-ho-se-ri h5{
     color: #fff;
     text-transform: uppercase;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: 10px;
     letter-spacing: 4px;
     font-weight: 100;
@@ -6334,7 +6318,7 @@ code, pre {
     font-size: 16px;
     margin-bottom: 0px;
     font-weight: 100;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     line-height: 30px;
 }
 .v2-search-form {
@@ -6586,14 +6570,14 @@ code, pre {
 }
 /* Component containers ----------------------------------*/
 .ui-widget {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: 1em;
 }
 .ui-widget .ui-widget {
     font-size: 1em;
 }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: 1em;
 }
 .ui-widget.ui-widget-content {
@@ -6702,7 +6686,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     line-height: 35px;
     font-weight: 600;
     font-size: 14px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .v2-sub-sinl-men {
 }
@@ -6726,7 +6710,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     display: inline-block;
     background: #1aa5d8;
     background: linear-gradient(to bottom, #1aa5d8, #1386b1);
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     font-size: 13px;
 }
 .menu-arr:after {
@@ -6813,7 +6797,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     color: #fff;
     font-weight: 400;
     font-size: 11.5px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     padding: 10px;
     border-radius: 3px;
 }
@@ -6843,12 +6827,6 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     font-size: 18px;
 }
 /*--======================================================================--*/
-.wed-logo{
-    float: left;
-    width: 20%;
-}
-.wed-logo a{
-}
 .wed-logo a img{
     width: 191px;
     padding: 0px 0px;
@@ -6922,7 +6900,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     top: 16px;
     left: 18px;
     font-size: 12px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .wed-search:before{
     content: '';
@@ -6963,37 +6941,33 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     height: 40px;
 }
 .main-menu{
-    float: right;
-    width: 50%;
+    flex-shrink: 0;
 }
 .main-menu ul{
     float: right;
     margin-bottom: 0px;
+    padding: 0;
 }
 .main-menu ul li{
-    float: left;
     display: inline-block;
 }
 .main-menu ul li a{
     color: #000000;
-    padding: 20px 10px;
+    padding: 10px 15px;
     line-height: 58px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
     /* text-transform: uppercase;
      */
     position:relative;
-    font-family: 'GT Eesti', Arial, sans-serif;
-}
-.main-menu ul li a:hover{
-    color: #e23464;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .main-menu ul li a:after{
     content: "";
     position: absolute;
     width: 100%;
     height: 3px;
-    bottom: 12px;
+    bottom: 0;
     left: 0;
     color: #e23464;
     background-color: #e23464;
@@ -7003,13 +6977,10 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     transition: all .15s ease-in;
     z-index: 1;
 }
-.main-menu ul li a:hover:after{
+.main-menu ul li a:not(.signin-button, .signup-button):hover:after{
     visibility: visible;
     transform: scaleX(1);
     transition: all .25s ease-out;
-}
-.main-menu ul li:last-child a{
-    padding-right:0px;
 }
 .ed-sub-menu:after{
     content: "\f107";
@@ -7333,7 +7304,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     text-align: center;
     color: #fff;
     border-radius: 70px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     position: relative;
     overflow: hidden;
     line-height: 24px;
@@ -7608,7 +7579,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     left: 20px;
     top: 15px;
     font-size: 16px;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 /*-------------------------------------------------*/
 /* = 21.MEGA MENU
@@ -7622,6 +7593,9 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
 .about-mm, .admi-mm, .cour-mm{
     display:none;
 }
+li.about-menu {
+    position: relative;
+}
 .m-menu{
     position: absolute;
     overflow: hidden;
@@ -7631,6 +7605,8 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     z-index: 999;
     margin-top: -7px;
     padding: 20px 10px;
+    min-width: 350px;
+    right: 0;
 }
 .m-menu-inn{
 }
@@ -7776,12 +7752,6 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     width: 50%;
     box-sizing: border-box;
 }
-.wed-logo{
-}
-.wed-logo a{
-}
-.wed-logo a img{
-}
 .ed-mm-right{
     float: left;
     width: 50%;
@@ -7906,7 +7876,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     position: fixed;
     top: 0px;
     width: 100%;
-    height: 55px;
+    height: auto;
     background: #fff;
     box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.32);
     z-index: 999;
@@ -8493,7 +8463,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     -webkit-transform-origin: -10% center;
     -ms-transform-origin: -10% center;
     transform-origin: -10% center;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     box-shadow: 0 0 0 1px #3d793f;
     text-align: center;
 }
@@ -8730,7 +8700,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
 }
 
 .tr-regi-form .btn-link{
-  color: #23527c !important;
+    color: #23527c !important;
 }
 
 .ed-com-t1-right ul li:nth-child(1) a{
@@ -8887,7 +8857,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     font-size: 47px;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     width: 100%;
     display: block;
     line-height: 46px;
@@ -8898,7 +8868,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     font-size: 66px;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     width: 100%;
     display: block;
     line-height: 46px;
@@ -8914,7 +8884,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
 .offer-l ul li span {
     display: block;
     color: #ecdee0;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .offer-l ul li a {
     border-radius: 70px;
@@ -8941,7 +8911,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
      */
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     display: inline-block;
     line-height: 46px;
     padding-top: 30px;
@@ -8967,7 +8937,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     text-transform: capitalize;
     color: #f4364f;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .or-12 {
     display: block;
@@ -8980,7 +8950,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
 .or-2 {
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     display: inline-block;
     line-height: 46px;
     padding-top: 30px;
@@ -9027,7 +8997,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     text-transform: capitalize;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .or-22 {
     font-size: 75px;
@@ -9035,7 +9005,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     text-transform: capitalize;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .or-23 {
     font-size: 34px;
@@ -9043,7 +9013,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     text-transform: capitalize;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .or-24 {
     font-size: 14px;
@@ -9052,7 +9022,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     text-transform: capitalize;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     border: 1px solid #fbafb9;
     padding: 6px;
     border-radius: 25px;
@@ -9064,7 +9034,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     text-transform: capitalize;
     color: #fff;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
 }
 .slider-wid {
     height: 600px;
@@ -9104,7 +9074,7 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
     color: #fff;
     text-transform: uppercase;
     font-weight: 600;
-    font-family: 'GT Eesti', Arial, sans-serif;
+    /*font-family: 'GT Eesti', Arial, sans-serif;*/
     border-radius: 2px;
     font-size: 14px;
     margin-right: 10px;
@@ -9291,9 +9261,500 @@ html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:activ
 @media (max-width: 767px){
 
 
-.special-offer-menu-class a{
- padding: 0 0 !important;
- font-size: 12px !important;
+    .special-offer-menu-class a{
+        padding: 0 0 !important;
+        font-size: 12px !important;
+    }
+
 }
+
+.search-bar, .mobile-search-bar {
+    width: 80%!important;
+    height: 61px;
+    position: relative;
+    margin: 0 auto;
+    float: unset!important;
+}
+.mobile-search-bar{
+    width: 90%!important;
+}
+
+.search-bar .search-field, .mobile-search-bar .search-field {
+    height: 100%;
+    width: 100%;
+    border-radius: 30px;
+    padding: 0 35px;
+    background: url(../../img/icon/search.png) no-repeat left center #fff;
+    background-position-x: 13px;
+    border: unset;
+    text-indent: 12px;
+    background-position-y: 20px;
+    box-shadow: 3px 6px 19px #1d6db2;
+    min-width: 350px;
+}
+.search-bar .search-button {
+    position: absolute;
+    right: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 25px;
+    font-size: 12px;
+    padding: 15px 20px;
+    line-height: 1;
+    background: linear-gradient(to bottom,#1d6db2,#1d6db2);
+    border: unset;
+    color: #fff;
+    font-weight: bold;
+    transition: .15s ease-in-out all;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 30%) !important;
+}
+
+
+.search-bar .search-button:hover{
+    background: linear-gradient(to bottom,#175b96,#1767ac);
+}
+
+.suggestion-icon {
+    width: 40px;
+    height: 40px;
+    background: #ddd;
+    border-radius: 6px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: #7a7a7a;
+    flex-shrink: 0;
+}
+
+.mobile-search-bar{
+    display: none;
+}
+
+.mobile-search-overlay {
+    position: fixed;
+    right: -100%;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background: #fff;
+    z-index: 1015;
+    transition: .3s ease-in-out all;
+    display: flex;
+    flex-direction: column;
+}
+
+.active-overlay{
+    right: 0;
+}
+
+.overlay-header {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    padding: 16px;
+    background: #1a2b49;
+    color: #fff;
+}
+
+.overlay-header .overlay-close {
+    position: absolute;
+    right: 19px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 100;
+}
+
+.overlay-body {
+    margin-top: 20px;
+    padding: 0 20px;
+    position: relative;
+}
+
+.mobile-search-area {
+    height: 45px;
+    position: relative;
+}
+
+.mobile-search-area input {
+    height: 100%;
+    text-indent: 5px;
+    border: 2px solid #1d6db2!important;
+}
+
+.mobile-suggestions-container{
+    margin-top: 10px;
+    height: 100vh;
+    padding-bottom: 20px;
+    overflow-y: auto;
+}
+
+.clear-input {
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    border: 1px solid #000;
+    font-size: 12px;
+    color: #000;
+}
+
+@media (max-width: 768px){
+    .search-bar{
+        display: none;
+    }
+    .mobile-search-bar{
+        display: block;
+    }
+}
+
+.light-border{
+    border: 1px solid #dddddd!important;
+    box-shadow: unset!important;
+}
+
+.search-bar .search-field:focus{
+    border: 2px solid #1d6db3!important;
+}
+
+.mobile-search-area i {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #1d6db2;
+    color: #fff;
+    font-size: 16px;
+}
+
+.header-search-area{
+    width: 100%!important;
+    height: 50px!important;
+}
+
+.header-search-area .search-button{
+    font-size: 10px!important;
+}
+
+.header-search-area .search-field{
+    background-position-y: 15px!important;
+}
+
+.d-flex {
+    display: flex!important;
+}
+
+.align-items-center{
+    align-items: center!important;
+}
+
+.affix-top{
+    padding: 5px 0;
+}
+.whatsapp-button-area {
+    position: fixed;
+    bottom: 30px;
+    z-index: 99;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: rgb(77, 194, 71) !important;
+    border-radius: 50%;
+    box-shadow: 0 0 28px rgb(63 155 59) !important;
+}
+
+.whatsapp-button-area a {color: #fff;font-size: 26px;width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;}
+
+.whatsapp-button-area a:hover {
+    color: #fff;
+}
+li.custom-dp {
+    position: relative;
+}
+
+ul.custom-dp-content {
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+    padding: 10px;
+    gap: 20px;
+    box-shadow: 0 0 6px #00000038;
+    transition: .3s ease-in-out all;
+    transform: scale(0);
+    transform-origin: top center;
+    opacity: 0;
+}
+
+ul.custom-dp-content li a {
+    padding: 0;
+    line-height: 1;
+}
+
+ul.custom-dp-content li a:after {
+    bottom: -5px;
+}
+
+.custom-dp:hover > .custom-dp-content, .custom-dp:focus > .custom-dp-content{
+    transform: scale(1);
+    transform-origin: top center;
+    opacity: 1;
+}
+
+.mobile-search-field {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    gap: 5px;
+}
+
+
+
+.hamburger-menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-direction: column;
+    /* gap: 4px; */
+}
+
+.hamburger-menu span {
+    width: 25px;
+    height: 3px;
+    background: #000;
+    /* margin-bottom: 7px; */
+    border-radius: 35px;
+    transition: .5s ease-in-out all ;
+}
+
+.hamburger-menu span:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+.hamburger-menu.open-menu span:nth-child(1){
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-menu.open-menu span:nth-child(2){
+    opacity: 0;
+}
+
+.hamburger-menu.open-menu span:nth-child(3){
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.justify-content-between{
+    justify-content: space-between;
+}
+
+.mobile-menu-content {
+    position: fixed;
+    top: 60px;
+    right: -100%;
+    width: 100%;
+    height: calc(100vh - 50px);
+    background: #fff;
+    z-index: 1001;
+    transition: .3s ease-in-out all;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+.open-menu-content{
+    right: 0;
+}
+
+.mobile-menu-content.open-menu-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.header-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+form.tourz-search-form.tour-form-two{
+    width: 100%;
+}
+
+.mst-dropdown-menu {
+    padding-left: 35px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s ease-in-out all;
+}
+
+.mst-dropdown-menu a{
+    width: 100%;
+}
+
+.mst-dropdown-menu a:not(:last-child) {
+    margin-bottom: 15px;
+}
+
+
+.mobile-menu-content ul {
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+}
+
+
+.mobile-menu-content ul *{
+    color: #000;
+}
+
+.mobile-menu-content ul li{
+    padding: 15px 0;
+}
+
+.mobile-menu-content ul li a{
+    color: #000;
+}
+
+
+.mobile-menu-content ul li:not(:last-child){
+    margin-bottom: 15px;
+    border-bottom: 1px solid #d2d2d2;
+}
+.mst-dropdown-menu a:first-child{
+    padding-top: 15px;
+}
+
+.mst-dropdown-button {
+    box-shadow: unset;
+    border: unset;
+    background: unset;
+    font-weight: normal;
+    width: 100%;
+    text-align: left;
+}
+
+.mst-dropdown-button em {
+    float: right;
+}
+
+.mst-dropdown-button em::before{
+    transition: .3s ease-in-out all;
+}
+
+.hasSubmenu.active  .mst-dropdown-button em::before{
+    transform: rotate(180deg);
+}
+
+.hasSubmenu.active  .mst-dropdown-menu{
+    max-height: 100%;
+    opacity: 1;
+    visibility: visible;
+}
+
+span.cartCount {
+    background: #ffad0c;
+    padding: 3px 5px;
+    border-radius: 5px;
+    text-align: center;
+    vertical-align: middle;
+    color: #fff;
+}
+
+a.signin-button {
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+}
+a.signup-button {
+    background: #1d6db2;
+    color: #fff!important;
+    border-radius: 8px;
+    border: 1px solid #1d6db3;
+}
+
+a.signin-button:hover {
+    border-color: #1d6db3;
+    color: #1d6db3;
+}
+
+a.signup-button:hover {
+    background: #fff;
+    color: #1d6db2!important;
+    border: 1px solid #1d6db2;
+    border-top-style: inset;
+}
+
+@media all and (min-width: 1500px) {
+    .container{
+        width: 1400px!important;
+    }
+}
+
+@media all and (max-width: 1440px) {
+    .wed-logo a img{
+        width: 150px
+    }
+}
+
+
+
+@media all and (max-width: 768px) {
+    .search-bar .search-field, .mobile-search-bar .search-field{
+        min-width: unset;
+    }
+    .main-menu{
+        display: none;
+    }
+    .mobile-menu{
+        display: flex;
+    }
+}
+
+@media all and (min-width: 768px) {
+    .main-menu{
+        display: flex;
+    }
+    .mobile-menu{
+        display: none;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1000px){
+    .search-bar{
+        display: none;
+    }
+    .mobile-search-bar{
+        display: block;
+    }
+    form.tourz-search-form.tour-form-two{
+        width: unset;
+    }
 
 }

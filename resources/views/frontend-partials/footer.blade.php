@@ -33,7 +33,7 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
                                 <li> <a style="font-weight: 700; color: #253d52ad;" href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('privacy-policy'))}}">{{__('privacyPolicy')}}</a> </li>
                                 <li> <a style="font-weight: 700; color: #253d52ad;" href="{{url($langCodeForUrl.'/'.$commonFunctions->getRouteLocalization('frequently-asked-questions'))}}">{{__('frequentlyAskedQuestions')}}</a> </li>
                             </ul>
-                             </div>
+                        </div>
                         <div class="col-sm-3  col-xs-12 foot-social foot-spec foot-com">
                             <h4 style="color: #253d52ad;">{!! __('followUs') !!}</h4>
                             <ul>
@@ -96,3 +96,24 @@ $langCodeForUrl = $langCode == 'en' ? '' : $langCode;
 
     </script>
 </section>
+<div class="mobile-search-overlay">
+    <div class="overlay-header">
+        <h4>SEARCH</h4>
+        <a class="overlay-close" href="javascript:;">X</a>
+    </div>
+    <div class="overlay-body">
+        <div class="mobile-search-area">
+            <form action="{{url($langCodeForUrl.'/s')}}" method="GET" id="searchSpecificForm" style="height: 100%">
+                <input type="text" name="q" placeholder="{{ __('searchLocationsAttractions')}}" class="search-field">
+                <a class="clear-input">X</a>
+                <i class="glyphicon glyphicon-search" onclick="event.preventDefault(); document.getElementById('searchSpecificForm').submit();"></i>
+                <div class="mobile-suggestions-container"></div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="whatsapp-button-area">
+    <a href="https://wa.me/+33184208801" target="_blank">
+        <i class="icon-cz-whatsapp"></i>
+    </a>
+</div>

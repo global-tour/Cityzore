@@ -37,14 +37,6 @@
         padding-left: 0px !important;
     }
 
-    .main-menu {
-        width: 55% !important;
-    }
-
-    .main-menu ul{
-        margin-right: 18%;
-    }
-
     .wed-logo {
         width: 45% !important;
     }
@@ -358,7 +350,6 @@
         padding-right: 30px;
         background-image: none;
         background-color:white;
-        z-index: 999;
         height: 100% !important;
         border-top: 1px solid #7d7878;
     }
