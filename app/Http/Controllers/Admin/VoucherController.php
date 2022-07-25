@@ -9,9 +9,17 @@ use App\Option;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Helpers\RefCodeGenerator;
 
 class VoucherController extends Controller
 {
+    public $refCodeGenerator;
+
+       public function __construct()
+    {
+        $this->refCodeGenerator = new RefCodeGenerator();
+    }
+
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -83,8 +91,8 @@ class VoucherController extends Controller
         }
 
         if ($request->bookingRefCode == null) {
-            $rand = rand(0,99999);
-            $voucher->bookingRefCode = 'BKN'.+$rand;
+        
+            $voucher->bookingRefCode = $this->refCodeGenerator->refCodeGeneratorForBooking(null);
         }
 
         $voucher->save();
