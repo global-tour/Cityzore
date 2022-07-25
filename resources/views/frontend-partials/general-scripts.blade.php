@@ -707,7 +707,7 @@ End of Tawk.to Script-->
     <script>
         $(window).on('load', function() {
             // console.log('burda')
-            // makeFilterCall();
+            makeFilterCall();
         });
 
         $('.datepicker-from').datepicker({
