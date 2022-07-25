@@ -101,6 +101,7 @@
 <div id="ex1" class="modal">
     <select style="width: 50%" multiple="multiple" id="supplierSelect" class="select2"></select>
     <button id="sendRestaurants" type="button">SEND</button>
+    <a href="ex1" class="close-modal remove-modal" style="z-index:99999; position:absolute;">Close</a>
 </div>
 
 
