@@ -248,5 +248,5 @@
 </section>
 
 @include('frontend-partials.footer')
-@include('frontend-partials.general-scripts', ['page' => 'all-products'])
+@include('frontend-partials.general-scripts', ['page' => 'search-specific'])
 
