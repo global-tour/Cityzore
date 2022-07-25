@@ -4370,6 +4370,75 @@ body.stop().animate({scrollTop:$(target).offset().top-50}, 0, 'swing', function(
             $("#bookings").select2({});
         });
     </script>
+
+@elseif($page == 'external-payment-edit')
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const selectInputs2 = $('#bookings')
+
+            $.ajax({
+                url: '/external-booking-ref-code/'+ {{ $externalPayment->id }},
+                type: 'POST',
+                data: {
+                    q: '',
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                }
+            }).then(function (data) {
+                var option;
+
+                if(data.item.length) {
+
+                $.each(data, function (key, val) {
+                    option += `<option value="${val}" selected>${val}</option>`;
+                });
+
+
+                selectInputs2.append(option).trigger('change');
+                }
+
+                // manually trigger the `select2:select` event
+                selectInputs2.trigger({
+                    type: 'select2:select',
+                    params: {
+                        data: data
+                    }
+                });
+
+            });
+
+            selectInputs2.select2({
+                ajax: {
+                    url: '/external-booking-ref-code/',
+                    type: 'post',
+                    dataType: 'json',
+                    data: function (params) {
+                        return {
+                            q: params.term,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        }
+                    },
+                    delay: 800,
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data.items, function (item) {
+                                return {
+                                    text: item.mutatorRefCode,
+                                    id: item.mutatorRefCode
+                                }
+                            })
+                        }
+                    }
+                },
+                cacheable: true,
+                 placeholder: 'Search for a platform',
+            })
+        })
+    </script>
+
 @elseif($page == 'barcodes-create')
     <script>
 
@@ -4861,12 +4930,17 @@ body.stop().animate({scrollTop:$(target).offset().top-50}, 0, 'swing', function(
 @elseif($page == 'external-payment-index')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('js/admin/externalPaymentTable.js') }}"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
     <script>
         $(function() {
             $("#bookings").select2({
             });
 
-            $('.resendEmail').on('click', function() {
+            $(document).on('click', '.resendEmail', function() {
                 let id = $(this).attr('data-id');
                 let $this = $(this);
                 $.ajax({

@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Http\Controllers\Datatables;
+
+use Illuminate\Http\Request;
+
+class DummyDatatable
+{
+
+    protected $columns = [];
+
+    public function getRows(Request $request)
+    {
+        //
+    }
+}

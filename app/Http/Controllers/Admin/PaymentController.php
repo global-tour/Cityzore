@@ -37,10 +37,10 @@ class PaymentController extends Controller
         $userID = -1;
         if (auth()->guard('supplier')->check()) {
             $userID = auth()->user()->id;
-            $paymentLinks = ExternalPayment::where('createdBy', '=', $userID)->orderBy('created_at', 'desc')->get();
+            $paymentLinks = ExternalPayment::where('createdBy', '=', $userID)->orderBy('created_at', 'desc')->get()->paginate(15);
         }
         if (Auth::guard('admin')->check()) {
-            $paymentLinks = ExternalPayment::orderBy('created_at', 'desc')->get();
+            $paymentLinks = ExternalPayment::orderBy('created_at', 'desc')->get()->paginate(15);
         }
         $config = Config::where('userID', $userID)->first();
 
@@ -217,6 +217,66 @@ class PaymentController extends Controller
         ];
         $pdf = PDF::loadView('pdfs.externalPaymentInvoice', $data);
         return $pdf->stream($externalPayment->referenceCode.'.pdf');
+    }
+
+    public function editExternalPayment($id)
+    {
+        $externalPayment = ExternalPayment::findOrFail($id);
+
+        return view('panel.external-payment.edit', compact( 'externalPayment'));
+    }
+
+    public function externalBookingRefCode($id = null, Request $request)
+    {
+
+        if ($id) {
+
+            $externalPayment = ExternalPayment::find($id);
+
+            if ($externalPayment->bookingRefCode){
+                return response()->json([
+                    'item' => $externalPayment->bookingRefCode
+                ]);
+            }
+
+        }
+
+        $booking['items'] = Booking::where('status', '=', 0)
+            ->whereMonth('created_at', '=', now())
+            ->where('bookingRefCode', 'like', '%'. $request->q .'%')
+            ->orWhere('gygBookingReference', 'like', '%'. $request->q .'%')
+            ->get()
+            ->take(10)
+            ->each(function ($item){
+                if ($item->gygBookingReference) {
+                    $item->mutatorRefCode =  $item->gygBookingReference;
+                }elseif ($item->isViator || $item->isBokun ){
+                    $item->mutatorRefCode =  $item->bookingRefCode;
+                }else{
+                    $bookingRefCode = explode('-', $item->bookingRefCode);
+                    $item->mutatorRefCode =  array_last($bookingRefCode);
+                }
+            });
+
+        return response()->json($booking);
+    }
+
+    public function updateExternalPayment($id, Request $request)
+    {
+        try {
+            $externalPayment = ExternalPayment::findOrFail($id);
+            $externalPayment->bookingRefCode = $request->bookingRefCode;
+            $externalPayment->message = $request->message;
+            $externalPayment->price = $request->price;
+            $externalPayment->save();
+
+            return redirect(url('/external-payment'));
+
+        } catch (\Exception $exception) {
+
+            return redirect()->back();
+
+        }
     }
 
     public function externalPaymentEdit(Request $request) {

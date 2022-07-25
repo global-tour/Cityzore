@@ -6,7 +6,6 @@ use App\Booking;
 use App\Http\Controllers\Helpers\CryptRelated;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use function GuzzleHttp\Psr7\str;
 
 class AllBookingsDatatable
 {
