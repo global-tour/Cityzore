@@ -3174,6 +3174,11 @@ $(document).on('change', '#access-checkins-form input[type="number"]', function(
 
     let supplierID;
 
+        $(document).on('click','.remove-modal', function(e) {
+            e.preventDefault();
+            $.modal.close();
+        });
+
     $('body').on('click', '.modalOpen', function() {
         $('#supplierSelect').html('');
         supplierID = $(this).attr('data-supplier-id');
@@ -3188,9 +3193,9 @@ $(document).on('change', '#access-checkins-form input[type="number"]', function(
             success: function(data) {
                 var options = data.options;
                 var block = '';
-                console.log(options);
+                //console.log(options);
                 for (let i = 0; i < options.length; i++) {
-                    
+
                     block += '<option ';
                     if(options[i].rCodeID){
                         const opt = options[i].rCodeID.toString().split(',').some(x => {
@@ -3202,7 +3207,7 @@ $(document).on('change', '#access-checkins-form input[type="number"]', function(
                         }
                     }
                     block += 'value="'+options[i].id+'">'+options[i].title+'</option>';
-                    
+
                 }
                 $('#supplierSelect').html(block);
             }
