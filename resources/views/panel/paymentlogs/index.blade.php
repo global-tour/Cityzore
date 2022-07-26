@@ -3,37 +3,17 @@
 @include('panel-partials.sidebar')
 
 
-<div class="sb2-2-3">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="box-inn-sp">
-                <div class="inn-title">
-                    <h4>Payment Logs</h4>
-                </div>
-                <div class="tab-inn">
-                    <div class="table-responsive table-desi" style="overflow-x: inherit;">
-                        <table id="datatable" class="table">
-                            <thead>
-                            <tr>
-                                <th>Process ID</th>
-                                <th>User ID</th>
-                                <th>Option Title</th>
-                                <th>Cart ID</th>
-                                <th>Code</th>
-                                <th>Date</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<div class="sb2-2-add-blog sb2-2-1">
+    <div class="inn-title">
+        <h4>Payment Logs</h4>
+    </div>
+    <div class="bor">
+        <div class="row" style="margin-top: 50px">
+            <table id="paymentlogs-table" class="table table-striped table-hover" style="width: 100%"></table>
         </div>
     </div>
 </div>
 
 
 @include('panel-partials.scripts', ['page' => 'paymentlogs-index'])
-@include('panel-partials.datatable-scripts', ['page' => 'paymentlogs-index'])
+{{--@include('panel-partials.datatable-scripts', ['page' => 'paymentlogs-index'])--}}
