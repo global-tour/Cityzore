@@ -945,7 +945,6 @@ class  BookingController extends Controller
                 $product = Product::findOrFail($c->productID);
                 $timeZone = $product->countryName->timezone;
             }
-
             foreach (json_decode($c->hour, true) as $h) {
                 if (strlen($h['hour']) < 6) {
                     $arr = ['dateTime' => $timeRelated->convertDmyToYmdWithHour($c->date, $h['hour'], $timeZone)];
@@ -1057,28 +1056,68 @@ class  BookingController extends Controller
 
             // If option has big bus external id send booking request to Big Bus API, else resume normal operations
             if (!is_null($option->bigBusID)) {
-                $items = json_decode($booking->bookingItems, true);
-                $itemsForBigBus = [];
-                $categories = ['ADULT' => 'Adult', 'CHILD' => 'Child'];
-                foreach ($items as $item) {
-                    array_push($itemsForBigBus, ['category' => $categories[$item['category']], 'quantity' => $item['count']]);
-                }
-                $dateOfTravel = $booking->dateForSort;
-                $bookingRefCode = $booking->bookingRefCode;
-                $productId = $option->bigBusID;
-                $bigBusResponse = $this->bigBusRelated->reserveAndConfirmBooking($productId, $booking, $dateOfTravel, $itemsForBigBus);
-                // $bbResponseJson = response()->json($bigBusResponse);
-                // $bbResponseJsonData =  $bbResponseJson->getData();
-                // $bbStatus = $bbResponseJsonData->status;
-                if ($bigBusResponse['status']) {
-                    array_push($isOkToBook, 'true');
-                    // $bbBookingResult = $bbResponseJsonData->bookingResult;
-                    // $bbBookingResultJson = response()->json($bbBookingResult);
-                    // $bbBookingResultJsonData = $bbBookingResultJson->getData();
-                    // $bigBusRefCode = $bbBookingResultJsonData->bookingReference;
-                    $booking->bigBusRefCode = $bigBusResponse['data']['uuid'];
-                } else {
-                    array_push($isOkToBook, 'false');
+
+                $bigBus = $this->bigBusRelated->setClient();
+
+                $bigBusDate = Carbon::make(str_replace('/', '-', $c->date))->format('Y-m-d');
+
+                $bigBusAvailabilityResponse = $bigBus->checkAvailability($option->bigBus->product_id, $bigBusDate);
+
+                if ($bigBusAvailabilityResponse['status'] && count($bigBusAvailabilityResponse['data']) && $bigBusAvailabilityResponse['data'][0]['available']) {
+
+                    $bigBus->setLog($booking->id, 'availability', $bigBusAvailabilityResponse['data']);
+
+                    $uuid = Uuid::uuid4();
+
+                    foreach (json_decode($booking->bookingItems, 1) as $item) {
+                        for ($i = 0; $i < $item['count']; $i++) {
+                            $unitItems[]['unitId'] = json_decode($option->bigBus->units, 1)[$item['category']]['id'];
+                        }
+                    }
+
+                    $data = [
+                        'uuid'                  => $uuid,
+                        'expirationMinutes'     => 75,
+                        'productId'             => $option->bigBus->product_id,
+                        'optionId'              => 'DEFAULT',
+                        'availabilityId'        => $bigBusAvailabilityResponse['data'][0]['id'],
+                        'unitItems'             => $unitItems
+                    ];
+
+                    $bigbusReserveResponse = $bigBus->reserve($data);
+
+                    if ($bigbusReserveResponse['status'] && count($bigbusReserveResponse)) {
+                        $bigBus->setLog($booking->id, 'reservation', $bigbusReserveResponse['data']);
+
+                        $data = [
+                            'emailReceipt' => true,
+                            'resellerReference' => null,
+                            'contact'           => [
+                                'fullName'      => $booking->fullName,
+                                'emailAdress'   => json_decode($booking->travelers, 1)[0]['email'] ?? '',
+                                'phoneNumber'   => json_decode($booking->travelers, 1)[0]['phone'] ?? '',
+                                'locales'       => [$booking->language],
+                                'country'       => "FR"
+                            ]
+                        ];
+
+                        $bigBusConfirmResponse = $bigBus->confirm($bigbusReserveResponse['data']['id'], $data);
+
+                        if ($bigBusConfirmResponse['status'] && count($bigBusConfirmResponse['data'])) {
+
+                            $bigBus->setLog($booking->id, 'confirm', $bigBusConfirmResponse['data']);
+
+                            $booking->bigBusRefCode = $bigBusConfirmResponse['data']['uuid'];
+
+                            $isOkToBook[] = 'true';
+                        }else{
+                            $isOkToBook[] = 'false';
+                        }
+                    }else{
+                        $isOkToBook[] = 'false';
+                    }
+                }else{
+                    $isOkToBook[] = 'false';
                 }
             }
 
@@ -1129,7 +1168,7 @@ class  BookingController extends Controller
                             // $bbProductsJson = response()->json($bbProducts);
                             // $bbProductsJsonData = $bbProductsJson->getData();
                             // $bbProductsProduct = $bbProductsJsonData->product;
-                            $bbItems = $bigBusResponse['data']['unitItems'];
+                            $bbItems = $bigBusConfirmResponse['data']['unitItems'];
                             foreach ($bbItems as $bbKey => $bbItem) {
                                 $barcode = new Barcode();
                                 $barcode->ticketType = 3;
@@ -1137,6 +1176,7 @@ class  BookingController extends Controller
                                 $barcode->isUsed = 1;
                                 $barcode->isReserved = 1;
                                 $barcode->isExpired = 0;
+                                $barcode->searchableTicketType = 'Big Bus Ticket';
                                 $barcode->endTime = date('d/m/Y', strtotime('+1 years'));
                                 $barcode->ownerID = -1;
                                 $barcode->cartID = $c->id;
