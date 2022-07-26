@@ -690,6 +690,7 @@ Route::group(['domain' => 'admin.'. env('ROUTE_VARIABLE', 'cityzore.com'), 'midd
 
         Route::post('/get-rows-for-bookings', 'AllBookingsDatatable@getRows');
         Route::post('/get-rows-for-external-payment', 'ExternalPayment@getRows');
+        Route::post('/get-rows-for-payment-logs', 'PaymentLogsTable@getRows');
     });
 
     //Availability Routes

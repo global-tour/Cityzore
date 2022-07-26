@@ -5012,6 +5012,13 @@ body.stop().animate({scrollTop:$(target).offset().top-50}, 0, 'swing', function(
             });
         });
     </script>
+
+@elseif($page == 'paymentlogs-index')
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('js/admin/paymentLogsTable.js') }}"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
 @elseif($page == 'ticket-types-index')
     <script>
         $(function() {

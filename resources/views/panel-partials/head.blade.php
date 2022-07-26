@@ -1402,6 +1402,46 @@
                 gap: 10px;
             }
         </style>
+    @elseif($page == 'paymentlogs-index')
+        <link rel="stylesheet" href="//cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+        <style>
+
+            .dataTables_wrapper .dataTables_filter input{
+                border: unset;
+                border-bottom: 1px solid #9e9e9e;
+                border-radius: unset;
+                padding: unset;
+                background-color: unset;
+                margin-left: unset;
+            }
+
+            .d-flex{
+                display: flex;
+            }
+
+            .justify-content-center{
+                justify-content: center !important;
+            }
+            .align-items-center {
+                align-items: center!important;
+            }
+
+            #paymentlogs-table_filter {
+                width: 100%;
+            }
+
+            .justify-content-end{
+                justify-content: end;
+            }
+            #paymentlogs-table_wrapper label {
+                display: flex;
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+            }
+        </style>
     @elseif($page == 'barcodes-create')
 
     @elseif($page == 'multiple-tickets')
