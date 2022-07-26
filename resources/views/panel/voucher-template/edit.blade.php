@@ -63,6 +63,13 @@
                             </div>
                         </div>
 
+                        <div class="row">
+                            <div class="form-group input-field col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <input {{$template->default ? 'checked' : ''}} type="checkbox" id="default" name="default">
+                                <label for="default">Set As Default</label>
+                            </div>
+                        </div>
+
 
 
 

@@ -86,7 +86,12 @@ class VoucherTemplateController extends Controller
     {
         try {
             $data = $request->validated();
-            VoucherTemplate::find($id)->update($data);
+            $voucher = VoucherTemplate::find($id);
+            $data['default'] = $data['default'] === "on" ? 1 : 0;
+            if($data['default']){
+                VoucherTemplate::where('id', '<>', $voucher->id)->update(['default' => 0]);
+            }
+            $voucher->update($data);
             return redirect('/voucher-template')->with('message', 'Voucher Template Updated Successfully!');
         } catch (\Exception $e) {
             return redirect('/voucher-template')->with('error', 'Error Data: ' . $e->getMessage());

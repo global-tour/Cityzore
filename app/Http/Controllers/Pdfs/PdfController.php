@@ -29,6 +29,7 @@ use App\Http\Controllers\Helpers\CryptRelated;
 use Illuminate\Support\Facades\Auth;
 use PHPHtmlParser\Dom;
 use PHPHtmlParser\Options;
+use App\Helpers\Vouchers\TemplateGenerator;
 
 
 class PdfController extends Controller
@@ -60,20 +61,123 @@ class PdfController extends Controller
      */
     public function voucherBackendv2($id)
     {
+        $ticketType = null;
+        $generator = new BarcodeGeneratorPNG();
+        $template = VoucherTemplate::where('default', 1)->first()->template;
         $id = $this->cryptRelated->decrypt($id);
         $booking = Booking::findOrFail($id);
-        $html = VoucherTemplate::first();
-        $dom = new Dom();
-        $dom->setOptions(
-        // this is set as the global option level.
-            (new Options())
-                ->setRemoveStyles(false)
-        );
+        $options = Option::where('referenceCode', '=', $booking->optionRefCode)->first();
+        $pricing = $options->pricings()->first();
+        $barcodes = Barcode::with('ticketTypeName')->where('bookingId', $booking->id)->get();
+        $products = Product::all();
+        $url = 'cityzore';
+        $rCode = null;
+        if (!($booking->rCodeID == null)) {
+            $rCode = Rcode::select('rCode')->where('id', $booking->rCodeID)->first();
+        }
 
-        $template = $html->template["en"];
-        $dom->loadStr($template);
+
+        if(count($barcodes)){
+            $ticketType = $barcodes[0]->ticketTypeName;
+            $template = !is_null($ticketType->template) ? $ticketType->template : $template;
+        }
+
+        $travelerName = json_decode($booking->travelers, true)[0]['firstName'];
+        $travelerLastname = json_decode($booking->travelers, true)[0]['lastName'];
+        $participantCountArr = [];
+        $participantSum = 0;
+        $priceData = [];
+        foreach (json_decode($booking->bookingItems, true) as $bookingItem) {
+            switch ($bookingItem['category']) {
+                case 'EU_CITIZEN':
+                    $title = 'euCitizen';
+                    break;
+                default:
+                    $title = strtolower($bookingItem['category']);
+                    break;
+            }
+
+
+
+                $column = $title.'Price';
+                $priceData[$title] = json_decode($pricing->$column)[0];
+
+
+            if (count($barcodes)) {
+
+
+                if (!is_null($pricing->ignoredCategories)) {
+                    if (!in_array($title, json_decode($pricing->ignoredCategories, true))) {
+                        array_push($participantCountArr, $bookingItem['count']);
+                        $participantSum = array_sum($participantCountArr);
+                    }
+                } else {
+                    array_push($participantCountArr, $bookingItem['count']);
+                    $participantSum = array_sum($participantCountArr);
+                }
+            } else {
+                array_push($participantCountArr, $bookingItem['count']);
+                $participantSum = array_sum($participantCountArr);
+            }
+        }
+
+        if ($booking->gygBookingReference == null && $booking->isBokun == 0 && $booking->isViator == 0) {
+            $bknNumber = explode("-", $booking->bookingRefCode)[3];
+            $productRefCode = explode('-', $booking->bookingRefCode)[0];
+            foreach ($products as $product) {
+                if ($product->referenceCode == $productRefCode) {
+                    $productImage = ProductGallery::where('id', '=', $product->coverPhoto)->pluck('src');
+                    $data = [
+                        'ticketType' => $ticketType,
+                        'template' => $template,
+                        'bkn' => $bknNumber,
+                        'travelerName' => $travelerName,
+                        'travelerLastname' => $travelerLastname,
+                        'product' => $product,
+                        'options' => $options,
+                        'participantSum' => $participantSum,
+                        'booking' => $booking,
+                        'productImage' => $productImage,
+                        'generator' => $generator,
+                        'url' => $url,
+                        'rCode' => $rCode,
+                        'priceData' => $priceData
+                    ];
+                }
+            }
+        } else {
+            if ($booking->isBokun == 1 || $booking->isViator == 1) {
+                $bknNumber = $booking->bookingRefCode;
+            } else {
+                $bknNumber = explode("-", $booking->bookingRefCode)[2];
+            }
+            $data = [
+                'ticketType' => $ticketType,
+                'template' => $template,
+                'bkn' => $bknNumber,
+                'travelerName' => $travelerName,
+                'travelerLastname' => $travelerLastname,
+                'options' => $options,
+                'participantSum' => $participantSum,
+                'booking' => $booking,
+                'generator' => $generator,
+                'url' => $url,
+                'rCode' => $rCode,
+                'priceData' => $priceData,
+                'productImage' => ['eiffel-tower-5ab.jpg'],
+            ];
+        }
+
+
+
+
+
+
+        $templateGenerator = new TemplateGenerator($data);
+        $modifiedDom = $templateGenerator->run();
+
         //dd($dom->outerHtml);
-        $pdf = PDF::loadHTML($dom->outerHtml);
+        $pdf = PDF::loadHTML($modifiedDom->outerHtml);
         return $pdf->stream(time() . '.pdf');
     }
 
@@ -246,9 +350,9 @@ class PdfController extends Controller
         }
 //        $view = view('pdfs.voucher', $data)->render();
 //        header("Content-type: text/html");
-//        header("Content-Disposition: attachment; filename=view.html");
+//        header("Content-Disposition: attachment; filename=default.html");
 //        return $view;
-//        return dd($view);
+        //return dd($view);
         $pdf = PDF::loadView('pdfs.voucher', $data);
         return $pdf->stream($travelerName . $travelerLastname . $bknNumber . '.pdf');
     }
