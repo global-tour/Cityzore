@@ -338,8 +338,8 @@ Route::group(['domain' => 'admin.'. env('ROUTE_VARIABLE', 'cityzore.com'), 'midd
         });
 
         Route::name('Booking')->group(function () {
-            Route::get('/bookings', 'BookingController@index')->name('bookings.index')->middleware('permission:Show All Bookings');
-            Route::get('/bookingsv2', 'BookingController@indexV2')->middleware('permission:Show All Bookings');
+            Route::get('/bookingsv2', 'BookingController@index')->name('bookings.index')->middleware('permission:Show All Bookings');
+            Route::get('/bookings', 'BookingController@indexV2')->middleware('permission:Show All Bookings');
             Route::post('/bookings-excel-import', 'BookingController@importExcel')->name('bookings.importExcel');
             Route::post('/bookings-extra-file-import', 'BookingController@boookings_extra_file_imports')->name('bookings.extra');
             Route::get('/mail-information', 'BookingController@mailInformation');
@@ -385,15 +385,20 @@ Route::group(['domain' => 'admin.'. env('ROUTE_VARIABLE', 'cityzore.com'), 'midd
         });
 
         Route::name('External Payment')->group(function () {
-            Route::get('/external-payment', 'PaymentController@externalPayment')->name('externalPayment')->middleware('permission:Show All External Payments');
-            Route::post('/external-payment/edit', 'PaymentController@externalPaymentEdit')->middleware('permission:Show All External Payments');
-
             Route::middleware('permission:External Payment Create')->group(function () {
                 Route::get('/external-payment/create', 'PaymentController@externalPaymentCreate');
                 Route::post('/storePaymentLink', 'PaymentController@storePaymentLink');
                 Route::post('resendEmail', 'PaymentController@resendEmail');
                 Route::get('/external-payments-pdf/{id}', 'PaymentController@externalPaymentInvoice')->middleware('permission:External Payment Create');
             });
+
+            Route::get('/external-payment', 'PaymentController@externalPayment')->name('externalPayment')->middleware('permission:Show All External Payments');
+            Route::get('/external-payment/{id}', 'PaymentController@editExternalPayment')->middleware('permission:Show All External Payments');
+            Route::post('/external-payment/{id}', 'PaymentController@updateExternalPayment')->middleware('permission:Show All External Payments');
+            Route::post('/external-booking-ref-code/{id?}', 'PaymentController@externalBookingRefCode')->middleware('permission:Show All External Payments');
+            Route::post('/external-payment/edit', 'PaymentController@externalPaymentEdit')->middleware('permission:Show All External Payments');
+
+
         });
 
         Route::name('Blog')->group(function () {
@@ -689,6 +694,8 @@ Route::group(['domain' => 'admin.'. env('ROUTE_VARIABLE', 'cityzore.com'), 'midd
     ], function () {
 
         Route::post('/get-rows-for-bookings', 'AllBookingsDatatable@getRows');
+        Route::post('/get-rows-for-external-payment', 'ExternalPayment@getRows');
+        Route::post('/get-rows-for-payment-logs', 'PaymentLogsTable@getRows');
     });
 
     //Availability Routes
@@ -919,7 +926,12 @@ Route::group(['domain' => 'supplier.'. env('ROUTE_VARIABLE'), 'middleware' => ['
         });
 
         Route::name('Booking')->group(function () {
-            Route::get('/bookings', 'BookingController@index')->name('bookings.index')->middleware('permission:Show All Bookings');
+            Route::get('/bookingsv2', 'BookingController@index')->name('bookings.index')->middleware('permission:Show All Bookings');
+            Route::get('/bookings', 'BookingController@indexV2')->middleware('permission:Show All Bookings');
+            Route::post('/get-booking-detail', 'BookingController@bookingDetail')->middleware('permission:Show All Bookings');
+
+            Route::post('/get-platforms', 'BulkMailController@getPlatforms');
+            Route::post('/get-products', 'BulkMailController@getProducts');
 
             Route::middleware('permission:Booking Create/Edit')->group(function () {
                 Route::get('/booking/{id}/edit', 'BookingController@edit')->name('bookings.edit');
@@ -982,14 +994,20 @@ Route::group(['domain' => 'supplier.'. env('ROUTE_VARIABLE'), 'middleware' => ['
         });
 
         Route::name('External Payment')->group(function () {
-            Route::get('/external-payment', 'PaymentController@externalPayment')->name('externalPayment')->middleware('permission:Show All External Payments');
-            Route::post('/external-payment/edit', 'PaymentController@externalPaymentEdit')->middleware('permission:Show All External Payments');
 
             Route::middleware('permission:External Payment Create')->group(function () {
                 Route::get('/external-payment/create', 'PaymentController@externalPaymentCreate');
                 Route::post('/storePaymentLink', 'PaymentController@storePaymentLink');
                 Route::post('resendEmail', 'PaymentController@resendEmail');
             });
+
+            Route::get('/external-payment', 'PaymentController@externalPayment')->name('externalPayment')->middleware('permission:Show All External Payments');
+            Route::get('/external-payment/{id}', 'PaymentController@editExternalPayment')->middleware('permission:Show All External Payments');
+            Route::post('/external-payment/{id}', 'PaymentController@updateExternalPayment')->middleware('permission:Show All External Payments');
+            Route::post('/external-booking-ref-code/{id?}', 'PaymentController@externalBookingRefCode')->middleware('permission:Show All External Payments');
+            Route::post('/external-payment/edit', 'PaymentController@externalPaymentEdit')->middleware('permission:Show All External Payments');
+
+
         });
 
         Route::name('Config')->group(function () {
@@ -999,6 +1017,7 @@ Route::group(['domain' => 'supplier.'. env('ROUTE_VARIABLE'), 'middleware' => ['
 
         Route::get('/single-pdf/{id}', 'BarcodeController@createTicket')->name('single.pdf');
     });
+
 
     Route::namespace('Pdfs')->group(function () {
         Route::get('/print-pdf/{id}', 'PdfController@voucherBackend')->name('print.pdf');
@@ -1023,6 +1042,18 @@ Route::group(['domain' => 'supplier.'. env('ROUTE_VARIABLE'), 'middleware' => ['
         Route::post('/getRowsForDataTable', 'DataTableFunctions@getRowsForDataTable');
         Route::post('/pageIDForDataTable', 'DataTableFunctions@pageIDForDataTable');
         Route::post('/getAttractionsByCity', 'CommonFunctions@getAttractionsByCity');
+    });
+
+    /*
+     * Datatables
+     **/
+    Route::group([
+        'namespace' => 'Datatables'
+    ], function () {
+
+        Route::post('/get-rows-for-bookings', 'AllBookingsDatatable@getRows');
+        Route::post('/get-rows-for-external-payment', 'ExternalPayment@getRows');
+        Route::post('/get-rows-for-payment-logs', 'PaymentLogsTable@getRows');
     });
 
     //Availability Routes

@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Controllers\Datatables;
+
+use Illuminate\Http\Request;
+
+class DummyDatatable
+{
+
+    protected $columns = [
+        // Columns
+    ];
+
+    public function getRows(Request $request)
+    {
+        $data = [];
+
+        /*
+         * Pagination
+         *
+         */
+        $start = $request->input('start');
+        $limit = $request->input('length');
+
+        /*
+         * Orderable
+         *
+         */
+        $column = $this->columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        /*
+         * Search
+         *
+         */
+        $search = $request->input('search.value');
+
+        // $data['recordsFiltered'] = $recordsFiltered;
+        // $data['recordsTotal'] = $recordsFiltered;
+        // $data['lastInput'] = $request->input();
+
+        return response()->json($data);
+    }
+}

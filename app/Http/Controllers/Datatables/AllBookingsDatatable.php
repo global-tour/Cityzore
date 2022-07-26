@@ -6,7 +6,6 @@ use App\Booking;
 use App\Http\Controllers\Helpers\CryptRelated;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use function GuzzleHttp\Psr7\str;
 
 class AllBookingsDatatable
 {
@@ -78,6 +77,15 @@ class AllBookingsDatatable
          **/
         if (auth()->guard('supplier')->check()) {
             $query->where(function ($q) {
+                $q->where('companyID', auth()->guard('supplier')->user()->id);
+                $q->orWhere(function ($q2) {
+                    $q2->whereHas("bookingOption", function ($sub) {
+                        $sub->where("rCodeID", auth()->guard('supplier')->user()->id);
+                    });
+                });
+            });
+
+            $queryC->where(function ($q) {
                 $q->where('companyID', auth()->guard('supplier')->user()->id);
                 $q->orWhere(function ($q2) {
                     $q2->whereHas("bookingOption", function ($sub) {
@@ -298,8 +306,11 @@ class AllBookingsDatatable
                 'info'            => [
                     'id'          => $item->id,
                     'voucher'     => url('/print-pdf/' . (new CryptRelated())->encrypt($item->id)),
+
                     'voucherv2'     => url('/print-pdf-v2/' . (new CryptRelated())->encrypt($item->id)),
-                    'invoice'     => url('/print-invoice/' . (new CryptRelated())->encrypt($item->id))
+                    'invoice'     => url('/print-invoice/' . (new CryptRelated())->encrypt($item->id)),
+                    'auth'        => auth()->guard('supplier')->check() ? auth()->guard('supplier')->user()->id : -1
+
                 ]
             ];
         });

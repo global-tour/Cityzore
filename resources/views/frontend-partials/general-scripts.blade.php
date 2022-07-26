@@ -609,7 +609,31 @@ End of Tawk.to Script-->
     <script src="{{asset('js/datatables/pdfmake.min.js')}}" defer></script>
     <script src="{{asset('js/datatables/vfs_fonts.js')}}" defer></script>
     <script src="{{asset('js/main/profile-scripts.js')}}" defer></script>
-
+    <script>
+        $(document).ready(function () {
+            $('body').on('click', '[data-booking]', function () {
+                if(confirm('{{ __('cancelByUser') }}')){
+                    $.ajax({
+                        url: '/cancel-by-user',
+                        type: 'POST',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            id: $(this).data('booking')
+                        },
+                        success: function (response) {
+                            alert(response.message);
+                            setTimeout(() => {
+                                location.reload()
+                            }, 1300)
+                        },
+                        error: function (error) {
+                            console.log(error)
+                        }
+                    })
+                }
+            })
+        })
+    </script>
 @elseif($page == 'commissions')
     <script>
         $(document).ready(function() {
@@ -683,7 +707,7 @@ End of Tawk.to Script-->
     <script>
         $(window).on('load', function() {
             // console.log('burda')
-            // makeFilterCall();
+            makeFilterCall();
         });
 
         $('.datepicker-from').datepicker({

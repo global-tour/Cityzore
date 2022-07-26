@@ -429,7 +429,8 @@ let table = $('#all-bookings-table').DataTable({
             orderable: false,
             width: 50,
             render: function (data, type, full, meta) {
-                return `<div style="display: flex; justify-content: center; align-items: center; gap: 13px; flex-direction: column">
+                if (full.info.auth === -1) {
+                    return `<div style="display: flex; justify-content: center; align-items: center; gap: 13px; flex-direction: column">
                             <div class="dropdown dropdown-inline" style=" width: 100%; text-align: center">
                                 <a href="javascript:;"
                                    class="btn-clean btn-icon"
@@ -480,7 +481,50 @@ let table = $('#all-bookings-table').DataTable({
                             <a href="#contact" class="btn-clean btn-icon" data-edit="${full.info.id}" data-toggle="tooltip" title="Contact" style=" width: 100%; text-align: center">
                                 <em class="fa fa-envelope" style="font-size: 20px"></em>
                             </a>
-                    </div>`
+                    </div>`;
+                }
+                return `<div style="display: flex; justify-content: center; align-items: center; gap: 13px; flex-direction: column">
+                            <div class="dropdown dropdown-inline" style=" width: 100%; text-align: center">
+                                <a href="javascript:;"
+                                   class="btn-clean btn-icon"
+                                   data-toggle="dropdown"
+                                   aria-expanded="false" style="display:block; width: 100%; text-align: center">
+                                    <em class="fa fa-cog" style="font-size: 20px"></em>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
+                                    <ul class="nav nav-hoverable flex-column">
+
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#" data-edit="${full.info.id}">
+                                                <em class="nav-icon fa fa-edit"></em>
+                                                <span class="nav-text">Edit</span>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="${full.info.voucher}" target="_blank">
+                                                <em class="nav-icon fa fa-download"></em>
+                                                <span class="nav-text">Voucher</span>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="${full.info.invoice}" target="_blank">
+                                                <em class="nav-icon fa fa-download"></em>
+                                                <span class="nav-text">Invoice</span>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                            <a href="#special-ref-code" class="btn-clean btn-icon" data-toggle="tooltip" title="Special Ref. Code" data-edit="${full.info.id}" style=" width: 100%; text-align: center">
+                                <em class="fa fa-barcode" style="font-size: 20px"></em>
+                            </a>
+                            <a href="#comment" class="btn-clean btn-icon" data-edit="${full.info.id}" data-toggle="tooltip" title="Comment" style=" width: 100%; text-align: center">
+                                <em class="fa fa-comments-o" style="font-size: 20px"></em>
+                            </a>
+                    </div>`;
             }
         },
     ],
