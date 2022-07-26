@@ -97,6 +97,14 @@ function format(d) {
                 <td>${d.childRow.phone}</td>
             </tr>
             <tr>
+                <th>Travelled Date: </th>
+                <td>${d.childRow.travelledDate}</td>
+            </tr>
+            <tr>
+                <th>Price: </th>
+                <td>${d.childRow.totalPrice} €</td>
+            </tr>
+            <tr>
                 <th>Item: </th>
                 <td>${d.childRow.items}</td>
             </tr>

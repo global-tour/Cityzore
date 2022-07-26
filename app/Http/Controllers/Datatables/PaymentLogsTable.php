@@ -85,14 +85,19 @@ class PaymentLogsTable
         $data['data'] = $query->with(['option', 'cart'])->get()->map(function ($item){
 
             $childRow = $item->record_fields;
-            $cat = '';
 
             if ($item->cart) {
+                $cat = '';
                 foreach (json_decode($item->cart->bookingItems, 1) as $category){
                     $cat .= "{$category['count']}x {$category['category']} ~ ";
                 }
+
+                $childRow['items'] = rtrim($cat, '~ ');
+                $childRow['totalPrice'] = $item->cart->totalPrice;
+                $childRow['travelledDate'] = !is_null($item->cart->date)
+                    ? $item->cart->date . ' ~ ' . $item->cart->hour
+                    : $item->cart->dateTime;
             }
-            $childRow['items'] = rtrim($cat, '~ ');
 
             return [
                 $this->columns[0] => $item->processID,

@@ -27,9 +27,7 @@ class BookingLog extends Model
 
     public function getRecordFieldsAttribute(): array
     {
-        $bookingRecord = BookingRecord::where('client_id', $this->attributes['userID'])
-            ->orWhere('request->clientid', 'like', '%' . $this->attributes['userID'] . '%')
-            ->orWhere('request->oid', 'like', '%' . $this->attributes['processID'] . '%')
+        $bookingRecord = BookingRecord::where('request->oid', 'like', '%' . $this->attributes['processID'] . '%')
             ->first();
 
 
