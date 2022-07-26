@@ -212,7 +212,7 @@ class BulkMailController extends Controller
 
         $data['items'] = $query->when(auth()->guard('supplier')->check(), function ($q) use ($request) {
             $q->where('supplierID', auth()->guard('supplier')->user()->id);
-        })->where('referenceCode', 'like', '%' . $request->q . '%')
+        })->orWhere('referenceCode', 'like', '%' . $request->q . '%')
             ->orWhere('id', $request->q)
             ->get()
             ->take(7)->map(function ($item) {
