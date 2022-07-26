@@ -84,6 +84,15 @@ class AllBookingsDatatable
                     });
                 });
             });
+
+            $queryC->where(function ($q) {
+                $q->where('companyID', auth()->guard('supplier')->user()->id);
+                $q->orWhere(function ($q2) {
+                    $q2->whereHas("bookingOption", function ($sub) {
+                        $sub->where("rCodeID", auth()->guard('supplier')->user()->id);
+                    });
+                });
+            });
         }
 
         /*
@@ -297,7 +306,8 @@ class AllBookingsDatatable
                 'info'            => [
                     'id'          => $item->id,
                     'voucher'     => url('/print-pdf/' . (new CryptRelated())->encrypt($item->id)),
-                    'invoice'     => url('/print-invoice/' . (new CryptRelated())->encrypt($item->id))
+                    'invoice'     => url('/print-invoice/' . (new CryptRelated())->encrypt($item->id)),
+                    'auth'        => auth()->guard('supplier')->check() ? auth()->guard('supplier')->user()->id : -1
                 ]
             ];
         });
