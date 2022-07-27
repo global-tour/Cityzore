@@ -57,8 +57,6 @@ class PdfController extends Controller
     public function voucherBackend($id)
     {
         $id = $this->cryptRelated->decrypt($id);
-
-
         $booking = Booking::findOrFail($id);
         //starting security
         /*if(!(auth()->guard('admin')->check()) && (int)$booking->companyID !== auth()->user()->id)
@@ -144,6 +142,10 @@ class PdfController extends Controller
             foreach ($products as $product) {
                 if ($product->referenceCode == $productRefCode) {
                     $productImage = ProductGallery::where('id', '=', $product->coverPhoto)->pluck('src');
+                    if($product->id === 128){
+                        $product->title = count(explode("with", $product->title)) ? explode("with", $product->title)[0] : $product->title;
+                        $options->title = count(explode("with", $options->title)) ? explode("with", $options->title)[0] : $options->title;
+                    }
                     $data = [
                         'bkn' => $bknNumber,
                         'travelerName' => $travelerName,
