@@ -161,65 +161,70 @@ class AllBookingsDatatable
 
         if ($bookingInformation) {
 
+            if (in_array(1, explode(',', $bookingInformation))) {
+                $query->whereHas('extra_files');
+                $queryC->whereHas('extra_files');
+            }
+            if (in_array(2, explode(',', $bookingInformation))) {
+                $query->whereDoesntHave('extra_files');
+                $queryC->whereDoesntHave('extra_files');
+            }
 
-            switch ($bookingInformation) {
-                case in_array(1, explode(',', $bookingInformation)):
-                        $query->whereHas('extra_files');
-                        $queryC->whereHas('extra_files');
-                    break;
-                case in_array(2, explode(',', $bookingInformation)):
-                        $query->whereDoesntHave('extra_files');
-                        $queryC->whereDoesntHave('extra_files');
-                    break;
-                case in_array(3, explode(',', $bookingInformation)):
-                        $query->whereHas('contactBooking', function ($q){
-                            $q->where("status", '1');
-                        });
-                        $queryC->whereHas('contactBooking', function ($q){
-                            $q->where("status", '1');
-                        });
-                    break;
-                case in_array(4, explode(',', $bookingInformation)):
-                        $query->whereHas('contactBooking', function ($q){
-                            $q->where("status", '0');
-                        });
-                        $queryC->whereHas('contactBooking', function ($q){
-                            $q->where("status", '0');
-                        });
-                    break;
-                case in_array(5, explode(',', $bookingInformation)):
-                        $query->whereHas('contactBooking', function ($q){
-                            $q->where("check_information->status", 'like', "%true%");
-                        });
-                        $queryC->whereHas('contactBooking', function ($q){
-                            $q->where("check_information->status", 'like', "%true%");
-                        });
-                    break;
-                case in_array(6, explode(',', $bookingInformation)):
-                        $query->whereHas('contactBooking', function ($q){
-                            $q->where("check_information->status", 'like', "%false%");
-                        });
-                        $queryC->whereHas('contactBooking', function ($q){
-                            $q->where("check_information->status", 'like', "%false%");
-                        });
-                    break;
-                case in_array(7, explode(',', $bookingInformation)):
-                        $query->whereNotNull('specialRefCode');
-                        $queryC->whereNotNull('specialRefCode');
-                    break;
-                case in_array(8, explode(',', $bookingInformation)):
-                        $query->whereNull('specialRefCode');
-                        $queryC->whereNull('specialRefCode');
-                    break;
-                case in_array(9, explode(',', $bookingInformation)):
-                        $query->has('invoice_numbers');
-                        $queryC->has('invoice_numbers');
-                    break;
-                case in_array(10, explode(',', $bookingInformation)):
-                        $query->whereDoesntHave('invoice_numbers');
-                        $queryC->whereDoesntHave('invoice_numbers');
-                    break;
 
+            if (in_array(9, explode(',', $bookingInformation))) {
+                $query->whereHas('invoice_numbers');
+                $queryC->whereHas('invoice_numbers');
+            }
+
+            if (in_array(10, explode(',', $bookingInformation))) {
+                $query->whereDoesntHave('invoice_numbers');
+                $queryC->whereDoesntHave('invoice_numbers');
+            }
+
+            if (in_array(3, explode(',', $bookingInformation))) {
+                $query->whereHas('contactBooking', function ($q){
+                    $q->where("status", '1');
+                });
+                $queryC->whereHas('contactBooking', function ($q){
+                    $q->where("status", '1');
+                });
+            }
+
+            if (in_array(4, explode(',', $bookingInformation))) {
+                $query->whereHas('contactBooking', function ($q){
+                    $q->where("status", '0');
+                });
+                $queryC->whereHas('contactBooking', function ($q){
+                    $q->where("status", '0');
+                });
+            }
+
+            if (in_array(5, explode(',', $bookingInformation))) {
+                $query->whereHas('contactBooking', function ($q){
+                    $q->where("check_information->status", 'like', "%true%");
+                });
+                $queryC->whereHas('contactBooking', function ($q){
+                    $q->where("check_information->status", 'like', "%true%");
+                });
+            }
+
+            if (in_array(6, explode(',', $bookingInformation))) {
+                $query->whereHas('contactBooking', function ($q){
+                    $q->where("check_information->status", 'like', "%false%");
+                });
+                $queryC->whereHas('contactBooking', function ($q){
+                    $q->where("check_information->status", 'like', "%false%");
+                });
+            }
+
+            if (in_array(7, explode(',', $bookingInformation))) {
+                $query->whereNotNull('specialRefCode');
+                $queryC->whereNotNull('specialRefCode');
+            }
+
+            if (in_array(8, explode(',', $bookingInformation))) {
+                $query->whereNull('specialRefCode');
+                $queryC->whereNull('specialRefCode');
             }
         }
 
