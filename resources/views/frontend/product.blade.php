@@ -385,12 +385,12 @@ $attractionTranslationModel = new \App\AttractionTranslation();
 
                                                         <span style="color:#ffad0c;font-size:20px;font-weight:bold;white-space: nowrap;">
                                                             <i class="{{session()->get('currencyIcon')}}"></i>
-                                                            {{number_format($currencyModel->calculateCurrencyForVisitor($prices[$i]) - $currencyModel->calculateCurrencyForVisitor($prices[$i])*((int)$specialOfferForThisOption/100), 2, '.', '')}}
+                                                            {{number_format($currencyModel->calculateCurrencyForVisitor($options[$i]['price']) - $currencyModel->calculateCurrencyForVisitor($options[$i]['price'])*((int)$specialOfferForThisOption/100), 2, '.', '')}}
                                                         </span>
 
                                                         <span style="color:#8a8181;font-size:20px;font-weight:bold;white-space: nowrap;">
                                                             <i class="{{session()->get('currencyIcon')}}"></i>
-                                                            <span class="strikeout">{{$currencyModel->calculateCurrencyForVisitor($prices[$i])}}</span>
+                                                            <span class="strikeout">{{$currencyModel->calculateCurrencyForVisitor($options[$i]['price'])}}</span>
                                                         </span>
                                                     </p>
                                                     @else
@@ -398,7 +398,7 @@ $attractionTranslationModel = new \App\AttractionTranslation();
                                                       <p style="font-size:20px;font-weight:bold;color: #1a1818;">
                                                         <span style="color:#ffad0c;font-size:20px;font-weight:bold;white-space: nowrap;">
                                                             <i class="{{session()->get('currencyIcon')}}"></i>
-                                                            {{number_format($currencyModel->calculateCurrencyForVisitor($prices[$i]), 2, '.', '')}}
+                                                            {{number_format($currencyModel->calculateCurrencyForVisitor($options[$i]['price']), 2, '.', '')}}
                                                         </span>
                                                     </p>
 

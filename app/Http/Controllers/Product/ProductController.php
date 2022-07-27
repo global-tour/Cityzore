@@ -564,7 +564,7 @@ class ProductController extends Controller
         $options = $product->options()->where('isPublished', '=', 1)->get();
         $prices = [];
         $ignoredCategoriesArray = [];
-        foreach ($options as $o) {
+        foreach ($options as &$o) {
             $specials = SpecialOffers::where('productID', '=', $product->id)->where('optionID', $o->id)->first();
 
 
@@ -580,7 +580,17 @@ class ProductController extends Controller
             array_push($ignoredCategoriesArray, $ignoredCategories);
             $price = json_decode($pricing->adultPrice, true)[0];
             array_push($prices, $price);
+
+            if($specialOfferForThisOption = $this->commonFunctions->getOfferPercentageForSpecificOption($product, $o)){
+               $modifiedPrice = Currency::calculateCurrencyForVisitor($price) - Currency::calculateCurrencyForVisitor($price)*((int)$specialOfferForThisOption/100);
+            }else{
+               $modifiedPrice = Currency::calculateCurrencyForVisitor($price);
+            }
+            $o['modifiedPrice'] = (float)$modifiedPrice;
+            $o['price'] = $price;
         }
+        $options = $options->sortBy('modifiedPrice')->values();
+        //dd($options);
         $minPrices = min($prices);
         $image = ProductGallery::where('id', $product->coverPhoto)->first() ? ProductGallery::where('id', $product->coverPhoto)->first()->src : ProductGallery::findOrFail(53)->src;
         $productImages = $product->productGalleries()->get();
