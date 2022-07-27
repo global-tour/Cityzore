@@ -943,7 +943,7 @@ class BookingController extends Controller
     public function changeStatus(Request $request)
     {
         $status = $request->status;
-        $booking = Booking::findOrFail($request->id);
+        $booking = Booking::with(['bookingOption.pricingsRel'])->findOrFail($request->id);
         $options = Option::where('referenceCode', '=', $booking->optionRefCode)->get();
         $BKNCode = ($booking->isBokun == 1 || $booking->isViator == 1) ? $booking->bookingRefCode : explode('-', $booking->bookingRefCode)[2];
         $date = date('D, d-F-Y', strtotime(json_decode($booking->dateTime, true)[0]['dateTime']));
@@ -1063,8 +1063,13 @@ class BookingController extends Controller
             }
 
             $count = [];
+
             foreach ($bookingItems as $b) {
-                $totalTicketCount += $b['count'];
+
+                if (!in_array(strtolower($b['category']), json_decode($booking->bookingOption->pricingsRel->first()->ignoredCategories, 1))) {
+                    $totalTicketCount += $b['count'];
+                }
+
             }
             $ticket = null;
             if ($status == 3) {
