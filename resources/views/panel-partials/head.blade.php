@@ -913,7 +913,7 @@
 
             .table thead th {
                 font-weight: 500;
-                color: #B5B5C3 !important;
+                color: #202037 !important;
                 font-size: 0.8rem;
                 text-transform: uppercase;
                 letter-spacing: 0.1rem;

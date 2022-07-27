@@ -128,6 +128,8 @@ let table = $('#all-bookings-table').DataTable({
                     input = $(`<select class="custom-select select2 select2-hidden-accessible datatable-input" multiple name="selectInputs4[]" id="selectInputs4" data-col-index="${column.index()}">
                                 <option value="1">Import Have</option>
                                 <option value="2">Import Haven't</option>
+                                <option value="9">Invioce Have</option>
+                                <option value="10">Invioce Haven't</option>
                                 <option value="3">Mail Sent</option>
                                 <option value="4">Mail Not Sent</option>
                                 <option value="5">Mail Checked</option>
@@ -407,9 +409,17 @@ let table = $('#all-bookings-table').DataTable({
             render: function (data, type, full, meta) {
                 return `<div class="booking-information-container">
                         <p><strong>Import: </strong> <i class="fa ${data.contactCheck ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></p>
+                        <p><strong>Invoice: </strong> <i class="fa ${data.invoices ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"> ${data.invoices}</i></p>
                         <p><strong>Mail Sent: </strong> <i class="fa ${data.mailSended ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></p>
                         <p><strong>Mail Checked: </strong> <i class="fa ${data.mailCheck ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></p>
-                        <p style="display: flex; flex-direction: column; gap: 5px"><strong>Spec Ref Code: <i class="fa ${data.specialRefCode.status ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></strong> <span class="special-ref-code" style="background: ${data.specialRefCode.status ? '#3c763d' : 'transparent'};">${data.specialRefCode.code}</span></p>
+                        <p style="display: flex; flex-direction: column; gap: 5px">
+                            <strong>Spec Ref Code:
+                                <i class="fa ${data.specialRefCode.status ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i>
+                            </strong>
+                            <span class="special-ref-code" style="background: ${data.specialRefCode.status ? '#3c763d' : 'transparent'};">
+                                ${data.specialRefCode.code}
+                            </span>
+                        </p>
                     </div>`;
             }
         },
