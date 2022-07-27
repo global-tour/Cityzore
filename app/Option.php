@@ -20,6 +20,11 @@ class Option extends Model
         return $this->belongsToMany(Pricing::class, 'option_pricing');
     }
 
+    public function pricingsRel()
+    {
+        return $this->belongsToMany(Pricing::class, 'option_pricing');
+    }
+
     public function supplier()
     {
         return $this->belongsToMany(Supplier::class, 'option_supplier');
