@@ -95,6 +95,11 @@ class Booking extends Model
         return $this->hasOne(Platform::class, 'id', 'platformID');
     }
 
+    public function mails()
+    {
+        return $this->hasMany(Mails::class, 'bookingID', 'id');
+    }
+
     public function getCancelPolicyStatusAttribute()
     {
         if ($this->bookingOption->cancelPolicyTime) {
