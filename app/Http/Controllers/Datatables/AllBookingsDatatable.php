@@ -217,6 +217,16 @@ class AllBookingsDatatable
                 $query->whereNull('specialRefCode');
                 $queryC->whereNull('specialRefCode');
             }
+
+            if (in_array(9, explode(',', $bookingInformation))) {
+                $query->whereHas('invoice_numbers');
+                $queryC->whereHas('invoice_numbers');
+            }
+
+            if (in_array(10, explode(',', $bookingInformation))) {
+                $query->whereDoesntHave('invoice_numbers');
+                $queryC->whereDoesntHave('invoice_numbers');
+            }
         }
 
         if ($status) {
