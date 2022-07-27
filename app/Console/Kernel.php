@@ -53,8 +53,8 @@ class Kernel extends ConsoleKernel
         ->daily();
         $schedule->command('check:solds')
             ->daily();
-//        $schedule->command('reminder:emails')
-//        ->dailyAt('22:00');
+        $schedule->command('reminder:emails')
+        ->dailyAt('22:00');
 //        //$schedule->command('place:barcodes')->twiceDaily(0, 12);
 //        $schedule->command('booking-counter:reminder-emails')
 //        ->dailyAt('09:00');

@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use App\Option;
 use App\Http\Controllers\Helpers\MailOperations;
 use App\Http\Controllers\Helpers\CryptRelated;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 class CustomerReminderEmails extends Command
@@ -44,66 +46,61 @@ class CustomerReminderEmails extends Command
      */
     public function handle()
     {
+        try {
+            Booking::with(['mails', 'bookingOption'])
+                ->withCount(['mails' => function ($q) {
+                    $q->where('blade', 'mail.booking-reminder');
+                }])
+                ->where('status', 0)
+                ->where(DB::raw('DATE_FORMAT(dateForSort, "%Y-%m-%d")'), now()->addDay()->format('Y-m-d'))
+                ->get()
+                ->each(function ($item) {
+                    $option = $item->bookingOption->first();
+                    $traveler = json_decode($item->travelers, 1)[0];
+                    $meetingDateTime = $item->bookingDateTime['org'];
 
-        $now = Carbon::now();
-        $allBookings = Booking::where("status", 0)->get();
+                    if (!is_null($option->first()->customer_mail_templates) &&
+                        !empty(json_decode($option->customer_mail_templates, true)["en"])) {
 
-        foreach ($allBookings as $booking) {
-            $bookingDate = Carbon::make($booking->dateForSort);
-            if ($bookingDate->diff($now)->days == 1 && ($now->timestamp < $bookingDate->timestamp)) {
+                        if (!$item->mails_count) {
+                            $mailTemplate = json_decode($option->customer_mail_templates, true)["en"];
+                            $mailTemplate = str_replace("#NAME SURNAME#", $traveler["firstName"] . " " . $traveler['lastName'], $mailTemplate);
+                            $mailTemplate = str_replace("#SENDER#", "Paris Business & Travel", $mailTemplate);
+                            $mailTemplate = str_replace("#DATE#", $meetingDateTime, $mailTemplate);
+                            $mailTemplate = nl2br($mailTemplate);
+
+                            $mails = new Mails();
+                            $mails->bookingID = $item->id;
+                            $mails->to = $traveler['email'];
+                            $mails->status = 0;
+                            $mails->blade = 'mail.booking-reminder';
 
 
-                if (Mails::where("bookingID", $booking->id)->count() == 0) {
-                    $option = Option::where('referenceCode', '=', $booking->optionRefCode)->first();
+                            $data[] = [
+                                'dateForSort' => $item->dateForSort,
+                                'options' => $option->title,
+                                'date' => $item->date,
+                                'hour' => $item->bookingDateTime['time'],
+                                'subject' => 'Upcoming Booking Announcements',
+                                'name' => $traveler['firstName'],
+                                'surname' => $traveler['lastName'],
+                                'sendToCC' => false,
+                                'template' => $mailTemplate,
+                                'booking_id' => $item->id
+                            ];
 
-                    if (!is_null($option->customer_mail_templates) && !empty(json_decode($option->customer_mail_templates, true)["en"])) {
-                        $traveler = json_decode($booking->travelers, true)[0];
+                            $mails->data = json_encode($data);
 
-                        if (strpos($booking->dateTime, "dateTime") === false) {
-                            $meetingDateTime = Carbon::parse($booking->dateTime)->format("d/m/Y H:i:s");
-                        } else {
-                            $meetingDateTime = $booking->date . " " . json_decode($booking->hour, true)[0]["hour"];
+                            $mails->save();
+
                         }
-
-                        $mailTemplate = json_decode($option->customer_mail_templates, true)["en"];
-                        $mailTemplate = str_replace("#NAME SURNAME#", $traveler["firstName"] . " " . $traveler['lastName'], $mailTemplate);
-                        $mailTemplate = str_replace("#SENDER#", "Paris Business & Travel", $mailTemplate);
-                        $mailTemplate = str_replace("#DATE#", $meetingDateTime, $mailTemplate);
-                        $mailTemplate = nl2br($mailTemplate);
-
-                        $mail = new Mails();
-                        $mail->bookingID = $booking->id;
-
-                        $data = [];
-                        $data[] = [
-                            'dateForSort' => $booking->dateForSort,
-                            'options' => $option->title,
-                            'date' => $booking->date,
-                            'hour' => !empty(json_decode($booking->hour, true)[0]['hour']) ? json_decode($booking->hour, true)[0]['hour'] : null,
-                            'subject' => 'Upcoming Booking Announcements',
-                            'name' => $traveler['firstName'],
-                            'surname' => $traveler['lastName'],
-                            'sendToCC' => false,
-                            'template' => $mailTemplate,
-                            'booking_id' => $booking->id
-                        ];
-                        $mail->data = json_encode($data);
-                        $mail->to = $traveler['email'];
-                        $mail->status = 0;
-                        $mail->blade = 'mail.booking-reminder';
-
-
-                        $mail->save();
-
                     }
+                });
 
+        } catch (\Exception $exception) {
 
-                } // end of if statement
-
-            }
+            Log::error('Reminder Mail Error: '. $exception->getMessage());
 
         }
-
-
     }
 }
