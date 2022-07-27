@@ -303,7 +303,7 @@ class Booking extends Model
         $row['contactCheck'] = $this->extra_files->count() > 0;
         $row['specialRefCode']['status'] = !is_null($this->attributes['specialRefCode']);
         $row['specialRefCode']['code'] = $this->attributes['specialRefCode'] ?? '';
-        $row['invoices'] = $this->invoice_numbers->count();
+        $row['invoices'] = $this->invoice_numbers->count() > 0;
         $row['updated_at'] = Carbon::make($this->updated_at)->format('Y-m-d H:i:s') ?? '';
 
         return $row;
