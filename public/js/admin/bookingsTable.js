@@ -409,7 +409,7 @@ let table = $('#all-bookings-table').DataTable({
             render: function (data, type, full, meta) {
                 return `<div class="booking-information-container">
                         <p><strong>Import: </strong> <i class="fa ${data.contactCheck ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></p>
-                        <p><strong>Invoice: </strong> <i class="fa ${data.invoices ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"> ${data.invoices}</i></p>
+                        <p><strong>Invoice: </strong> <i class="fa ${data.invoices ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></p>
                         <p><strong>Mail Sent: </strong> <i class="fa ${data.mailSended ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></p>
                         <p><strong>Mail Checked: </strong> <i class="fa ${data.mailCheck ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}" style="font-size:14px"></i></p>
                         <p style="display: flex; flex-direction: column; gap: 5px">
