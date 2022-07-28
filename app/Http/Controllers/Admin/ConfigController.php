@@ -85,7 +85,7 @@ class ConfigController extends Controller
          }
          Storage::disk('public')->put('page_cache.json', json_encode($pages));
          return redirect()->back()->with('message', 'Changes has Been Stored Successfully');
-        
+
        }
 
     /**
@@ -102,6 +102,9 @@ class ConfigController extends Controller
             $config->couponDiscountType = $request->couponDiscountType;
             $config->couponDiscountAmount = $request->couponDiscountAmount;
             $config->meeting_distance = $request->meeting_distance;
+            $config->hide_options_for_sold_avs = ($request->hide_options_for_sold_avs == "on") ? 1 : 0;
+
+
         }
         $config->save();
         return redirect('/');
@@ -165,7 +168,7 @@ class ConfigController extends Controller
         }else{
          $page = Page::findOrFail($id);
         }
-        
+
         return view('panel.config.changemetatags', ['page' => $page, 'platform' => $platform]);
     }
 
@@ -186,7 +189,7 @@ class ConfigController extends Controller
         }else{
          $page = Page::findOrFail($id);
         }
-        
+
 
 
 
@@ -371,18 +374,18 @@ class ConfigController extends Controller
                 $model->setConnection('mysql3');
             }
             elseif ($platform == 'ctp') {
-            
+
                 $model->setConnection('mysql4');
             }
             $isTranslated = $model->where('attractionID', $id)->where('languageID', $languageID)->where(function($query) {
                 $query->where('name', '!=', null)
                     ->where('description', '!=', null)
                     ->where('slug', '!=', null);
-                   
+
             })->first();
 
 
-           
+
         }
 
         if ($type == 'route') {
@@ -848,8 +851,8 @@ class ConfigController extends Controller
             $attractionTranslationModel->setConnection('mysql4');
             $attractionModel->setConnection('mysql4');
         }
-       
-        
+
+
         $attractionTranslation = $attractionTranslationModel->where('attractionID', $attractionID)->where('languageID', $languageID)->first();
         $languageToTranslate = Language::findOrFail($languageID);
         $attraction = $attractionModel->findOrFail($attractionID);
@@ -979,7 +982,7 @@ class ConfigController extends Controller
         elseif ($type == 'ctp') {
             $attractionTranslation->setConnection('mysql4');
         }
-       
+
 
             $attractionTranslation->attractionID = $attractionID;
             $attractionTranslation->languageID = $languageID;
@@ -1438,8 +1441,8 @@ class ConfigController extends Controller
     {
         $platform = $request->platform;
         $languageToTranslate = Language::findOrFail($languageID);
-       
-        
+
+
 
         $pageMetaTransModel = new PageMetaTagsTrans();
         $pageModel = new Page();
@@ -1482,8 +1485,8 @@ class ConfigController extends Controller
      */
     public function savePageMetaTagsTranslation(Request $request, $pageID, $languageID)
     {
-        $platform = $request->type; 
-        
+        $platform = $request->type;
+
 
 
        $pageMetaTagsTransModel = new PageMetaTagsTrans();
@@ -1501,7 +1504,7 @@ class ConfigController extends Controller
             $pageMetaTagsTransModel->setConnection('mysql4');
             //$pageModel->setConnection('mysql4');
         }
-       
+
         $page = $pageModel::findOrFail($pageID);
         $pageMetaTagsTrans = $pageMetaTagsTransModel->where('pageID', $pageID)->where('languageID', $languageID)->first();
 
@@ -1512,17 +1515,17 @@ class ConfigController extends Controller
 
              if ($platform == 'pct') {
             $pageMetaTagsTrans->setConnection('mysql2');
-            
+
         }
         elseif ($platform == 'pctcom') {
             $pageMetaTagsTrans->setConnection('mysql3');
-           
+
         }
         elseif ($platform == 'ctp') {
             $pageMetaTagsTrans->setConnection('mysql4');
-           
+
         }
-         
+
 
 
             $pageMetaTagsTrans->pageID = $pageID;
@@ -1824,12 +1827,12 @@ class ConfigController extends Controller
         $blogTranslation->title = $request->title;
         $blogTranslation->postContent = $request->postContent;
 
-       
+
 
          $categorTranslation = CategoryTranslation::where("categoryID",$categoryID)->where("languageID", $languageID)->first();
 
-        
-       
+
+
 
 
         $blogTranslation->category = $slugify->slugify($categorTranslation->categoryName);

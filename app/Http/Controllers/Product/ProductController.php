@@ -44,6 +44,7 @@ use App\Av;
 use App\Booking;
 use DB;
 use App\OptionTranslation;
+use App\Helpers\Frontend\Option\CheckAllAvailabilities;
 
 class ProductController extends Controller
 {
@@ -564,7 +565,14 @@ class ProductController extends Controller
         $options = $product->options()->where('isPublished', '=', 1)->get();
         $prices = [];
         $ignoredCategoriesArray = [];
-        foreach ($options as &$o) {
+        $checkAvailability = new CheckAllAvailabilities();
+        $ccfg = Config::where('userID', -1)->first();
+        $noPossibleDayCounter = 0;
+        foreach ($options as $key => &$o) {
+            if((!empty($ccfg->hide_options_for_sold_avs) && $ccfg->hide_options_for_sold_avs == 1) && $checkAvailability->load($o)->check() === false){
+                $o['NoPossibleDay'] = true;
+                $noPossibleDayCounter++;
+            }
             $specials = SpecialOffers::where('productID', '=', $product->id)->where('optionID', $o->id)->first();
 
 
@@ -590,7 +598,7 @@ class ProductController extends Controller
             $o['price'] = $price;
         }
         $options = $options->sortBy('modifiedPrice')->values();
-        //dd($options);
+        //dump($options);
         $minPrices = min($prices);
         $image = ProductGallery::where('id', $product->coverPhoto)->first() ? ProductGallery::where('id', $product->coverPhoto)->first()->src : ProductGallery::findOrFail(53)->src;
         $productImages = $product->productGalleries()->get();
@@ -709,7 +717,8 @@ class ProductController extends Controller
             'translationArray' => $translationArray,
             'ignoredCategories' => $ignoredCategoriesArray,
             'productAttraction' => $productAttraction,
-            'optionsTranslation' => $optionsTranslation
+            'optionsTranslation' => $optionsTranslation,
+            'noPossibleDayCounter' => $noPossibleDayCounter
         ]);
 
     }
