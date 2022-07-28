@@ -82,7 +82,6 @@ class CartController extends Controller
     public function addToCart(Request $request)
     {
 
-
         $option = Option::findOrFail($request->productOption);
         $supplierID = $option->supplierID;
         $productID = $request->productID;
@@ -149,7 +148,38 @@ class CartController extends Controller
             array_push($ticketTypes, $av->ticketType()->first());
         }
         $image = ProductGallery::where('id', '=', $product->coverPhoto)->first()->src;
-        $ticketCount = $request->adultCount + $request->youthCount + $request->childCount + $request->infantCount + $request->euCitizenCount;
+        $cats = [];
+
+        if ($request->adultCount) {
+            $cats['adult'] = $request->adultCount;
+        }
+
+        if ($request->youthCount) {
+            $cats['youth'] = $request->youthCount;
+        }
+
+        if ($request->infantCount) {
+            $cats['infant'] = $request->infantCount;
+        }
+
+        if ($request->childCount) {
+            $cats['child'] = $request->childCount;
+        }
+
+        if ($request->euCitizenCount) {
+            $cats['euCitizen'] = $request->euCitizenCount;
+        }
+
+        $ticketCount = 0;
+        foreach ($cats as $key => $cat) {
+            if (!is_null(json_decode($option->pricingsRel->first()->ignoredCategories, 1))) {
+                if (!in_array($key, json_decode($option->pricingsRel->first()->ignoredCategories, 1))) {
+                    $ticketCount += $cat;
+                }
+            }else{
+                $ticketCount += $cat;
+            }
+        }
 
         $totalPriceWOSO = $request->totalPriceWOSO;
         $totalPrice = $request->totalPrice;
@@ -327,7 +357,7 @@ class CartController extends Controller
             $oldCart->currencyID = !is_null(session()->get('currencyCode')) ? session()->get('currencyCode') : 2;
             if (session()->has('affiliate_user_id')) {
 
-                    $oldCart->affiliate_id = session()->get('affiliate_user_id');
+                $oldCart->affiliate_id = session()->get('affiliate_user_id');
 
 
                 // reserve update if cart has tootbus (start)
@@ -398,7 +428,7 @@ class CartController extends Controller
 
             if (session()->has('affiliate_user_id')) {
 
-                    $cart->affiliate_id = session()->get('affiliate_user_id');
+                $cart->affiliate_id = session()->get('affiliate_user_id');
 
             }
 
@@ -410,8 +440,17 @@ class CartController extends Controller
                     array_push($hour, $hourArray);
                 }
             }
+
             $cart->hour = json_encode($hour);
-            $cart->ticketCount = $request->adultCount + $request->youthCount + $request->childCount + $request->infantCount + $request->euCitizenCount;
+            foreach ($cats as $key => $cat) {
+                if (!is_null(json_decode($option->pricingsRel->first()->ignoredCategories, 1))) {
+                    if (!in_array($key, json_decode($option->pricingsRel->first()->ignoredCategories, 1))) {
+                        $cart->ticketCount += $cat;
+                    }
+                }else{
+                    $cart->ticketCount += $cat;
+                }
+            }
 
             if ($request->adultCount) {
                 $adult = ['category' => 'ADULT', 'count' => $request->adultCount];
@@ -465,13 +504,13 @@ class CartController extends Controller
             $cart->bookingItems = json_encode($bookingItems);
 
             $ticketCountDecrement = $this->ticketCountDecrement($request);
-            if($ticketCountDecrement === false){
+            if ($ticketCountDecrement === false) {
                 return response()->json(['status' => 0, 'message' => 'Insufficient Number of Tickets']);
             }
             if ($cart->save()) {
                 foreach ($ticketTypes as $ticketType) {
                     if (!is_null($ticketType)) {
-                        if($ticketType->id == 30) {
+                        if ($ticketType->id == 30) {
                             Barcode::where('isUsed', 0)->where('isReserved', 0)
                                 ->where('isExpired', 0)->where('ownerID', $supplierID)
                                 ->where('ticketType', 30)->take($request->adultCount)
@@ -491,7 +530,6 @@ class CartController extends Controller
                 }
             }
         }
-
 
 
         $cartItems = Cart::where('userID', '=', $userID)->where('status', '=', 0)->get();
@@ -633,7 +671,7 @@ class CartController extends Controller
                 $ticketDailyDatabase = json_decode($av->daily, true);
                 $ticketDateRangeDatabase = json_decode($av->dateRange, true);
                 $ticketBarcodeDatabase = json_decode($av->barcode, true);
-                if ($av->avTicketType == 1 && count($ticketHourlyDatabase) > 0) {
+                if (count($ticketHourlyDatabase) > 0) {
                     foreach ($ticketRequest as $tic) {
                         $res = $jsonq->json($av->hourly);
                         $result = $res->where('day', '=', $tic['day'])->where('hour', '=', $tic['hour'])->get();
@@ -641,7 +679,7 @@ class CartController extends Controller
                             $key = key($result);
                             $ticketHourlyDatabase[$key]['ticket'] = $ticketHourlyDatabase[$key]['ticket'] - $temporaryTicketCount;
                             $ticketState = $ticketHourlyDatabase[$key]['ticket'];
-                            if($ticketState < 0) return false;
+                            if ($ticketState < 0) return false;
                             $av->hourly = json_encode($ticketHourlyDatabase);
                             $av->save();
                             $isDateTimeValid = $this->timeRelatedFunctions->isDateTimeValid($tic['day'], $tic['hour'], 'Europe/Paris');
@@ -660,14 +698,14 @@ class CartController extends Controller
                     }
                 }
 
-                if ($av->avTicketType == 2 && count($ticketDailyDatabase) > 0) {
+                if (count($ticketDailyDatabase) > 0) {
                     $res = $jsonq->json($av->daily);
                     $result = $res->where('day', '=', $ticketRequest[0]['day'])->get();
                     if (count($result) == 1) {
                         $key = key($result);
                         $ticketDailyDatabase[$key]['ticket'] -= $temporaryTicketCount;
                         $ticketState = $ticketDailyDatabase[$key]['ticket'];
-                        if($ticketState < 0) return false;
+                        if ($ticketState < 0) return false;
                         $av->daily = json_encode($ticketDailyDatabase);
                         $av->save();
                         $isDateTimeValid = $this->timeRelatedFunctions->isDateTimeValid($ticketRequest[0]['day'], '00:00', 'Europe/Paris');
@@ -685,7 +723,7 @@ class CartController extends Controller
                     $res->reset();
                 }
 
-                if ($av->avTicketType == 3 && count($ticketDateRangeDatabase) > 0) {
+                if (count($ticketDateRangeDatabase) > 0) {
                     $selectedDate = $ticketRequest[0]['day'];
                     $res = $jsonq->json($av->dateRange);
                     $result = $res->where('dayFrom', 'dateLte', $selectedDate)->where('dayTo', 'dateGte', $selectedDate)->get();
@@ -693,7 +731,7 @@ class CartController extends Controller
                         $key = key($result);
                         $ticketDateRangeDatabase[$key]['ticket'] -= $temporaryTicketCount;
                         $ticketState = $ticketDateRangeDatabase[$key]['ticket'];
-                        if($ticketState < 0) return false;
+                        if ($ticketState < 0) return false;
                         $av->dateRange = json_encode($ticketDateRangeDatabase);
                         $av->save();
                         $isDateTimeValid = $this->timeRelatedFunctions->isDateTimeValid($ticketRequest[0]['day'], '00:00', 'Europe/Paris');
@@ -718,7 +756,7 @@ class CartController extends Controller
                     $res->reset();
                 }
 
-                if ($av->avTicketType == 4 && count($ticketBarcodeDatabase) > 0) {
+                if (count($ticketBarcodeDatabase) > 0) {
                     $selectedDate = $request->obj[0]['day'];
                     $res = $jsonq->json($av->barcode);
                     $res->where('dayFrom', 'dateLte', $selectedDate)->where('dayTo', 'dateGte', $selectedDate)->get();
@@ -727,7 +765,7 @@ class CartController extends Controller
                     if (array_key_exists($key, $resDecoded)) {
                         $key = array_keys(json_decode($res->toJson(), true))[0];
                         $ticketBarcodeDatabase[$key]['ticket'] -= $temporaryTicketCount;
-                       // if($ticketBarcodeDatabase[$key]['ticket'] < 0) return false;
+                        // if($ticketBarcodeDatabase[$key]['ticket'] < 0) return false;
                         $av->barcode = json_encode($ticketBarcodeDatabase);
                         $av->save();
                         if ($ticketBarcodeDatabase[$key]['ticket'] <= 5) {
