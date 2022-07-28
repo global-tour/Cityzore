@@ -208,19 +208,13 @@ let table = $('#all-bookings-table').DataTable({
                 $(input).appendTo($('<th>').appendTo(rowFilter));
             }
 
-            var start = moment().subtract(29, 'days');
-            var end = moment();
-
             $('.dateranger').daterangepicker({
-                startDate: start,
-                endDate: end,
                 autoApply: true,
                 autoUpdateInput: false,
                 ranges: {
-                    'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'Today': [moment(), moment()],
+                    'Tomorrow' : [moment().add(1, 'day'), moment().add(1, 'day')],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 }
