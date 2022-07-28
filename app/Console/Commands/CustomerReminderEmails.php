@@ -47,6 +47,7 @@ class CustomerReminderEmails extends Command
     public function handle()
     {
         try {
+
             Booking::with(['mails', 'bookingOption'])
                 ->withCount(['mails' => function ($q) {
                     $q->where('blade', 'mail.booking-reminder');
@@ -55,15 +56,15 @@ class CustomerReminderEmails extends Command
                 ->where(DB::raw('DATE_FORMAT(dateForSort, "%Y-%m-%d")'), now()->addDay()->format('Y-m-d'))
                 ->get()
                 ->each(function ($item) {
-                    $option = $item->bookingOption->first();
                     $traveler = json_decode($item->travelers, 1)[0];
                     $meetingDateTime = $item->bookingDateTime['org'];
 
-                    if (!is_null($option->first()->customer_mail_templates) &&
-                        !empty(json_decode($option->customer_mail_templates, true)["en"])) {
+                    if (!is_null($item->bookingOption->customer_mail_templates) &&
+                        !empty(json_decode($item->bookingOption->customer_mail_templates, true)["en"])) {
 
                         if (!$item->mails_count) {
-                            $mailTemplate = json_decode($option->customer_mail_templates, true)["en"];
+
+                            $mailTemplate = json_decode($item->bookingOption->customer_mail_templates, true)["en"];
                             $mailTemplate = str_replace("#NAME SURNAME#", $traveler["firstName"] . " " . $traveler['lastName'], $mailTemplate);
                             $mailTemplate = str_replace("#SENDER#", "Paris Business & Travel", $mailTemplate);
                             $mailTemplate = str_replace("#DATE#", $meetingDateTime, $mailTemplate);
@@ -78,7 +79,7 @@ class CustomerReminderEmails extends Command
 
                             $data[] = [
                                 'dateForSort' => $item->dateForSort,
-                                'options' => $option->title,
+                                'options' => $item->bookingOption->title,
                                 'date' => $item->date,
                                 'hour' => $item->bookingDateTime['time'],
                                 'subject' => 'Upcoming Booking Announcements',
@@ -94,7 +95,9 @@ class CustomerReminderEmails extends Command
                             $mails->save();
 
                         }
+
                     }
+
                 });
 
         } catch (\Exception $exception) {
