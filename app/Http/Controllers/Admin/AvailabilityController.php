@@ -217,27 +217,14 @@ class AvailabilityController extends Controller
 
         // To get ongoing tickets
         $optionsUsingThisAv = $availability->options()->pluck('id')->toArray();
-        $carts = Cart::whereIn('optionID', $optionsUsingThisAv)->whereIn('status', [0, 6])->get();
-        $ignoredCount = 0;
-        foreach ($optionsUsingThisAv as $optionID) {
-            $option = Option::findOrFail($optionID);
-            $pricing = $option->pricings()->first();
-            if ($pricing) {
-                $ignoredCategories = json_decode($pricing->ignoredCategories, true);
-                if (!is_null($ignoredCategories)) {
-                    foreach ($carts as $cart) {
-                        $bookingItems = json_decode($cart->bookingItems,true);
-                        foreach ($bookingItems as $bookingItem) {
-                            if (in_array('euCitizen', $ignoredCategories) && $bookingItem['category'] == 'EU_CITIZEN') {
-                                $ignoredCount += $bookingItem['count'];
-                            } elseif (in_array(strtolower($bookingItem['category']), $ignoredCategories)) {
-                                $ignoredCount += $bookingItem['count'];
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        $carts = Cart::whereIn('optionID', $optionsUsingThisAv)
+            ->whereIn('status', [0, 6])
+            ->where(function ($q) use ($request){
+                $q->where('date', 'like', '%' . $request->formattedDate . '%')
+                    ->orWhere('dateTime', 'like', '%' . Carbon::createFromFormat('d/m/Y', $request->formattedDate)->format('Y-m-d') . '%');
+            })
+            ->get();
+
         // For Starting Time
         if ($availabilityType == 'Starting Time') {
             $hourlyDecoded = json_decode($availability->hourly, true);
@@ -247,8 +234,11 @@ class AvailabilityController extends Controller
                 $result = $res->where('day', '=', $date)->get();
                 if ($res->count() > 0) {
                     $keys = array_keys($result);
+
                     foreach ($keys as $key) {
+
                         $ticketCount = $result[$key]['ticket'];
+
                         if ($availability->isLimitless == 1) {
                             $ticketCount = 0;
                         }
@@ -295,7 +285,7 @@ class AvailabilityController extends Controller
                                 $dateCartBKN = explode('-', explode('T', $decodedDT->dateTime)[0])[2].'/'.explode('-',explode('T', $decodedDT->dateTime)[0])[1].'/'.explode('-',explode('T', $decodedDT->dateTime)[0])[0];
                                 $hourCartBKN = explode(':', explode('T', $decodedDT->dateTime)[1])[0].':'.explode(':',explode('T', $decodedDT->dateTime)[1])[1];
                                 if ($dateCartBKN == $date && $hourCartBKN == $hourFrom) {
-                                    $onGoingBKN += $c->ticketCount - $ignoredCount;
+                                    $onGoingBKN += $c->ticketCount ;
                                 }
                             } else {
                                 $hourCart = json_decode($c->hour,true);
@@ -304,7 +294,7 @@ class AvailabilityController extends Controller
                                     foreach($avs as $ind => $av) {
                                         if($av->id == $request->availabilityId) {
                                             if ($hourCart[$ind]['hour'] == $hourFrom && $c->date == $date) {
-                                                $onGoingCZ += $c->ticketCount - $ignoredCount;
+                                                $onGoingCZ += $c->ticketCount ;
                                             }
 
                                             break 2;
@@ -313,7 +303,7 @@ class AvailabilityController extends Controller
                                 }
                             }
                         }
-                        array_push($allDateTimes, ['hourFrom' => $hourFrom, 'ticket' => $ticketCount, 'isActive' => $isActive, 'onGoingCZ' => $onGoingCZ, 'onGoingGYG' => $onGoingGYG, 'onGoingBKN' => $onGoingBKN, 'sold' => $sold, 'availabilityId' => $availability->id, 'availabilityTimeIndex' => "Hourly." . $key, 'meetingGuides' => $meetingGuides]);
+                        array_push($allDateTimes, ['hourFrom' => $hourFrom, 'diffCatFromAdult' => 0, 'ticket' => $ticketCount, 'isActive' => $isActive, 'onGoingCZ' => $onGoingCZ, 'onGoingGYG' => $onGoingGYG, 'onGoingBKN' => $onGoingBKN, 'sold' => $sold, 'availabilityId' => $availability->id, 'availabilityTimeIndex' => "Hourly." . $key, 'meetingGuides' => $meetingGuides]);
                     }
                 }
                 $res->reset();
@@ -376,7 +366,7 @@ class AvailabilityController extends Controller
                             $hourCartGYG = explode(':',explode('T', $c->dateTime)[1])[0].':'.explode(':',explode('T', $c->dateTime)[1])[1];
                             // That if will be checked
                             if ($dateCartGYG == $date && $hourCartGYG == '00:00') {
-                                $onGoingGYG += $c->ticketCount - $ignoredCount;
+                                $onGoingGYG += $c->ticketCount;
                             }
                         } elseif ($c->status == 0 && $c->isBokun == 1 && !is_null($c->dateTime)) {
                             $decodedDT = json_decode($c->dateTime);
@@ -384,7 +374,7 @@ class AvailabilityController extends Controller
                             $hourCartBKN = explode(':',explode('T', $decodedDT->dateTime)[1])[0].':'.explode(':',explode('T', $decodedDT->dateTime)[1])[1];
                             // That if will be checked
                             if ($dateCartBKN == $date && $hourCartBKN == '00:00') {
-                                $onGoingBKN += $c->ticketCount - $ignoredCount;
+                                $onGoingBKN += $c->ticketCount;
                             }
                         } else {
                             $hourCart = json_decode($c->hour,true);
@@ -396,7 +386,7 @@ class AvailabilityController extends Controller
                                         $cHourFrom = $cHourExploded[0];
                                         $cHourTo = $cHourExploded[1];
                                         if ($c->date == $date && $hourFrom == $cHourFrom && $hourTo == $cHourTo) {
-                                            $onGoingCZ += $c->ticketCount - $ignoredCount;
+                                            $onGoingCZ += $c->ticketCount;
                                         }
 
                                         break 2;
@@ -405,12 +395,57 @@ class AvailabilityController extends Controller
                             }
                         }
                     }
-                    array_push($allDateTimes, ['hourFrom' => $hourFrom, 'hourTo' => $hourTo, 'ticket' => $ticketCount, 'isActive' => $isActive, 'onGoingCZ' => $onGoingCZ, 'onGoingGYG' => $onGoingGYG, 'onGoingBKN' => $onGoingBKN, 'sold' => $sold, 'availabilityId' => $availability->id, 'availabilityTimeIndex' => "Daily." . $key, 'meetingGuides' => $meetingGuides]);
+                    array_push($allDateTimes, ['hourFrom' => $hourFrom, 'diffCatFromAdult' => 0 , 'hourTo' => $hourTo, 'ticket' => $ticketCount, 'isActive' => $isActive, 'onGoingCZ' => $onGoingCZ, 'onGoingGYG' => $onGoingGYG, 'onGoingBKN' => $onGoingBKN, 'sold' => $sold, 'availabilityId' => $availability->id, 'availabilityTimeIndex' => "Daily." . $key, 'meetingGuides' => $meetingGuides]);
                 }
                 $res->reset();
             }
         }
 
+        $ms = Cart::whereIn('optionID', $optionsUsingThisAv)
+            ->whereIn('status', [2, 3])
+            ->where(function ($q) use ($request){
+                $q->where('date', 'like', '%' . $request->formattedDate . '%')
+                    ->orWhere('dateTime', 'like', '%' . Carbon::createFromFormat('d/m/Y', $request->formattedDate)->format('Y-m-d') . '%');
+            })
+            ->get();
+
+        foreach ($allDateTimes as $key => $dateTime) {
+
+            foreach ($ms as $item) {
+
+                if (!is_null($item->hour)) {
+
+                    if (count(json_decode($item->hour, 1)) > 1) {
+                        $arr = array_column(json_decode($item->hour, 1), 'hour');
+
+                        $minHour = min($arr);
+
+                        $minHour = explode('-', $minHour)[0];
+
+                    }else{
+
+                        $arr = json_decode($item->hour, 1)[0]['hour'];
+
+                        $minHour = explode('-' , $arr)[0];
+
+                    }
+
+                }else{
+
+                    $minHour = Carbon::make($item->dateTime)->format('H:i')[0];
+
+                }
+
+
+                if ($dateTime['hourFrom'] == $minHour) {
+                    foreach (json_decode($item['bookingItems'], 1) as $c) {
+                        if ($c['category'] != 'ADULT') {
+                            ++$allDateTimes[$key]['diffCatFromAdult'];
+                        }
+                    }
+                }
+            }
+        }
         // Sorting hours ascending
         usort($allDateTimes, function($a, $b) {return strtotime($a['hourFrom']) > strtotime($b['hourFrom']);});
 
