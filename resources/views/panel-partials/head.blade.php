@@ -1165,6 +1165,12 @@
             .offcanvas-body ul::-webkit-scrollbar {height: 5px;background-color: #614141;}
 
             .offcanvas-body ul::-webkit-scrollbar-track {-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);border-radius: 10px;background-color: #F5F5F5;}
+
+            #toast-container {
+                top: unset!important;
+                bottom: 5%!important;
+                right: 2%!important;
+            }
         </style>
     @elseif($page == 'bulkmail')
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
