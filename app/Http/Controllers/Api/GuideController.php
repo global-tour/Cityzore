@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Barcode;
 use App\GuideToken;
 use App\Booking;
 use App\Checkin;
@@ -414,7 +415,6 @@ class GuideController extends Controller
                 $selected = [];
                 $selected["status"] = false;
 
-
                 if (Meeting::where('date', $request->date)->where('time', $request->time)->where('option', $key)->exists()) {
 
                     $meeting = Meeting::where('date', $request->date)->where('time', $request->time)->where('option', $key)->first();
@@ -422,6 +422,8 @@ class GuideController extends Controller
 
 
                     foreach ($bookings as $key2 => $bb) {
+
+
 
                         foreach ($bb as $b) {
                             if ($v['id'] == $b) {
@@ -439,9 +441,19 @@ class GuideController extends Controller
                 $ignoredCategories = empty($ignoredCategories) ? [] : $ignoredCategories;
                 $ignoredCategories = is_array($ignoredCategories) ? $ignoredCategories : json_decode($ignoredCategories, true);
 
+                if ($v->isBokun || $v->isViator) {
+
+                    $cruiseTickets = Barcode::where('description', 'like', '%' . $v->bookingRefCode . '%')->where('ticketType', 4)->get()->pluck('code');
+
+                }else{
+
+                    $cruiseTickets = Barcode::where('description', 'like', '%' . $v->gygBookingReference . '%')->where('ticketType', 4)->get()->pluck('code');
+
+                }
+
                 $parsingData = explode('-', $v['bookingRefCode']);
                 $responseArray[trim($key)][] = [
-                    "meetingId" => $meeting->id,
+                    "meetingId" => $meeting ? $meeting->id : null,
                     "bookingId" => $v['id'],
                     "isBokun" => $v['isBokun'],
                     "isViator" => $v['isViator'],
@@ -457,7 +469,8 @@ class GuideController extends Controller
                     "currencyID" => $v['currencyID'],
                     "check" => $v->check()->orderBy('updated_at', 'asc')->get(),
                     "selected" => $selected,
-                    "meetingStartEndTimes" => $meeting->startEndTimes()->where("guide_id", $request->guide_id)->get()
+                    "cruiseTickets" => count($cruiseTickets) ? $cruiseTickets : null,
+                    "meetingStartEndTimes" => $meeting ?  $meeting->startEndTimes()->where("guide_id", $request->guide_id)->get() : []
                 ];
 
 
@@ -521,6 +534,17 @@ class GuideController extends Controller
             $ignoredCategories = is_array($ignoredCategories) ? $ignoredCategories : json_decode($ignoredCategories, true);
 
             foreach ($value as $v) {
+
+                if ($v->isBokun || $v->isViator) {
+
+                    $cruiseTickets = Barcode::where('description', 'like', '%' . $v->bookingRefCode . '%')->where('ticketType', 4)->get()->pluck('code');
+
+                }else{
+
+                    $cruiseTickets = Barcode::where('description', 'like', '%' . $v->gygBookingReference . '%')->where('ticketType', 4)->get()->pluck('code');
+
+                }
+
                 $parsingData = explode('-', $v['bookingRefCode']);
                 $responseArray[] = [
                     "bookingId" => $v['id'],
@@ -537,6 +561,7 @@ class GuideController extends Controller
                     "totalPrice" => $v['totalPrice'],
                     "currencyID" => $v['currencyID'],
                     "dateForSort" => $v['dateForSort'],
+                    "cruiseTickets" => count($cruiseTickets) ? $cruiseTickets : null,
                     "check" => $v->check()->orderBy('updated_at', 'asc')->get()
                     //"selected" => false
                 ];
@@ -592,6 +617,14 @@ class GuideController extends Controller
             $ignoredCategories = is_array($ignoredCategories) ? $ignoredCategories : json_decode($ignoredCategories, true);
 
             foreach ($value as $v) {
+
+
+                if ($v->isBokun || $v->isViator) {
+                    $cruiseTickets = Barcode::where('description', 'like', '%' . $v->bookingRefCode . '%')->where('ticketType', 4)->get()->pluck('code');
+                }else{
+                    $cruiseTickets = Barcode::where('description', 'like', '%' . $v->gygBookingReference . '%')->where('ticketType', 4)->get()->pluck('code');
+                }
+
                 $parsingData = explode('-', $v['bookingRefCode']);
                 $responseArray[] = [
                     "bookingId" => $v['id'],
@@ -608,6 +641,7 @@ class GuideController extends Controller
                     "totalPrice" => $v['totalPrice'],
                     "currencyID" => $v['currencyID'],
                     "dateForSort" => $v['dateForSort'],
+                    "cruiseTickets" => count($cruiseTickets) ? $cruiseTickets : null,
                     "check" => $v->check()->orderBy('updated_at', 'asc')->get()
                     //"selected" => false
                 ];
