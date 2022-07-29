@@ -23,9 +23,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use DateTime;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use App\Http\Controllers\Helpers\CryptRelated;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Facades\Image as Image;
+
 
 
 class PdfController extends Controller
@@ -142,6 +145,7 @@ class PdfController extends Controller
             foreach ($products as $product) {
                 if ($product->referenceCode == $productRefCode) {
                     $productImage = ProductGallery::where('id', '=', $product->coverPhoto)->pluck('src');
+                    $productImage = $this->reducedImage($productImage);
                     if($product->id === 128){
                         $product->title = count(explode("with", $product->title)) ? explode("with", $product->title)[0] : $product->title;
                         $options->title = count(explode("with", $options->title)) ? explode("with", $options->title)[0] : $options->title;
@@ -212,8 +216,7 @@ class PdfController extends Controller
                 'rCode' => $rCode,
                 'pompidou' => $pompidou,
                 'museedelarmePricing' => $museedelarmePricing,
-
-                'productImage' => ['eiffel-tower-5ab.jpg'],
+                'productImage' => asset('reducedimages/eiffel-tower-5ab.jpg'),
             ];
         }
         $pdf = PDF::loadView('pdfs.voucher', $data);
@@ -604,6 +607,18 @@ class PdfController extends Controller
             $return[] = $a;
         });
         return $return;
+    }
+
+    private function reducedImage($images){
+        if(!empty($images)){
+            $img = Image::make(Storage::disk('s3')->url('product-images/' . $images[0]));
+            $img->resize(350, 350);
+            $fileName = $images[0];
+            $img->save(public_path('reducedimages/'.$fileName));
+            $url = asset('reducedimages/'.$fileName);
+            return $url;
+        }
+        return asset('reducedimages/eiffel-tower-5ab.jpg');
     }
 
 
