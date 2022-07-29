@@ -402,7 +402,7 @@ class AvailabilityController extends Controller
         }
 
         $ms = Cart::whereIn('optionID', $optionsUsingThisAv)
-            ->whereIn('status', [2, 3])
+            ->where('status', 2)
             ->where(function ($q) use ($request){
                 $q->where('date', 'like', '%' . $request->formattedDate . '%')
                     ->orWhere('dateTime', 'like', '%' . Carbon::createFromFormat('d/m/Y', $request->formattedDate)->format('Y-m-d') . '%');
