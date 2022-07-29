@@ -611,6 +611,9 @@ class PdfController extends Controller
 
     private function reducedImage($images){
         if(!empty($images)){
+            if(file_exists(public_path('reducedimages/'.$images[0]))){
+               return asset('reducedimages/'.$images[0]);
+            }
             $img = Image::make(Storage::disk('s3')->url('product-images/' . $images[0]));
             $img->resize(350, 350);
             $fileName = $images[0];
