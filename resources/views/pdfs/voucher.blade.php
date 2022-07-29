@@ -222,9 +222,9 @@
                         <table style="width:100%">
                             <tr>
                                 <th height="25%" width="25%">
-                                    @foreach($productImage as $productImg)
-                                        <img src="{{Storage::disk('s3')->url('product-images/' . $productImg)}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
-                                    @endforeach
+
+                                        <img src="{{$productImage}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
+
                                 </th>
                                 <th width="75%" style="float: left; text-align: center;">
                                     @if($url == 'cityzore')
@@ -457,7 +457,7 @@
                             @if($ticketType == '3')
                                 <tr>
                                     <td>
-                                        <img src="{{public_path('img/big-bus-map.png')}}">
+                                        <img style="position:relative; width:100%; margin-top:60px; margin-bottom:240px;" src="{{public_path('img/big-bus-map.png')}}">
                                     </td>
                                 </tr>
                             @endif
@@ -478,9 +478,8 @@
                         <table style="width:100%">
                             <tr>
                                 <th height="25%" width="25%">
-                                    @foreach($productImage as $productImg)
-                                        <img src="{{Storage::disk('s3')->url('product-images/' . $productImg)}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
-                                    @endforeach
+                                        <img src="{{$productImage}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
+
                                 </th>
                                 <th width="75%" style="float: left; text-align: center;">
                                     @if($url == 'cityzore')
@@ -755,8 +754,8 @@
                             <table style="width:100%">
                                 <tr>
                                     <th height="25%" width="25%">
-                                        @foreach($productImage as $productImg)<img src="{{Storage::disk('s3')->url('product-images/' . $productImg)}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
-                                        @endforeach
+                                        <img src="{{$productImage}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
+
                                     </th>
                                     <th width="75%" style="float: left; text-align: center;">
                                         @if($url == 'cityzore')
@@ -898,9 +897,9 @@
                         <table style="width:100%">
                             <tr>
                                 <th height="25%" width="25%">
-                                    @foreach($productImage as $productImg)
-                                        <img src="{{Storage::disk('s3')->url('product-images/' . $productImg)}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
-                                    @endforeach
+
+                                        <img src="{{$productImage}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
+
                                 </th>
                                 <th width="75%" style="float: left; text-align: center;">
                                     <img src="{{ public_path('img/paris-city-tours-logo.png') }}" style="width: 200px; height:60px;padding-right: 30%; padding-left: 30%;"/>
@@ -1039,9 +1038,9 @@
                                 <table style="width:100%">
                                     <tr>
                                         <th height="25%" width="25%">
-                                            @foreach($productImage as $productImg)
-                                                <img src="{{Storage::disk('s3')->url('product-images/' . $productImg)}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
-                                            @endforeach
+
+                                                <img src="{{$productImage}}" style="border-radius:5px; width: 220px; height: 220px; position: absolute; margin-top:4%;"/>
+
                                         </th>
                                         <th width="75%" style="float: left; text-align: center;">
                                             @if($url == 'cityzore')
