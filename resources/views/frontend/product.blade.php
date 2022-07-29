@@ -271,6 +271,7 @@ $attractionTranslationModel = new \App\AttractionTranslation();
                     </ul>
                 </div>
                 <div class="col-lg-4 col-xs-12 hidden-xs hidden-sm">
+                    @if($options->count() !== $noPossibleDayCounter)
                     <div class="gradient-border" id="box" style="margin-top: 10%;margin-right: 20%;">
                         <div class="product-right-book">
                             <span style="font-size: 25px;">{{__('from')}}
@@ -307,6 +308,7 @@ $attractionTranslationModel = new \App\AttractionTranslation();
                             <button>Book Now</button>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div> <!--end of row-->
 
@@ -333,7 +335,9 @@ $attractionTranslationModel = new \App\AttractionTranslation();
                     <button class="fixed-book hidden-lg hidden-md hidden-sm" id="book-focus">{{__('bookNow')}}</button>
                 </div>
                 <div class="col-lg-8 hidden-xs" style="margin-top: 5%;padding-left: 0px;">
+                    @if($options->count() !== $noPossibleDayCounter)
                     @for($i=0; $i<count($options); $i++)
+                        @continue(isset($options[$i]->NoPossibleDay))
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" onclick="changeOptionCard({{$options[$i]->id}})" style="padding-left: 0px;">
                             <ul style="padding-left: 0px !important;">
                                 <li class="option optionMovable" id="movable{{$options[$i]->id}}" style="border-radius: 10px;">
@@ -416,6 +420,7 @@ $attractionTranslationModel = new \App\AttractionTranslation();
                             </ul>
                         </div>
                     @endfor
+                    @endif
                         <div class="col-lg-12 col-xs-12 tour_head1" style="padding-left: 0px">
                             <p class="productContentTitles">{{__('includes')}}</p>
                             <div id="incNotIncBlock">
@@ -463,6 +468,7 @@ $attractionTranslationModel = new \App\AttractionTranslation();
                         </div>
                 </div>
 <div class="col-lg-4" style="padding: 0px;">
+    @if($options->count() !== $noPossibleDayCounter)
         <div class="tour_r" id="datepickerProduct" style="float: right;">
             <div id="box_style_1" class="box_style_1" style="margin-top: 5%;">
                 <p id="alert-special-offer" class="text-success">
@@ -636,6 +642,7 @@ $attractionTranslationModel = new \App\AttractionTranslation();
                 </div>
             </div>
         </div>
+    @endif
 </div>
                 <!-- <div class="col-lg-6 tour_r">
                     <div class="box_style_1" style="margin-top: 5%; width: 65%;margin-left: 10%;">

@@ -48,6 +48,11 @@
                     <label class="col-md-3">Maximum Shifting Distance for Guide (meter)</label>
                     <input class="col s9 col-md-9" type="number" value="{{$config->meeting_distance}}" name="meeting_distance" id="meeting_distance">
                 </div>
+
+                    <div class="col-md-12" style="margin-top: 50px;">
+                        <label class="col-md-3">hide options for sold avs</label>
+                        <input class="col s1 col-md-1" type="checkbox" style="opacity: 1;" {{$config->hide_options_for_sold_avs ? 'checked' : ''}} name="hide_options_for_sold_avs">
+                    </div>
                 @endif
             </div>
             <div class="row">
