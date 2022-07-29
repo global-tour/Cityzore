@@ -117,6 +117,7 @@
                                             let availabilityId = data.allDateTimes[i].availabilityId;
                                             let availabilityTimeIndex = data.allDateTimes[i].availabilityTimeIndex;
                                             let meetingGuides = data.allDateTimes[i].meetingGuides;
+                                            let diffCatFromAdult = data.allDateTimes[i].diffCatFromAdult;
                                             if(meetingGuides == "")
                                                 meetingGuides = "-";
 
@@ -227,9 +228,9 @@
                                             block += '<td>' +
                                                 '<input type="text" id="bknOngoing" readonly="" value="'+onGoingBKN+'">\n' +
                                                 '</td>';
-                                            block += '<td>' +
-                                                '<button class="btn btn-primary modalTrigger" id="modalTrigger.' + availabilityId + '.' + availabilityTimeIndex + '" style="padding: 0 1.5rem!important;background: rgb(38, 166, 154);" data-toggle="modal" data-target="#bookingsModal">+</button>\n' +
-                                                '</td>';
+                                            block += `<td>
+                                                <button class="btn btn-primary modalTrigger" id="modalTrigger.${availabilityId}.${availabilityTimeIndex}" style="padding: 0 1.5rem!important;background: ${diffCatFromAdult ? 'rgb(173 117 233)' : 'rgb(38, 166, 154)'};" data-toggle="modal" data-target="#bookingsModal">+</button>
+                                            </td>`;
                                             block += '<td>' +
                                                 '<button class="btn btn-primary onGoingModalTrigger" style="padding: 0 1.5rem!important;background: rgb(38, 166, 154);" data-toggle="modal" data-target="#onGoingModal">+</button>\n' +
                                                 '</td>';
